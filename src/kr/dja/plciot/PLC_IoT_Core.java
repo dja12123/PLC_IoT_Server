@@ -24,7 +24,7 @@ public class PLC_IoT_Core implements IDependencyTask
 	public final WebServer webServer;
 	
 	private PLC_IoT_Core()
-	{//TEST
+	{//TESTa
 		this.console = new Console();
 		this.mainFrame = new MainFrame(this.console);
 		this.dbManager = new DatabaseConnector(this.console);
