@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-public class DeviceConnection implements Runnable
+public class DeviceConnection
 {
 	public final byte[] macAddr;
 	private final String ipAddr;
@@ -28,15 +28,16 @@ public class DeviceConnection implements Runnable
 	
 	public void dataSend(String name, Map<String, String> sendData, IDeviceConnectSuccess successCallback, IDeviceConnectFail failCallback)
 	{
-		this.connectOperation = true;
-		this.taskThread = new Thread(this);
-		this.taskThread.start();
+
 		
-		byte[] sendDataByte = new byte[PacketProcess.DATAPACKET_TOTAL_BUFFER];
-		
-		//DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
+
 		
 		failCallback.connectFail(this, name, sendData);
+	}
+	
+	public void dataResive(String name, Map<String, String> sendData)
+	{
+		
 	}
 	
 	public void dataCheckCallback(byte[] resiveCheckData)
@@ -44,20 +45,5 @@ public class DeviceConnection implements Runnable
 		
 	}
 
-	@Override
-	public void run()
-	{
-		try
-		{
-			Thread.sleep(PacketProcess.TIMEOUT);
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
-		
-	}
-	
 
-	
 }

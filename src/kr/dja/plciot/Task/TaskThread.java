@@ -38,36 +38,49 @@ class TaskThread extends Thread
 	{
 		while(this.threadSwitch)
 		{
-			// 시작 시간 측정
-			long taskStartTime = System.currentTimeMillis();
-			
-			Iterator<ITaskCallback> itr;
-			synchronized(this)
-			{
-				itr = this.taskList.iterator();
-				this.taskList.clear();// 작업 대기 리스트 지우기.
-			}
-			
-			while(itr.hasNext())
-			{// 작업 대기 리스트에 있는 작업 모두 실행.
-				itr.next().task();
-			}
-			
-			long taskTime = System.currentTimeMillis() - taskStartTime;
-			if(taskTime >= this.taskInterval)
-			{
-				// 작업 시간이 너무 오래 걸렸을때.
-				// taskTime을 최대치로 조정해서 쓰레드가 0ms만큼 대기하도록 한다.
-				taskTime = this.taskInterval;
-			}
+			Object[] taskArr;
 			
 			try
 			{// 설정한 시간만큼 대기.
-				Thread.sleep(this.taskInterval - taskTime);
+				Thread.sleep(this.taskInterval);
 			}
 			catch (InterruptedException e)
 			{
 				e.printStackTrace();
+			}
+			
+			if(this.taskList.size() == 0) continue;
+			
+			System.out.println("TASKSIZE: " + this.taskList.size());
+			synchronized(this)
+			{
+				taskArr = this.taskList.toArray();
+				this.taskList.clear();
+			}
+			
+			for(Object callback : taskArr)
+			{// 작업 대기 리스트에 있는 작업 모두 실행.
+				long taskStartTime = System.currentTimeMillis();
+				
+				((ITaskCallback)callback).task();
+				
+				long taskTime = System.currentTimeMillis() - taskStartTime;
+				try
+				{
+					if(taskTime >= this.taskInterval)
+					{
+						// 작업 시간이 너무 오래 걸렸을때.
+						// taskTime을 최대치로 조정해서 쓰레드가 0ms만큼 대기하도록 한다.
+						taskTime = this.taskInterval;
+					}
+					
+					Thread.sleep(this.taskInterval - taskTime);
+				}
+				catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
+				System.out.println(taskTime + " sleep: " + (this.taskInterval - taskTime));
 			}
 		}
 	}

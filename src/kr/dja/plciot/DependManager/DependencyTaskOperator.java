@@ -1,18 +1,30 @@
 package kr.dja.plciot.DependManager;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import kr.dja.plciot.Task.ITaskCallback;
+
 public class DependencyTaskOperator
 {
-	private int taskIndex;
-	
 	private final TaskOption option;
-	private final IDependencyTask[] callbackArr;
+	private List<IDependencyTask> taskList;
+	
+	public DependencyTaskOperator()
+	{
+		
+	}
 	
 	public DependencyTaskOperator(TaskOption option, IDependencyTask[] callbackArr)
 	{
 		this.option = option;
-		this.callbackArr = callbackArr;
+		this.taskList = Collections.synchronizedList(new ArrayList<IDependencyTask>());
 		
-		this.taskIndex = 0;
+		for(IDependencyTask task : callbackArr)
+		{
+			this.taskList.add(task);
+		}
 	}
 	
 	public void nextTask()
@@ -25,7 +37,7 @@ public class DependencyTaskOperator
 		{
 			e.printStackTrace();
 		}
-		System.out.println(taskIndex+"½ÇÇà:"+this.callbackArr[this.taskIndex].getClass());
+
 		new Thread(()->
 		{
 			try
