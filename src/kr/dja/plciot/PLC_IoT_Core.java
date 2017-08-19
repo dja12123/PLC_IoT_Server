@@ -51,7 +51,6 @@ public class PLC_IoT_Core implements IDependencyTask
 	public static void main(String[] args)
 	{
 		MainInstance = new PLC_IoT_Core();
-		
 	}
 
 	@Override

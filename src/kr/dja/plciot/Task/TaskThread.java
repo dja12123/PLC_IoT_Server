@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.SynchronousQueue;
 
 class TaskThread extends Thread
 {
-	private List<ITaskCallback> taskList;
+	private ConcurrentLinkedQueue<ITaskCallback> taskQueue;
 	private boolean threadSwitch;
 	private int taskInterval;
 	
@@ -18,14 +20,15 @@ class TaskThread extends Thread
 	
 	public TaskThread(int taskInterval)
 	{
-		this.taskList = Collections.synchronizedList(new ArrayList<ITaskCallback>());
+		this.taskQueue = new ConcurrentLinkedQueue<ITaskCallback>();
 		this.threadSwitch = true;
 		this.taskInterval = taskInterval;
 	}
 	
+	
 	public void addTask(ITaskCallback callback)
 	{// 작업 추가.
-		this.taskList.add(callback);
+		this.taskQueue.add(callback);
 	}
 	
 	public void threadOff()
@@ -36,33 +39,18 @@ class TaskThread extends Thread
 	@Override
 	public void run()
 	{
+		boolean sleepFlag;
 		while(this.threadSwitch)
 		{
-			Object[] taskArr;
+			sleepFlag = true;
+			System.out.println("TASKSIZE: " + this.taskQueue.size());
 			
-			try
-			{// 설정한 시간만큼 대기.
-				Thread.sleep(this.taskInterval);
-			}
-			catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
-			
-			if(this.taskList.size() == 0) continue;
-			
-			System.out.println("TASKSIZE: " + this.taskList.size());
-			synchronized(this)
-			{
-				taskArr = this.taskList.toArray();
-				this.taskList.clear();
-			}
-			
-			for(Object callback : taskArr)
+			while(!this.taskQueue.isEmpty())
 			{// 작업 대기 리스트에 있는 작업 모두 실행.
+				sleepFlag = false;
 				long taskStartTime = System.currentTimeMillis();
 				
-				((ITaskCallback)callback).task();
+				this.taskQueue.poll().task();
 				
 				long taskTime = System.currentTimeMillis() - taskStartTime;
 				try
@@ -81,6 +69,18 @@ class TaskThread extends Thread
 					e.printStackTrace();
 				}
 				System.out.println(taskTime + " sleep: " + (this.taskInterval - taskTime));
+			}
+			
+			if(sleepFlag)
+			{
+				try
+				{// 설정한 시간만큼 대기.
+					Thread.sleep(this.taskInterval);
+				}
+				catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
 	}
