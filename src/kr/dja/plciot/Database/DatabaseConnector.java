@@ -8,6 +8,7 @@ import java.sql.Statement;
 
 import kr.dja.plciot.Log.Console;
 import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
+import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
@@ -56,7 +57,7 @@ public class DatabaseConnector implements IMultiThreadTaskCallback
 	}
 
 	@Override
-	public void executeTask(TaskOption option, MultiThreadTaskOperator operator)
+	public void executeTask(TaskOption option, NextTask next)
 	{
 		if(option == TaskOption.START)
 		{
@@ -74,7 +75,7 @@ public class DatabaseConnector implements IMultiThreadTaskCallback
 						e.printStackTrace();
 					}
 				}
-				operator.nextTask();
+				next.nextTask();
 			}).start();
 		}
 		else if(option == TaskOption.SHUTDOWN)
@@ -89,12 +90,12 @@ public class DatabaseConnector implements IMultiThreadTaskCallback
 				}
 				catch (SQLException e)
 				{
-					operator.error(e, "데이터베이스 오류");
+					next.error(e, "데이터베이스 오류");
 					this.console.push("데이터베이스 접속 종료 실패");
 				}
 			}
 			
-			operator.nextTask();
+			next.nextTask();
 		}
 	}
 }

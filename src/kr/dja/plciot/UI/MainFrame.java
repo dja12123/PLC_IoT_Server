@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 
 import kr.dja.plciot.Log.Console;
 import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
+import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
@@ -33,12 +34,12 @@ public class MainFrame extends JFrame implements IMultiThreadTaskCallback
 	}
 
 	@Override
-	public void executeTask(TaskOption option, MultiThreadTaskOperator operator)
+	public void executeTask(TaskOption option, NextTask next)
 	{
 		if(option == TaskOption.SHUTDOWN)
 		{
 			this.consoleUI.shutdown();
-			operator.nextTask();
+			next.nextTask();
 		}
 	}
 	

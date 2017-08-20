@@ -2,6 +2,7 @@ package kr.dja.plciot.Web;
 
 import kr.dja.plciot.Log.Console;
 import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
+import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
@@ -79,17 +80,17 @@ public class WebServer implements Runnable, IMultiThreadTaskCallback
 
 
 	@Override
-	public void executeTask(TaskOption option, MultiThreadTaskOperator operator)
+	public void executeTask(TaskOption option, NextTask next)
 	{
 		if(option == TaskOption.START)
 		{
 			this.webServerThread = new Thread(this);
 			this.webServerThread.start();
-			operator.nextTask();
+			next.nextTask();
 		}
 		if(option == TaskOption.SHUTDOWN)
 		{
-			operator.nextTask();
+			next.nextTask();
 		}
 	}
 }

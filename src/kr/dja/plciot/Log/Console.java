@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Observable;
 
 import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
+import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
@@ -40,11 +41,11 @@ public class Console extends Observable implements IMultiThreadTaskCallback
 	}
 
 	@Override
-	public void executeTask(TaskOption option, MultiThreadTaskOperator operator)
+	public void executeTask(TaskOption option, NextTask next)
 	{
 		if(option == TaskOption.SHUTDOWN)
 		{//TODO 로그 저장 처리
-			operator.nextTask();
+			next.nextTask();
 		}
 	}
 

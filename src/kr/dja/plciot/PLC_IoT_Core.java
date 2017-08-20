@@ -9,6 +9,7 @@ import kr.dja.plciot.Database.DatabaseConnector;
 import kr.dja.plciot.Device.DeviceConnection;
 import kr.dja.plciot.Log.Console;
 import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
+import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 import kr.dja.plciot.UI.MainFrame;
@@ -36,14 +37,14 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 		IMultiThreadTaskCallback[] shutdownTaskArr = new IMultiThreadTaskCallback[]{this.webServer, this.dbManager, this.console, this.mainFrame, this};
 		MultiThreadTaskOperator serverShutdownOperator = new MultiThreadTaskOperator(TaskOption.SHUTDOWN, shutdownTaskArr);
 		
-		serverStartOperator.nextTask();
+		serverStartOperator.start();
 		
 		this.mainFrame.addWindowListener(new WindowAdapter()
 		{
 			@Override
 			public void windowClosing(WindowEvent e)
 			{
-				serverShutdownOperator.nextTask();
+				serverShutdownOperator.start();
 			}
 		});
 	}
@@ -54,7 +55,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 	}
 
 	@Override
-	public void executeTask(TaskOption option, MultiThreadTaskOperator operator)
+	public void executeTask(TaskOption option, NextTask next)
 	{
 		if(option == TaskOption.START)
 		{

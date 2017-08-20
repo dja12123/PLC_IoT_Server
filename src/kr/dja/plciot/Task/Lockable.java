@@ -21,6 +21,10 @@ public abstract class Lockable
 		return false;
 	}
 	
+	protected void unLock(){}
+	
+	protected void lock(){}
+	
 	public synchronized TaskLock createLock()
 	{
 		TaskLock lock = new TaskLock(this);
@@ -32,22 +36,20 @@ public abstract class Lockable
 	{
 		if(this.lockList.contains(lockInst))
 		{
-			if(lockInst.getState())
-			{// 락이 걸린 상태라면.
-				--this.lockCount;
-			}
+			lockInst.unlock();
 			this.lockList.remove(lockInst);
+			System.out.println(this.lockList.size());
 		}
-		
 	}
 	
-	synchronized void noticeChange(boolean state, TaskLock lockInst)
+	synchronized void noticeChange(TaskLock lockInst)
 	{
 		// state = true Lock
 		// state = false UnLock
 		if(this.lockList.contains(lockInst))
 		{
-			if(state)
+			boolean beforeLock = this.isLock();
+			if(lockInst.getState())
 			{
 				++this.lockCount;
 			}
@@ -55,7 +57,20 @@ public abstract class Lockable
 			{
 				--this.lockCount;
 			}
-			System.out.println(this.lockList.size() + " lockCount " + lockCount);
+			
+			boolean afterLock = this.isLock();
+			if(afterLock != beforeLock)
+			{
+				if(afterLock)
+				{
+					this.lock();
+				}
+				else
+				{
+					this.unLock();
+				}
+				System.out.println(this.lockCount + " " + afterLock + " " + this.lockList.size());
+			}
 		}
 	}
 }

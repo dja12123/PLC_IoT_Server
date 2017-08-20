@@ -15,8 +15,8 @@ public class TaskLock
 	{
 		if(!this.lock)
 		{
-			this.lockInst.noticeChange(true, this);
 			this.lock = true;
+			this.lockInst.noticeChange(this);
 		}
 	}
 	
@@ -24,8 +24,8 @@ public class TaskLock
 	{
 		if(this.lock)
 		{
-			this.lockInst.noticeChange(false, this);
 			this.lock = false;
+			this.lockInst.noticeChange(this);
 		}
 	}
 	
