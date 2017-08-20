@@ -6,26 +6,27 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import kr.dja.plciot.Task.TaskLock;
 import kr.dja.plciot.Task.Serial.ISerialTaskCallback;
 
-public class MTTaskOperator
+public class MultiThreadTaskOperator
 {
 	private final TaskOption option;
-	private ConcurrentLinkedQueue<IMTTaskCallback> taskQueue;
+	private ConcurrentLinkedQueue<IMultiThreadTaskCallback> taskQueue;
 	private List<TaskLock> lock;
 	
-	public MTTaskOperator(TaskOption option)
+	public MultiThreadTaskOperator(TaskOption option)
 	{
 		this.option = option;
-		this.taskQueue = new ConcurrentLinkedQueue<IMTTaskCallback>();
+		this.taskQueue = new ConcurrentLinkedQueue<IMultiThreadTaskCallback>();
 		this.lock = Collections.synchronizedList(new ArrayList<TaskLock>());
 	}
 	
-	public MTTaskOperator(TaskOption option, IMTTaskCallback[] callbackArr)
+	public MultiThreadTaskOperator(TaskOption option, IMultiThreadTaskCallback[] callbackArr)
 	{
 		this(option);
 		
-		for(IMTTaskCallback task : callbackArr)
+		for(IMultiThreadTaskCallback task : callbackArr)
 		{
 			this.taskQueue.add(task);
 		}
@@ -47,13 +48,5 @@ public class MTTaskOperator
 		System.out.println("순차 작업중 오류 발생");
 		System.out.println(message);
 		e.printStackTrace();
-	}
-	
-	public TaskLock createLock()
-	{
-		TaskLock lock = new TaskLock();
-		lock.unlock();
-		this.lock.add(lock);
-		return lock;
 	}
 }

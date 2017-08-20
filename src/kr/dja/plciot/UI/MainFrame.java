@@ -6,11 +6,11 @@ import java.awt.Container;
 import javax.swing.JFrame;
 
 import kr.dja.plciot.Log.Console;
-import kr.dja.plciot.Task.MultiThread.MTTaskOperator;
-import kr.dja.plciot.Task.MultiThread.IMTTaskCallback;
+import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
+import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class MainFrame extends JFrame implements IMTTaskCallback
+public class MainFrame extends JFrame implements IMultiThreadTaskCallback
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -33,7 +33,7 @@ public class MainFrame extends JFrame implements IMTTaskCallback
 	}
 
 	@Override
-	public void executeTask(TaskOption option, MTTaskOperator operator)
+	public void executeTask(TaskOption option, MultiThreadTaskOperator operator)
 	{
 		if(option == TaskOption.SHUTDOWN)
 		{

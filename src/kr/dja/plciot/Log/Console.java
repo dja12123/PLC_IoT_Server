@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 
-import kr.dja.plciot.Task.MultiThread.MTTaskOperator;
-import kr.dja.plciot.Task.MultiThread.IMTTaskCallback;
+import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
+import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class Console extends Observable implements IMTTaskCallback
+public class Console extends Observable implements IMultiThreadTaskCallback
 {// 콘솔 로그 관리 클래스.
 	private LogSaver logSaver;
 	
@@ -40,7 +40,7 @@ public class Console extends Observable implements IMTTaskCallback
 	}
 
 	@Override
-	public void executeTask(TaskOption option, MTTaskOperator operator)
+	public void executeTask(TaskOption option, MultiThreadTaskOperator operator)
 	{
 		if(option == TaskOption.SHUTDOWN)
 		{//TODO 로그 저장 처리

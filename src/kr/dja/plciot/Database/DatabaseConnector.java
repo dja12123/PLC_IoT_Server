@@ -7,11 +7,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import kr.dja.plciot.Log.Console;
-import kr.dja.plciot.Task.MultiThread.MTTaskOperator;
-import kr.dja.plciot.Task.MultiThread.IMTTaskCallback;
+import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
+import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class DatabaseConnector implements IMTTaskCallback
+public class DatabaseConnector implements IMultiThreadTaskCallback
 {
 	private static final String DB_ADDR = "203.250.133.158:3306";
 	private static final String DB_NAME = "team_korea_server";
@@ -56,7 +56,7 @@ public class DatabaseConnector implements IMTTaskCallback
 	}
 
 	@Override
-	public void executeTask(TaskOption option, MTTaskOperator operator)
+	public void executeTask(TaskOption option, MultiThreadTaskOperator operator)
 	{
 		if(option == TaskOption.START)
 		{
