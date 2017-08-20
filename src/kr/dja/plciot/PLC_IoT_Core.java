@@ -6,15 +6,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import kr.dja.plciot.Database.DatabaseConnector;
-import kr.dja.plciot.DependManager.DependencyTaskOperator;
-import kr.dja.plciot.DependManager.IDependencyTask;
-import kr.dja.plciot.DependManager.TaskOption;
 import kr.dja.plciot.Device.DeviceConnection;
 import kr.dja.plciot.Log.Console;
+import kr.dja.plciot.Task.MultiThread.MTTaskOperator;
+import kr.dja.plciot.Task.MultiThread.IMTTaskCallback;
+import kr.dja.plciot.Task.MultiThread.TaskOption;
 import kr.dja.plciot.UI.MainFrame;
 import kr.dja.plciot.Web.WebServer;
 
-public class PLC_IoT_Core implements IDependencyTask
+public class PLC_IoT_Core implements IMTTaskCallback
 {
 	private static PLC_IoT_Core MainInstance;
 	
@@ -30,11 +30,11 @@ public class PLC_IoT_Core implements IDependencyTask
 		this.dbManager = new DatabaseConnector(this.console);
 		this.webServer = new WebServer(this.console);
 		
-		IDependencyTask[] startTaskArr = new IDependencyTask[]{this.dbManager, this.webServer, this};
-		DependencyTaskOperator serverStartOperator = new DependencyTaskOperator(TaskOption.START, startTaskArr);
+		IMTTaskCallback[] startTaskArr = new IMTTaskCallback[]{this.dbManager, this.webServer, this};
+		MTTaskOperator serverStartOperator = new MTTaskOperator(TaskOption.START, startTaskArr);
 		
-		IDependencyTask[] shutdownTaskArr = new IDependencyTask[]{this.webServer, this.dbManager, this.console, this.mainFrame, this};
-		DependencyTaskOperator serverShutdownOperator = new DependencyTaskOperator(TaskOption.SHUTDOWN, shutdownTaskArr);
+		IMTTaskCallback[] shutdownTaskArr = new IMTTaskCallback[]{this.webServer, this.dbManager, this.console, this.mainFrame, this};
+		MTTaskOperator serverShutdownOperator = new MTTaskOperator(TaskOption.SHUTDOWN, shutdownTaskArr);
 		
 		serverStartOperator.nextTask();
 		
@@ -54,7 +54,7 @@ public class PLC_IoT_Core implements IDependencyTask
 	}
 
 	@Override
-	public void executeTask(TaskOption option, DependencyTaskOperator operator)
+	public void executeTask(TaskOption option, MTTaskOperator operator)
 	{
 		if(option == TaskOption.START)
 		{

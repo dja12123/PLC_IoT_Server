@@ -6,12 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import kr.dja.plciot.DependManager.DependencyTaskOperator;
-import kr.dja.plciot.DependManager.IDependencyTask;
-import kr.dja.plciot.DependManager.TaskOption;
 import kr.dja.plciot.Log.Console;
+import kr.dja.plciot.Task.MultiThread.MTTaskOperator;
+import kr.dja.plciot.Task.MultiThread.IMTTaskCallback;
+import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class DatabaseConnector implements IDependencyTask
+public class DatabaseConnector implements IMTTaskCallback
 {
 	private static final String DB_ADDR = "203.250.133.158:3306";
 	private static final String DB_NAME = "team_korea_server";
@@ -56,7 +56,7 @@ public class DatabaseConnector implements IDependencyTask
 	}
 
 	@Override
-	public void executeTask(TaskOption option, DependencyTaskOperator operator)
+	public void executeTask(TaskOption option, MTTaskOperator operator)
 	{
 		if(option == TaskOption.START)
 		{

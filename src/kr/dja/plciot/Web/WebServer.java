@@ -1,9 +1,9 @@
 package kr.dja.plciot.Web;
 
-import kr.dja.plciot.DependManager.DependencyTaskOperator;
-import kr.dja.plciot.DependManager.IDependencyTask;
-import kr.dja.plciot.DependManager.TaskOption;
 import kr.dja.plciot.Log.Console;
+import kr.dja.plciot.Task.MultiThread.MTTaskOperator;
+import kr.dja.plciot.Task.MultiThread.IMTTaskCallback;
+import kr.dja.plciot.Task.MultiThread.TaskOption;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +13,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
  
 
-public class WebServer implements Runnable, IDependencyTask
+public class WebServer implements Runnable, IMTTaskCallback
 {
 	public static final String ROOT_DOC = "/Users/kyoungil_lee/Desktop/web";
 
@@ -79,7 +79,7 @@ public class WebServer implements Runnable, IDependencyTask
 
 
 	@Override
-	public void executeTask(TaskOption option, DependencyTaskOperator operator)
+	public void executeTask(TaskOption option, MTTaskOperator operator)
 	{
 		if(option == TaskOption.START)
 		{

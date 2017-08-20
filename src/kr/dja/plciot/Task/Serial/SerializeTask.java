@@ -1,4 +1,4 @@
-package kr.dja.plciot.Task;
+package kr.dja.plciot.Task.Serial;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,26 +7,25 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.SynchronousQueue;
 
-class TaskThread extends Thread
+public class SerializeTask extends Thread
 {
-	private ConcurrentLinkedQueue<ITaskCallback> taskQueue;
+	private ConcurrentLinkedQueue<ISerialTaskCallback> taskQueue;
 	private boolean threadSwitch;
 	private int taskInterval;
 	
-	public TaskThread()
+	public SerializeTask()
 	{
 		this(0);
 	}
 	
-	public TaskThread(int taskInterval)
+	public SerializeTask(int taskInterval)
 	{
-		this.taskQueue = new ConcurrentLinkedQueue<ITaskCallback>();
+		this.taskQueue = new ConcurrentLinkedQueue<ISerialTaskCallback>();
 		this.threadSwitch = true;
 		this.taskInterval = taskInterval;
 	}
 	
-	
-	public void addTask(ITaskCallback callback)
+	public void addTask(ISerialTaskCallback callback)
 	{// 작업 추가.
 		this.taskQueue.add(callback);
 	}

@@ -5,12 +5,12 @@ import java.awt.Container;
 
 import javax.swing.JFrame;
 
-import kr.dja.plciot.DependManager.DependencyTaskOperator;
-import kr.dja.plciot.DependManager.IDependencyTask;
-import kr.dja.plciot.DependManager.TaskOption;
 import kr.dja.plciot.Log.Console;
+import kr.dja.plciot.Task.MultiThread.MTTaskOperator;
+import kr.dja.plciot.Task.MultiThread.IMTTaskCallback;
+import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class MainFrame extends JFrame implements IDependencyTask
+public class MainFrame extends JFrame implements IMTTaskCallback
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -33,7 +33,7 @@ public class MainFrame extends JFrame implements IDependencyTask
 	}
 
 	@Override
-	public void executeTask(TaskOption option, DependencyTaskOperator operator)
+	public void executeTask(TaskOption option, MTTaskOperator operator)
 	{
 		if(option == TaskOption.SHUTDOWN)
 		{

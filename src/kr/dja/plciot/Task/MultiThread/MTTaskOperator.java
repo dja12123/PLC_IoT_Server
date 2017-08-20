@@ -1,4 +1,4 @@
-package kr.dja.plciot.DependManager;
+package kr.dja.plciot.Task.MultiThread;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,26 +6,26 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import kr.dja.plciot.Task.ITaskCallback;
+import kr.dja.plciot.Task.Serial.ISerialTaskCallback;
 
-public class DependencyTaskOperator
+public class MTTaskOperator
 {
 	private final TaskOption option;
-	private ConcurrentLinkedQueue<IDependencyTask> taskQueue;
+	private ConcurrentLinkedQueue<IMTTaskCallback> taskQueue;
 	private List<TaskLock> lock;
 	
-	public DependencyTaskOperator(TaskOption option)
+	public MTTaskOperator(TaskOption option)
 	{
 		this.option = option;
-		this.taskQueue = new ConcurrentLinkedQueue<IDependencyTask>();
+		this.taskQueue = new ConcurrentLinkedQueue<IMTTaskCallback>();
 		this.lock = Collections.synchronizedList(new ArrayList<TaskLock>());
 	}
 	
-	public DependencyTaskOperator(TaskOption option, IDependencyTask[] callbackArr)
+	public MTTaskOperator(TaskOption option, IMTTaskCallback[] callbackArr)
 	{
 		this(option);
 		
-		for(IDependencyTask task : callbackArr)
+		for(IMTTaskCallback task : callbackArr)
 		{
 			this.taskQueue.add(task);
 		}
