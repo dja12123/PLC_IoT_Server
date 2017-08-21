@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import kr.dja.plciot.Database.DatabaseConnector;
-import kr.dja.plciot.Device.DeviceConnection;
+import kr.dja.plciot.Device.Connection.DeviceConnect;
 import kr.dja.plciot.Log.Console;
 import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
 import kr.dja.plciot.Task.MultiThread.NextTask;

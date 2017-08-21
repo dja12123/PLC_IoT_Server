@@ -1,4 +1,4 @@
-package kr.dja.plciot.Device;
+package kr.dja.plciot.Device.Connection;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-public class DeviceConnection
+public class DeviceConnect implements INetworkManager
 {
 	public final byte[] macAddr;
 	private final String ipAddr;
@@ -18,7 +18,7 @@ public class DeviceConnection
 	private boolean connectOperation;
 	private Thread taskThread;
 	
-	public DeviceConnection(byte[] macAddr, String ipAddr)
+	public DeviceConnect(byte[] macAddr, String ipAddr)
 	{
 		this.macAddr = macAddr;
 		this.ipAddr = ipAddr;
@@ -26,22 +26,18 @@ public class DeviceConnection
 		
 	}
 	
-	public void dataSend(String name, Map<String, String> sendData, IDeviceConnectSuccess successCallback, IDeviceConnectFail failCallback)
+	@Override
+	public void sendData(String name, Map<String, String> sendData, IDeviceConnectSuccessCallback successCallback,
+			IDeviceConnectFailCallback failCallback)
 	{
-
 		
-
-		
-		failCallback.connectFail(this, name, sendData);
-	}
-	
-	public void dataResive(String name, Map<String, String> sendData)
-	{
 		
 	}
-	
-	public void dataCheckCallback(byte[] resiveCheckData)
+
+	@Override
+	public void receiveData(String name, Map<String, String> sendData)
 	{
+		
 		
 	}
 
