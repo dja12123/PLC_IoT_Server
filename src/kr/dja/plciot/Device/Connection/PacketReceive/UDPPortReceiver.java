@@ -23,7 +23,7 @@ public class UDPPortReceiver extends DatagramSocket implements Runnable
 	{
 		while(true)
 		{
-			byte[] buffer = PacketProcess.createDataSet();
+			byte[] buffer = PacketProcess.CreateDataSet();
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 			try
 			{

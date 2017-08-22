@@ -8,15 +8,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import kr.dja.plciot.Device.Connection.PacketProcess;
+
 public class ReceiveManager implements IPacketReceiveObservable, IPacketReceiver
 {
 	private List<UDPPortReceiver> receivers;
-	private Map<byte[], IPacketReceiveObserver> observers;
+	private Map<String, IPacketReceiveObserver> observers;
 	
 	public ReceiveManager(int startUDPPort, int endUDPPort)
 	{
 		this.receivers = new ArrayList<UDPPortReceiver>();
-		this.observers = Collections.synchronizedMap(new HashMap<byte[], IPacketReceiveObserver>());
+		this.observers = Collections.synchronizedMap(new HashMap<String, IPacketReceiveObserver>());
 		
 		for(int receiverPort = startUDPPort; receiverPort <= endUDPPort; ++receiverPort)
 		{
@@ -35,7 +37,7 @@ public class ReceiveManager implements IPacketReceiveObservable, IPacketReceiver
 	}
 
 	@Override
-	public void addObserver(byte[] uuid, IPacketReceiveObserver o)
+	public void addObserver(String uuid, IPacketReceiveObserver o)
 	{
 		if(!this.observers.containsKey(uuid))
 		{
@@ -48,7 +50,7 @@ public class ReceiveManager implements IPacketReceiveObservable, IPacketReceiver
 	}
 
 	@Override
-	public void deleteObserver(byte[] uuid)
+	public void deleteObserver(String uuid)
 	{
 		if(this.observers.containsKey(uuid))
 		{
@@ -63,6 +65,8 @@ public class ReceiveManager implements IPacketReceiveObservable, IPacketReceiver
 	@Override
 	public void PacketResive(int sendPort, InetAddress sendAddress, byte[] data)
 	{
+		String uuid = PacketProcess.GetPacketFULLUID(data);
 		
-	}	
+		
+	}
 }
