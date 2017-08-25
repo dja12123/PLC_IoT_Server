@@ -7,7 +7,7 @@ import java.util.Map;
 public class PacketProcess
 {// 장치와 주고받는 패킷에 관련된 함수와 상수를 캡슐화.
 
-	/*public static void main(String args[])
+	public static void main(String args[])
     {
 		String macAddr = "001F1F1F1FAA";
 		String fulluid = PacketProcess.CreateUUID(macAddr);
@@ -23,18 +23,8 @@ public class PacketProcess
 		
 		PacketProcess.InputPacketData(data, packetName, PacketProcess.DataMapToByte(sendData));
 		
-		System.out.println("FullAddr " + PacketProcess.GetPacketFULLUID(data));
-		System.out.println("MacAddr " + PacketProcess.GetpacketMacAddr(data));
-		System.out.println("PacketName " + PacketProcess.GetPacketName(data));
-		System.out.println("Phase " + String.format("%02X", PacketProcess.GetPacketPhase(data)));
-		Map<String, String> valueSet = PacketProcess.GetPacketData(data);
-		
-		System.out.println("-- DATA --");
-		for(String key : valueSet.keySet())
-		{
-			System.out.println("key:" + key + " value:" + valueSet.get(key));
-		}
-    }*/
+		PacketProcess.PrintDataPacket(data);
+    }
 	
 	private static final int BYTE = 8;// 8bit = byte
 	
@@ -55,6 +45,21 @@ public class PacketProcess
 	
 	public static final int TIMEOUT = 2000;
 	public static final int MAX_RESEND = 3;
+	
+	public static void PrintDataPacket(byte[] data)
+	{
+		System.out.println("FullAddr   - " + PacketProcess.GetPacketFULLUID(data));
+		System.out.println("MacAddr    - " + PacketProcess.GetpacketMacAddr(data));
+		System.out.println("PacketName - " + PacketProcess.GetPacketName(data));
+		System.out.println("Phase      - " + String.format("%02X", PacketProcess.GetPacketPhase(data)));
+		Map<String, String> valueSet = PacketProcess.GetPacketData(data);
+		
+		System.out.println("-- DATA --");
+		for(String key : valueSet.keySet())
+		{
+			System.out.println("key:" + key + " value:" + valueSet.get(key));
+		}
+	}
 	
 	public static byte[] CreateDataSet()
 	{// 데이타 샛 생성.

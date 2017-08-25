@@ -14,12 +14,13 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 	
 	private Thread resiveTaskThread;
 	
-	public ReceiveCycle(IPacketReceiveObservable observable, byte[] dataPacket)
+	public ReceiveCycle(IPacketReceiveObservable observable, byte[] data)
 	{
 		this.resendCount = 0;
 		this.taskState = false;
 		this.observable = observable;
-		this.uuid = PacketProcess.GetPacketFULLUID(dataPacket);
+		this.ReceivePacket = data;
+		this.uuid = PacketProcess.GetPacketFULLUID(data);
 		this.observable.addObserver(this.uuid, this);
 		
 		this.resiveWaitTask();

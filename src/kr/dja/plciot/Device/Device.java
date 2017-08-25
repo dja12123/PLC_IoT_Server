@@ -1,4 +1,4 @@
-package kr.dja.plciot.Device.Connection;
+package kr.dja.plciot.Device;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -10,7 +10,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-public class DeviceConnect implements INetworkManager
+import kr.dja.plciot.Device.Connection.IDeviceCommunicationCallback;
+import kr.dja.plciot.Device.Connection.PacketReceive.IPacketReceiveObservable;
+
+public class Device implements INetworkManager, 
 {
 	public final byte[] macAddr;
 	private final String ipAddr;
@@ -18,7 +21,7 @@ public class DeviceConnect implements INetworkManager
 	private boolean connectOperation;
 	private Thread taskThread;
 	
-	public DeviceConnect(byte[] macAddr, String ipAddr)
+	public Device(byte[] macAddr, String ipAddr)
 	{
 		this.macAddr = macAddr;
 		this.ipAddr = ipAddr;
@@ -27,19 +30,15 @@ public class DeviceConnect implements INetworkManager
 	}
 	
 	@Override
-	public void sendData(String name, Map<String, String> sendData, IDeviceConnectSuccessCallback successCallback,
-			IDeviceConnectFailCallback failCallback)
+	public void sendData(String name, Map<String, String> sendData, IDeviceCommunicationCallback failCallback)
 	{
-		
 		
 	}
 
 	@Override
-	public void receiveData(String name, Map<String, String> sendData)
+	public void addReceiveObserver(String name, IReceiveObserver observer)
 	{
-		
+		// TODO Auto-generated method stub
 		
 	}
-
-
 }
