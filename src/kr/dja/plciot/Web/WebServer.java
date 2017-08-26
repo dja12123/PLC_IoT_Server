@@ -17,6 +17,8 @@ import java.net.Socket;
 public class WebServer implements Runnable, IMultiThreadTaskCallback
 {
 	public static final String ROOT_DOC = "/Users/kyoungil_lee/Desktop/web";
+	
+	private NextTask startNextTask;
 
 	private boolean stop = false;
 
@@ -32,6 +34,8 @@ public class WebServer implements Runnable, IMultiThreadTaskCallback
 	public void run()
 	{
 		this.console.push("웹 서버 시작");
+		this.startNextTask.nextTask();
+		
 		ServerSocket serverSocket = null;
 		int port = 80;
  
@@ -80,17 +84,17 @@ public class WebServer implements Runnable, IMultiThreadTaskCallback
 
 
 	@Override
-	public void executeTask(TaskOption option, NextTask next)
+	public void executeTask(TaskOption option, NextTask nextTask)
 	{
 		if(option == TaskOption.START)
 		{
+			this.startNextTask = nextTask;
 			this.webServerThread = new Thread(this);
 			this.webServerThread.start();
-			next.nextTask();
 		}
 		if(option == TaskOption.SHUTDOWN)
 		{
-			next.nextTask();
+			nextTask.nextTask();
 		}
 	}
 }

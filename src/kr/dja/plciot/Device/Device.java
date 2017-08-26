@@ -10,18 +10,17 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import kr.dja.plciot.Device.Connection.IDeviceCommunicationCallback;
 import kr.dja.plciot.Device.Connection.PacketReceive.IPacketReceiveObservable;
 
-public class Device implements INetworkManager, 
+public class Device implements INetworkManager, IDevicePacketReceiveObserver
 {
-	public final byte[] macAddr;
+	public final String macAddr;
 	private final String ipAddr;
 	
 	private boolean connectOperation;
 	private Thread taskThread;
 	
-	public Device(byte[] macAddr, String ipAddr)
+	public Device(String macAddr, String ipAddr)
 	{
 		this.macAddr = macAddr;
 		this.ipAddr = ipAddr;
@@ -30,15 +29,24 @@ public class Device implements INetworkManager,
 	}
 	
 	@Override
-	public void sendData(String name, Map<String, String> sendData, IDeviceCommunicationCallback failCallback)
+	public void sendData(String name, Map<String, String> sendData)
 	{
 		
 	}
 
 	@Override
-	public void addReceiveObserver(String name, IReceiveObserver observer)
+	public void addReceiveObserver(String name, IDevicePacketReceiveObserver observer)
 	{
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void ReceiveData(String name, Map<String, String> data, boolean success)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }

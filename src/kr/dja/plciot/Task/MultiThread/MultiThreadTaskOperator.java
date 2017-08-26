@@ -28,6 +28,16 @@ public class MultiThreadTaskOperator extends Lockable implements Runnable
 		}
 	}
 	
+	public void addTask(IMultiThreadTaskCallback callback)
+	{
+		this.taskQueue.add(callback);
+	}
+	
+	public void insertTask(IMultiThreadTaskCallback callback)
+	{
+		this.taskQueue.add(Áß°£»ðÀÔ)
+	}
+	
 	public synchronized void start()
 	{
 		if(!this.startFlag)

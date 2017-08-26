@@ -19,13 +19,13 @@ import kr.dja.plciot.Task.MultiThread.TaskOption;
 public class ReceiveController implements IPacketReceiveObservable, IRawSocketObserver, IMultiThreadTaskCallback
 {
 	private List<UDPRawSocketReceiver> rawSocketReceiver;
-	private Map<String, IPacketReceiveObserver> observers;
+	private Map<String, ICyclePacketReceiveObserver> observers;
 	private IReceiveRegister communicator;
 	
 	public ReceiveController(int startUDPPort, int endUDPPort, IReceiveRegister communicator)
 	{
 		this.rawSocketReceiver = new ArrayList<UDPRawSocketReceiver>();
-		this.observers = Collections.synchronizedMap(new HashMap<String, IPacketReceiveObserver>());
+		this.observers = Collections.synchronizedMap(new HashMap<String, ICyclePacketReceiveObserver>());
 		this.communicator = communicator;
 		
 		for(int receiverPort = startUDPPort; receiverPort <= endUDPPort; ++receiverPort)
@@ -45,7 +45,7 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 	}
 
 	@Override
-	public void addObserver(String uuid, IPacketReceiveObserver o)
+	public void addObserver(String uuid, ICyclePacketReceiveObserver o)
 	{
 		if(!this.observers.containsKey(uuid))
 		{
@@ -74,7 +74,7 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 	public void rawPacketResive(int sendPort, InetAddress sendAddress, byte[] data)
 	{
 		String uuid = PacketProcess.GetPacketFULLUID(data);
-		IPacketReceiveObserver observer = this.observers.getOrDefault(uuid, null);
+		ICyclePacketReceiveObserver observer = this.observers.getOrDefault(uuid, null);
 		if(observer != null)
 		{
 			observer.packetResive(data);

@@ -1,6 +1,6 @@
 package kr.dja.plciot.Device.Connection.PacketReceive;
 
-public interface IPacketReceiveObserver
+public interface ICyclePacketReceiveObserver
 {
 	public void packetResive(byte[] resiveData);
 }
