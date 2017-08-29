@@ -29,7 +29,7 @@ public class Console extends Observable implements IMultiThreadTaskCallback
 		this.push(message, null);
 	}
 	
-	public void push(String message, Object sender)
+	public synchronized void push(String message, Object sender)
 	{
 		ConsoleMessage messageObj = new ConsoleMessage(sender, message, this.numOfLog++);
 		this.consoleList.add(messageObj);

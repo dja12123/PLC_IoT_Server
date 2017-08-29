@@ -1,170 +1,381 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.2.0" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
   associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
-  <interface id="1" language="java" name="kr.dja.plciot.Device.Connection.PacketReceive.RawSocket.IRawSocketObserver" 
+  <interface id="1" language="java" name="kr.dja.plciot.Device.Connection.PacketReceive.IPacketReceiveObservable" 
     project="PLC_IOT_Server" 
-    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/PacketReceive/RawSocket/IRawSocketObserver.java" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/PacketReceive/IPacketReceiveObservable.java" 
     binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="232" y="377"/>    
+    <position height="-1" width="-1" x="974" y="307"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <class id="2" language="java" name="kr.dja.plciot.Device.Connection.PacketReceive.RawSocket.UDPRawSocketReceiver" 
+  <interface id="2" language="java" name="kr.dja.plciot.Device.Connection.PacketReceive.IPacketReceiveObserver" 
     project="PLC_IOT_Server" 
-    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/PacketReceive/RawSocket/UDPRawSocketReceiver.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="57" y="583"/>    
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/PacketReceive/IPacketReceiveObserver.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="624" y="72"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <interface id="3" language="java" name="kr.dja.plciot.Device.Connection.PacketReceive.IRawSocketObserver" 
+    project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/PacketReceive/IRawSocketObserver.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="946" y="505"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <class id="4" language="java" 
+    name="kr.dja.plciot.Device.Connection.PacketReceive.ReceiveController.ReceiveControllerBuildManager" 
+    project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/PacketReceive/ReceiveController.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="240" y="308"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="3" language="java" name="kr.dja.plciot.Device.Connection.PacketReceive.IPacketReceiveObservable" 
-    project="PLC_IOT_Server" 
-    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/PacketReceive/IPacketReceiveObservable.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="99" width="271" x="545" y="311"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <interface id="4" language="java" name="kr.dja.plciot.Device.Connection.PacketReceive.IPacketReceiveObserver" 
-    project="PLC_IOT_Server" 
-    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/PacketReceive/IPacketReceiveObserver.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="766" y="577"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
   <class id="5" language="java" name="kr.dja.plciot.Device.Connection.PacketReceive.ReceiveController" 
     project="PLC_IOT_Server" 
     file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/PacketReceive/ReceiveController.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="402" y="599"/>    
+    <position height="-1" width="-1" x="620" y="307"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="6" language="java" name="kr.dja.plciot.Device.Connection.SendCycle" project="PLC_IOT_Server" 
-    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/SendCycle.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1031" y="465"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <interface id="7" language="java" name="kr.dja.plciot.Device.Connection.IDeviceConnectEndCallback" 
-    project="PLC_IOT_Server" file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/IDeviceConnectEndCallback.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="823" y="111"/>    
+  <interface id="6" language="java" 
+    name="kr.dja.plciot.Device.Connection.PacketReceive.ReceiveController.BuildManagerCallback" project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/PacketReceive/ReceiveController.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="234" y="193"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="8" language="java" name="kr.dja.plciot.Device.INetworkManager" project="PLC_IOT_Server" 
-    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/INetworkManager.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="99" width="520" x="423" y="467"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </interface>  
-  <class id="9" language="java" name="kr.dja.plciot.Device.Connection.PacketProcess" project="PLC_IOT_Server" 
-    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/PacketProcess.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1125" y="825"/>    
+  <class id="7" language="java" name="kr.dja.plciot.Device.Connection.PacketReceive.UDPRawSocketReceiver" 
+    project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/PacketReceive/UDPRawSocketReceiver.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="616" y="514"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="10" language="java" name="kr.dja.plciot.Device.Connection.ReceiveCycle" project="PLC_IOT_Server" 
+  <class id="8" language="java" 
+    name="kr.dja.plciot.Device.Connection.PacketReceive.UDPRawSocketReceiver.UDPRawSocketThreadManage" 
+    project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/PacketReceive/UDPRawSocketReceiver.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="240" y="513"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="9" language="java" name="kr.dja.plciot.Device.Connection.ReceiveCycle" project="PLC_IOT_Server" 
     file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/ReceiveCycle.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="659" y="867"/>    
+    <position height="-1" width="-1" x="976" y="71"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="11" language="java" name="kr.dja.plciot.Device.DeviceManager" project="PLC_IOT_Server" 
+  <class id="10" language="java" name="kr.dja.plciot.Device.Device" project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Device.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="566" y="-159"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <interface id="11" language="java" name="kr.dja.plciot.Device.IDevicePacketReceiveObserver" project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/IDevicePacketReceiveObserver.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="974" y="-158"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <interface id="12" language="java" name="kr.dja.plciot.Device.INetworkManager" project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/INetworkManager.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="566" y="-355"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <interface id="13" language="java" name="kr.dja.plciot.Device.Connection.IReceiveRegister" project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/IReceiveRegister.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="211" y="78"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <class id="14" language="java" name="kr.dja.plciot.Device.DeviceManager" project="PLC_IOT_Server" 
     file="/PLC_IOT_Server/src/kr/dja/plciot/Device/DeviceManager.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="199" y="721"/>    
+    <position height="-1" width="-1" x="210" y="-155"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <association id="12">    
-    <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="13" name="observers">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="14" minimum="0" maximum="2147483647">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
+  <interface id="15" language="java" name="kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback" 
+    project="PLC_IOT_Server" file="/PLC_IOT_Server/src/kr/dja/plciot/Task/MultiThread/IMultiThreadTaskCallback.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-153" y="-287"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <class id="16" language="java" name="kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator" project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Task/MultiThread/MultiThreadTaskOperator.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-154" y="-44"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="17" language="java" name="kr.dja.plciot.Task.MultiThread.NextTask" project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Task/MultiThread/NextTask.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-98" y="286"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="18" language="java" name="kr.dja.plciot.Task.TaskLock" project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Task/TaskLock.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-96" y="516"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="19" language="java" name="kr.dja.plciot.Task.Lockable" project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Task/Lockable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="-349" y="336"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <association id="20">    
+    <end type="SOURCE" refId="19" navigable="false">      
+      <attribute id="21" name="lockList"/>      
+      <multiplicity id="22" minimum="0" maximum="2147483647"/>    
     </end>    
-    <end type="TARGET" refId="4" navigable="true"/>    
+    <end type="TARGET" refId="18" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="15">    
-    <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="16" name="receiveManager">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="17" minimum="0" maximum="1">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
+  <association id="23">    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="24" name="deviceCallback"/>      
+      <multiplicity id="25" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="1" navigable="true"/>    
+    <end type="TARGET" refId="11" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="18">    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="1"/>  
+  <realization id="26">    
+    <end type="SOURCE" refId="14"/>    
+    <end type="TARGET" refId="15"/>  
   </realization>  
-  <association id="19">    
+  <generalization id="27">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="19"/>  
+  </generalization>  
+  <realization id="28">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="12"/>  
+  </realization>  
+  <realization id="29">    
+    <end type="SOURCE" refId="14"/>    
+    <end type="TARGET" refId="13"/>  
+  </realization>  
+  <association id="30">    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="31" name="instance"/>      
+      <multiplicity id="32" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="7" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="33">    
+    <end type="SOURCE" refId="14" navigable="false">      
+      <attribute id="34" name="receiveController"/>      
+      <multiplicity id="35" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="36">    
     <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="20" name="rawSocketReceiver">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="21" minimum="0" maximum="2147483647">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
+      <attribute id="37" name="rawSocketReceiver"/>      
+      <multiplicity id="38" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="7" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <nesting id="39">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="8"/>  
+  </nesting>  
+  <realization id="40">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="3"/>  
+  </realization>  
+  <association id="41">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="42" name="instance"/>      
+      <multiplicity id="43" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="44">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="45" name="observers"/>      
+      <multiplicity id="46" minimum="0" maximum="2147483647"/>    
     </end>    
     <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="22">    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="3"/>  
+  <generalization id="47">    
+    <end type="SOURCE" refId="17"/>    
+    <end type="TARGET" refId="19"/>  
+  </generalization>  
+  <association id="48">    
+    <end type="SOURCE" refId="14" navigable="false">      
+      <attribute id="49" name="deviceList"/>      
+      <multiplicity id="50" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="51">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="11"/>  
   </realization>  
-  <association id="23">    
-    <end type="SOURCE" refId="10" navigable="false">      
-      <attribute id="24" name="receiveManager">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="25" minimum="0" maximum="1">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
+  <association id="52">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="53" name="register"/>      
+      <multiplicity id="54" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="55">    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="56" name="shutdownLock"/>      
+      <multiplicity id="57" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="18" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="58">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="2"/>  
+  </realization>  
+  <association id="59">    
+    <end type="SOURCE" refId="17" navigable="false">      
+      <attribute id="60" name="oper"/>      
+      <multiplicity id="61" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="16" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="62">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="63" name="receiverThreadList"/>      
+      <multiplicity id="64" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="65">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="66" name="receiveManager"/>      
+      <multiplicity id="67" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="68">    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="69" name="receiveManager"/>      
+      <multiplicity id="70" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="71">    
+    <end type="SOURCE" refId="18" navigable="false">      
+      <attribute id="72" name="lockInst"/>      
+      <multiplicity id="73" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="19" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <nesting id="74">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="6"/>  
+  </nesting>  
+  <realization id="75">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="1"/>  
+  </realization>  
+  <association id="76">    
+    <end type="SOURCE" refId="16" navigable="false">      
+      <attribute id="77" name="taskQueue"/>      
+      <multiplicity id="78" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="15" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <nesting id="79">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="4"/>  
+  </nesting>  
+  <association id="80">    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="81" name="startLock"/>      
+      <multiplicity id="82" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="18" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 

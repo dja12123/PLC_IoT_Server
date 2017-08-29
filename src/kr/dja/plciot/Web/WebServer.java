@@ -1,5 +1,6 @@
 package kr.dja.plciot.Web;
 
+import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Log.Console;
 import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
 import kr.dja.plciot.Task.MultiThread.NextTask;
@@ -22,18 +23,16 @@ public class WebServer implements Runnable, IMultiThreadTaskCallback
 
 	private boolean stop = false;
 
-	private final Console console;
 	private Thread webServerThread;
 	
-	public WebServer(Console console)
+	public WebServer()
 	{
-		this.console = console;
 	}
 
 	@Override
 	public void run()
 	{
-		this.console.push("웹 서버 시작");
+		PLC_IoT_Core.CONS.push("웹 서버 시작");
 		this.startNextTask.nextTask();
 		
 		ServerSocket serverSocket = null;
@@ -58,7 +57,7 @@ public class WebServer implements Runnable, IMultiThreadTaskCallback
 			try
 			{
 				socket = serverSocket.accept();
-				this.console.push("웹 서비스 요청");
+				PLC_IoT_Core.CONS.push("웹 서비스 요청");
 				input = socket.getInputStream();
 				output = socket.getOutputStream();
  
@@ -79,7 +78,7 @@ public class WebServer implements Runnable, IMultiThreadTaskCallback
 				continue;
 			}
 		}
-		this.console.push("서버 중단");
+		PLC_IoT_Core.CONS.push("서버 중단");
 	}
 
 

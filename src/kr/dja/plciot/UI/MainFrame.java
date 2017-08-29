@@ -5,6 +5,7 @@ import java.awt.Container;
 
 import javax.swing.JFrame;
 
+import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Log.Console;
 import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
 import kr.dja.plciot.Task.MultiThread.NextTask;
@@ -17,10 +18,9 @@ public class MainFrame extends JFrame implements IMultiThreadTaskCallback
 	
 	private final ConsoleUI consoleUI;
 	
-	public MainFrame(Console console)
+	public MainFrame()
 	{
-		
-		this.consoleUI = new ConsoleUI(console);
+		this.consoleUI = new ConsoleUI(PLC_IoT_Core.CONS);
 		Container contantPane = this.getContentPane();
 		
 		this.setTitle("PLC IoT Server");

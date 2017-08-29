@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import kr.dja.plciot.Database.DatabaseConnector;
+import kr.dja.plciot.Device.DeviceManager;
 import kr.dja.plciot.Log.Console;
 import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
 import kr.dja.plciot.Task.MultiThread.NextTask;
@@ -18,23 +19,26 @@ import kr.dja.plciot.Web.WebServer;
 public class PLC_IoT_Core implements IMultiThreadTaskCallback
 {
 	private static PLC_IoT_Core MainInstance;
+	public static final Console CONS = new Console();
 	
 	public final MainFrame mainFrame;
-	public final Console console;
 	public final DatabaseConnector dbManager;
+	public final DeviceManager deviceManager;
 	public final WebServer webServer;
 	
 	private PLC_IoT_Core()
 	{//TEST
-		this.console = new Console();
-		this.mainFrame = new MainFrame(this.console);
-		this.dbManager = new DatabaseConnector(this.console);
-		this.webServer = new WebServer(this.console);
+		this.mainFrame = new MainFrame();
+		this.dbManager = new DatabaseConnector();
+		this.deviceManager = new DeviceManager();
+		this.webServer = new WebServer();
 		
-		IMultiThreadTaskCallback[] startTaskArr = new IMultiThreadTaskCallback[]{this.dbManager, this.webServer, new TestClass(), this};
+		IMultiThreadTaskCallback[] startTaskArr = new IMultiThreadTaskCallback[]
+				{this.dbManager, this.deviceManager, this.webServer, new TestClass(), this};
 		MultiThreadTaskOperator serverStartOperator = new MultiThreadTaskOperator(TaskOption.START, startTaskArr);
 		
-		IMultiThreadTaskCallback[] shutdownTaskArr = new IMultiThreadTaskCallback[]{this.webServer, this.dbManager, this.console, this.mainFrame, this};
+		IMultiThreadTaskCallback[] shutdownTaskArr = new IMultiThreadTaskCallback[]
+				{this.webServer, this.dbManager, CONS, this.mainFrame, this};
 		MultiThreadTaskOperator serverShutdownOperator = new MultiThreadTaskOperator(TaskOption.SHUTDOWN, shutdownTaskArr);
 		
 		serverStartOperator.start();
@@ -59,7 +63,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 	{
 		if(option == TaskOption.START)
 		{
-			this.console.push("서버 시작 완료");
+			CONS.push("서버 시작 완료");
 		}
 		if(option == TaskOption.SHUTDOWN)
 		{
