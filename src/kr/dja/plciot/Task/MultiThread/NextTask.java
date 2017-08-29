@@ -17,9 +17,9 @@ public class NextTask extends Lockable
 		this.lockTaskFlag = false;
 	}
 	
-	public void addTask(IMultiThreadTaskCallback callback)
+	public void insertTask(IMultiThreadTaskCallback callback)
 	{
-		
+		this.oper.insertTask(callback);
 	}
 	
 	public void nextTask()

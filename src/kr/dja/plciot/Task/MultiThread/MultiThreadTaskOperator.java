@@ -1,13 +1,15 @@
 package kr.dja.plciot.Task.MultiThread;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import kr.dja.plciot.Task.Lockable;
 
 public class MultiThreadTaskOperator extends Lockable implements Runnable
 {
 	private final TaskOption option;
-	private ConcurrentLinkedQueue<IMultiThreadTaskCallback> taskQueue;
+	private List<IMultiThreadTaskCallback> taskQueue;
 	private Thread nowTaskThread;
 	private boolean taskLockFlag;
 	private boolean startFlag;
@@ -15,7 +17,7 @@ public class MultiThreadTaskOperator extends Lockable implements Runnable
 	public MultiThreadTaskOperator(TaskOption option)
 	{
 		this.option = option;
-		this.taskQueue = new ConcurrentLinkedQueue<IMultiThreadTaskCallback>();
+		this.taskQueue = Collections.synchronizedList(new ArrayList<IMultiThreadTaskCallback>());
 	}
 	
 	public MultiThreadTaskOperator(TaskOption option, IMultiThreadTaskCallback[] callbackArr)
@@ -33,9 +35,9 @@ public class MultiThreadTaskOperator extends Lockable implements Runnable
 		this.taskQueue.add(callback);
 	}
 	
-	public void insertTask(IMultiThreadTaskCallback callback)
-	{
-		this.taskQueue.add(중간삽입)
+	public synchronized void insertTask(IMultiThreadTaskCallback callback)
+	{// 현재 작업중인 위치 바로 뒤에 작업을 삽입합니다.
+		this.taskQueue.add(0, callback);
 	}
 	
 	public synchronized void start()
@@ -103,7 +105,8 @@ public class MultiThreadTaskOperator extends Lockable implements Runnable
 			
 			if(!this.taskQueue.isEmpty())
 			{
-				task = this.taskQueue.poll();
+				task = this.taskQueue.get(0);
+				this.taskQueue.remove(0);
 			}
 			else
 			{
@@ -112,7 +115,7 @@ public class MultiThreadTaskOperator extends Lockable implements Runnable
 			
 			this.nowTaskThread = null;
 		}
-		
+		 
 		task.executeTask(this.option, new NextTask(this));
 	}
 }
