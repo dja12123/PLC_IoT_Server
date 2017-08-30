@@ -9,15 +9,15 @@ import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Device.Connection.PacketProcess;
 import kr.dja.plciot.Task.TaskLock;
 
-public class UDPRawSocketReceiver extends DatagramSocket
+public class UDPRawSocketReceiver
 {
+	private final DatagramSocket socket;
 	private final IRawSocketObserver receiveManager;
 	private boolean threadFlag;
 	
-	private UDPRawSocketReceiver(int port, IRawSocketObserver receiveManager) throws SocketException
+	private UDPRawSocketReceiver(DatagramSocket socket, IRawSocketObserver receiveManager)
 	{
-		super(port);
-
+		this.socket = socket;
 		this.receiveManager = receiveManager;
 		this.threadFlag = true;
 	}
@@ -30,7 +30,7 @@ public class UDPRawSocketReceiver extends DatagramSocket
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 			try
 			{
-				this.receive(packet);
+				this.socket.receive(packet);
 				this.receiveManager.rawPacketResive(packet.getPort(), packet.getAddress(), buffer);
 				packet.getAddress();
 			}
@@ -48,16 +48,9 @@ public class UDPRawSocketReceiver extends DatagramSocket
 		private TaskLock startLock;
 		private TaskLock shutdownLock;
 		
-		public UDPRawSocketThreadManage(int port, IRawSocketObserver receiveManager, TaskLock startLock)
+		public UDPRawSocketThreadManage(DatagramSocket socket, IRawSocketObserver receiveManager, TaskLock startLock)
 		{
-			try
-			{
-				this.instance = new UDPRawSocketReceiver(port, receiveManager);
-			}
-			catch (SocketException e)
-			{
-				e.printStackTrace();
-			}
+			this.instance = new UDPRawSocketReceiver(socket, receiveManager);
 			this.startLock = startLock;
 			
 			this.start();
@@ -71,7 +64,7 @@ public class UDPRawSocketReceiver extends DatagramSocket
 		@Override
 		public void run()
 		{
-			PLC_IoT_Core.CONS.push("장치 수신자 포트 " + this.instance.getLocalPort() + " 번 활성화.");
+			PLC_IoT_Core.CONS.push("장치 수신자 포트 " + this.instance.socket.getLocalPort() + " 번 활성화.");
 			this.startLock.unlock();
 			this.instance.executeTask();
 			this.shutdownLock.unlock();
@@ -81,7 +74,6 @@ public class UDPRawSocketReceiver extends DatagramSocket
 		{
 			this.shutdownLock = shutdownLock;
 			this.instance.threadFlag = false;
-			this.instance.close();
 		}
 	}
 }

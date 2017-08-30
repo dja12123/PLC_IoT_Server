@@ -1,5 +1,6 @@
 package kr.dja.plciot.Device.Connection.PacketReceive;
 
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -60,6 +61,7 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 	public void rawPacketResive(int sendPort, InetAddress sendAddress, byte[] data)
 	{
 		String uuid = PacketProcess.GetPacketFULLUID(data);
+		PLC_IoT_Core.CONS.push(uuid);
 		IPacketReceiveObserver observer = this.observers.getOrDefault(uuid, null);
 		if(observer != null)
 		{
@@ -75,14 +77,32 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 	{
 		private ReceiveController instance;
 		private List<UDPRawSocketThreadManage> receiverThreadList;
+		private List<DatagramSocket> dataSocketList;
 		
 		public ReceiveControllerBuildManager(IReceiveRegister register)
 		{
 			this.instance = new ReceiveController(register);
 			this.receiverThreadList = new ArrayList<UDPRawSocketThreadManage>();
+			this.dataSocketList = new ArrayList<DatagramSocket>();
 		}
 		
-		public void createInstance(int startUDPPort, int endUDPPort, NextTask nextTask, BuildManagerCallback startCallback)
+		public void setDatagramSocket(int startPort, int endPort)
+		{
+			for(int i = startPort; i <= endPort; ++i)
+			{
+				try
+				{
+					DatagramSocket rcvSocket = new DatagramSocket(i);
+					this.dataSocketList.add(rcvSocket);
+				}
+				catch (SocketException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		public void createInstance(NextTask nextTask, BuildManagerCallback startCallback)
 		{
 			PLC_IoT_Core.CONS.push("장치 수신자 빌드 시작.");
 			nextTask.insertTask((TaskOption option, NextTask insertNext)->
@@ -97,9 +117,9 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 			});
 			
 			TaskLock totalLock = nextTask.createLock();
-			for(int receiverPort = startUDPPort; receiverPort <= endUDPPort; ++receiverPort)
+			for(DatagramSocket socket : this.dataSocketList)
 			{
-				UDPRawSocketThreadManage builder = new UDPRawSocketThreadManage(receiverPort, this.instance, nextTask.createLock());
+				UDPRawSocketThreadManage builder = new UDPRawSocketThreadManage(socket, this.instance, nextTask.createLock());
 				this.receiverThreadList.add(builder);
 			}
 			totalLock.unlock();

@@ -25,6 +25,7 @@ public class DatabaseConnector implements IMultiThreadTaskCallback
 	
 	public DatabaseConnector()
 	{
+		
 	}
 	
 	private boolean connectDB()
