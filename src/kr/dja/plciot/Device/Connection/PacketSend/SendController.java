@@ -3,6 +3,7 @@ package kr.dja.plciot.Device.Connection.PacketSend;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,47 +11,39 @@ import java.util.Map;
 import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Device.Connection.PacketProcess;
 
-public class SendController
+public class SendController implements IDataSender
 {
-	private final int startPort;
-	private final int endPort;
-	private Map<Integer, UDPRawSocketSender> rawSocketSender;
+	private final List<UDPRawSocketSender> rawSocketSender;
 	
+	private final Object sendDataSyncObj;
 	private int beforeSendPort;
 	
-	public SendController(int startPort, int endPort)
+	public SendController(List<DatagramSocket> dataSocketList)
 	{
 		PLC_IoT_Core.CONS.push("장치 송신자 빌드 시작.");
 		
-		this.startPort = startPort;
-		this.endPort = endPort;
-		this.rawSocketSender = new HashMap<Integer, UDPRawSocketSender>();
+		this.rawSocketSender = new ArrayList<UDPRawSocketSender>();
 		
-		for(int i = this.startPort; i <= this.endPort; ++i)
+		for(DatagramSocket socket : dataSocketList)
 		{
-			try
-			{
-				DatagramSocket sndSocket = new DatagramSocket(i);
-				this.rawSocketSender.put(i, new UDPRawSocketSender(sndSocket));
-			}
-			catch (SocketException e)
-			{
-				e.printStackTrace();
-			}
+			this.rawSocketSender.add(new UDPRawSocketSender(socket));
 		}
-		this.beforeSendPort = this.startPort;
+		this.sendDataSyncObj = new Object();
 		
 		PLC_IoT_Core.CONS.push("장치 송신자 빌드 완료.");
 	}
 	
+	@Override
 	public void sendData(InetAddress sendAddress, byte[] data)
 	{
-		++this.beforeSendPort;
-		if(this.beforeSendPort > this.endPort)
+		synchronized(this.sendDataSyncObj)
 		{
-			this.beforeSendPort = this.startPort;
+			++this.beforeSendPort;
+			if(this.beforeSendPort >= this.rawSocketSender.size())
+			{
+				this.beforeSendPort = 0;
+			}
 		}
-		
 		this.rawSocketSender.get(this.beforeSendPort).sendData(sendAddress, data);
 	}
 }

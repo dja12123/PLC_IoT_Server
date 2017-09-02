@@ -10,6 +10,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import kr.dja.plciot.Device.Connection.IDevicePacketReceiveObserver;
+import kr.dja.plciot.Device.Connection.INetworkManager;
 import kr.dja.plciot.Device.Connection.PacketReceive.IPacketReceiveObservable;
 
 public class Device implements INetworkManager, IDevicePacketReceiveObserver

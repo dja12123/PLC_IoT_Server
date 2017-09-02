@@ -7,6 +7,8 @@ import java.util.Map;
 
 import kr.dja.plciot.Database.DatabaseConnector;
 import kr.dja.plciot.Device.DeviceManager;
+import kr.dja.plciot.Device.Connection.ConnectionManager;
+import kr.dja.plciot.Device.Connection.ConnectionManager.ConnectionManagerBuilder;
 import kr.dja.plciot.Log.Console;
 import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
 import kr.dja.plciot.Task.MultiThread.NextTask;
@@ -21,24 +23,29 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 	private static PLC_IoT_Core MainInstance;
 	public static final Console CONS = new Console();
 	
-	public final MainFrame mainFrame;
-	public final DatabaseConnector dbManager;
-	public final DeviceManager deviceManager;
-	public final WebServer webServer;
+	private final MainFrame mainFrame;
+	private final DatabaseConnector dbManager;
+	private final ConnectionManager deviceConnectionManager;
+	private final DeviceManager deviceManager;
+	private final WebServer webServer;
 	
 	private PLC_IoT_Core()
 	{//TEST
 		this.mainFrame = new MainFrame();
 		this.dbManager = new DatabaseConnector();
-		this.deviceManager = new DeviceManager();
+		this.deviceConnectionManager = new ConnectionManager();
+		this.deviceManager = new DeviceManager(this.deviceConnectionManager);
 		this.webServer = new WebServer();
 		
+		ConnectionManagerBuilder connectionManagerBuilder = new ConnectionManagerBuilder(this.deviceConnectionManager);
+		connectionManagerBuilder.setReceiveRegister(this.deviceManager);
+		
 		IMultiThreadTaskCallback[] startTaskArr = new IMultiThreadTaskCallback[]
-				{this.dbManager, this.deviceManager, this.webServer, new TestClass(), this};
+				{this.dbManager, connectionManagerBuilder, this.webServer, new TestClass(), this};
 		MultiThreadTaskOperator serverStartOperator = new MultiThreadTaskOperator(TaskOption.START, startTaskArr);
 		
 		IMultiThreadTaskCallback[] shutdownTaskArr = new IMultiThreadTaskCallback[]
-				{this.webServer, this.dbManager, CONS, this.mainFrame, this};
+				{connectionManagerBuilder, this.webServer, this.dbManager, CONS, this.mainFrame, this};
 		MultiThreadTaskOperator serverShutdownOperator = new MultiThreadTaskOperator(TaskOption.SHUTDOWN, shutdownTaskArr);
 		
 		serverStartOperator.start();

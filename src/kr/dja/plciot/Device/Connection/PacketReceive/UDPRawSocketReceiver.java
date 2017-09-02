@@ -44,7 +44,7 @@ public class UDPRawSocketReceiver
 	public static class UDPRawSocketThreadManage extends Thread
 	{// UDPRawSocketReceiver 클래스를 빌드하고 작업을 실행합니다.
 		
-		private UDPRawSocketReceiver instance;
+		private final UDPRawSocketReceiver instance;
 		private TaskLock startLock;
 		private TaskLock shutdownLock;
 		

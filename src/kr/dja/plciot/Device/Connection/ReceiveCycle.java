@@ -4,7 +4,6 @@ import kr.dja.plciot.Device.Connection.PacketReceive.IPacketReceiveObservable;
 
 import java.util.Map;
 
-import kr.dja.plciot.Device.IDevicePacketReceiveObserver;
 import kr.dja.plciot.Device.Connection.PacketReceive.IPacketReceiveObserver;
 
 public class ReceiveCycle implements Runnable, IPacketReceiveObserver

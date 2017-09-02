@@ -107,6 +107,8 @@ public class MultiThreadTaskOperator extends Lockable implements Runnable
 			{
 				task = this.taskQueue.get(0);
 				this.taskQueue.remove(0);
+				System.out.println("COUNT: " + this.taskQueue.size());
+				System.out.println(task != null);
 			}
 			else
 			{

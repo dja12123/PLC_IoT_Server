@@ -2,7 +2,6 @@ package kr.dja.plciot.Device.Connection.PacketReceive;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,11 +19,11 @@ import kr.dja.plciot.Task.MultiThread.TaskOption;
 
 public class ReceiveController implements IPacketReceiveObservable, IRawSocketObserver
 {
-	private List<UDPRawSocketReceiver> rawSocketReceiver;
-	private Map<String, IPacketReceiveObserver> observers;
-	private IReceiveRegister register;
+	private final List<UDPRawSocketReceiver> rawSocketReceiver;
+	private final Map<String, IPacketReceiveObserver> observers;
+	private final IReceiveRegister register;
 	
-	private ReceiveController(IReceiveRegister register)
+	public ReceiveController(IReceiveRegister register)
 	{// ReceiveControllerBuilder에서 인스턴스를 생성합니다.
 		this.rawSocketReceiver = new ArrayList<UDPRawSocketReceiver>();
 		this.observers = Collections.synchronizedMap(new HashMap<String, IPacketReceiveObserver>());
@@ -73,46 +72,36 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 		}
 	}
 	
-	public static class ReceiveControllerBuildManager
+	public static class ReceiveControllerBuildManager implements IMultiThreadTaskCallback
 	{
-		private ReceiveController instance;
-		private List<UDPRawSocketThreadManage> receiverThreadList;
+		private final ReceiveController instance;
+		private final List<UDPRawSocketThreadManage> receiverThreadList;
 		private List<DatagramSocket> dataSocketList;
 		
-		public ReceiveControllerBuildManager(IReceiveRegister register)
+		public ReceiveControllerBuildManager(ReceiveController instance)
 		{
-			this.instance = new ReceiveController(register);
+			this.instance = instance;
 			this.receiverThreadList = new ArrayList<UDPRawSocketThreadManage>();
 			this.dataSocketList = new ArrayList<DatagramSocket>();
 		}
 		
-		public void setDatagramSocket(int startPort, int endPort)
+		public void setDatagramSocket(List<DatagramSocket> dataSocketList)
 		{
-			for(int i = startPort; i <= endPort; ++i)
-			{
-				try
-				{
-					DatagramSocket rcvSocket = new DatagramSocket(i);
-					this.dataSocketList.add(rcvSocket);
-				}
-				catch (SocketException e)
-				{
-					e.printStackTrace();
-				}
-			}
+			this.dataSocketList = dataSocketList;
 		}
 		
-		public void createInstance(NextTask nextTask, BuildManagerCallback startCallback)
+		private void initializeValues(NextTask nextTask)
 		{
 			PLC_IoT_Core.CONS.push("장치 수신자 빌드 시작.");
 			nextTask.insertTask((TaskOption option, NextTask insertNext)->
 			{
+				System.out.println(this.receiverThreadList != null);
 				for(UDPRawSocketThreadManage builder : this.receiverThreadList)
 				{
-					this.instance.rawSocketReceiver.add(builder.getInstance());
+					System.out.println(builder != null);
+					//this.instance.rawSocketReceiver.add(builder.getInstance());
 				}
 				PLC_IoT_Core.CONS.push("장치 수신자 빌드 완료.");
-				startCallback.run(this.instance);
 				insertNext.nextTask();
 			});
 			
@@ -125,26 +114,30 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 			totalLock.unlock();
 		}
 		
-		public void disposeInstance(NextTask nextTask, Runnable shutdownCallback)
+		private void disposeInstance(NextTask nextTask)
 		{
-			nextTask.insertTask((TaskOption option, NextTask insertNext)->
-			{
-				shutdownCallback.run();
-				insertNext.nextTask();
-			});
-			
 			TaskLock totalLock = nextTask.createLock();
 			for(UDPRawSocketThreadManage builder : this.receiverThreadList)
 			{
 				builder.stopTask(nextTask.createLock());
 			}
+			
 			totalLock.unlock();
 		}
-	}
 
-	public static interface BuildManagerCallback
-	{
-		void run(ReceiveController instance);
+		@Override
+		public void executeTask(TaskOption option, NextTask nextTask)
+		{
+			if(option == TaskOption.START)
+			{
+				this.initializeValues(nextTask);
+			}
+			else if(option == TaskOption.SHUTDOWN)
+			{
+				this.disposeInstance(nextTask);
+			}
+			
+		}
 	}
 }
 

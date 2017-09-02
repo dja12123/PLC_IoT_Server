@@ -109,8 +109,9 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <interface id="11" language="java" name="kr.dja.plciot.Device.IDevicePacketReceiveObserver" project="PLC_IOT_Server" 
-    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/IDevicePacketReceiveObserver.java" binary="false" 
+  <interface id="11" language="java" name="kr.dja.plciot.Device.Connection.IDevicePacketReceiveObserver" 
+    project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/IDevicePacketReceiveObserver.java" binary="false" 
     corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="974" y="-158"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
@@ -119,8 +120,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </interface>  
-  <interface id="12" language="java" name="kr.dja.plciot.Device.INetworkManager" project="PLC_IOT_Server" 
-    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/INetworkManager.java" binary="false" corner="BOTTOM_RIGHT">    
+  <interface id="12" language="java" name="kr.dja.plciot.Device.Connection.INetworkManager" project="PLC_IOT_Server" 
+    file="/PLC_IOT_Server/src/kr/dja/plciot/Device/Connection/INetworkManager.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="566" y="-355"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
@@ -199,120 +200,120 @@
     <end type="TARGET" refId="13"/>  
   </realization>  
   <association id="21">    
-    <end type="SOURCE" refId="14" navigable="false">      
-      <attribute id="22" name="receiveController">        
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="22" name="deviceCallback">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
       <multiplicity id="23" minimum="0" maximum="1">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
-    <end type="TARGET" refId="5" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="24">    
-    <end type="SOURCE" refId="9" navigable="false">      
-      <attribute id="25" name="deviceCallback">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="26" minimum="0" maximum="1">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
-    </end>    
     <end type="TARGET" refId="11" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <nesting id="27">    
+  <nesting id="24">    
     <end type="SOURCE" refId="5"/>    
     <end type="TARGET" refId="6"/>  
   </nesting>  
-  <association id="28">    
+  <association id="25">    
     <end type="SOURCE" refId="9" navigable="false">      
-      <attribute id="29" name="receiveManager">        
+      <attribute id="26" name="receiveManager">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="30" minimum="0" maximum="1">        
+      <multiplicity id="27" minimum="0" maximum="1">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="1" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="31">    
+  <association id="28">    
     <end type="SOURCE" refId="4" navigable="false">      
-      <attribute id="32" name="receiverThreadList">        
+      <attribute id="29" name="receiverThreadList">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="33" minimum="0" maximum="2147483647">        
+      <multiplicity id="30" minimum="0" maximum="2147483647">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="8" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="34">    
+  <association id="31">    
     <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="35" name="register">        
+      <attribute id="32" name="register">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="36" minimum="0" maximum="1">        
+      <multiplicity id="33" minimum="0" maximum="1">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="13" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <nesting id="37">    
+  <nesting id="34">    
     <end type="SOURCE" refId="7"/>    
     <end type="TARGET" refId="8"/>  
   </nesting>  
-  <realization id="38">    
+  <realization id="35">    
     <end type="SOURCE" refId="14"/>    
     <end type="TARGET" refId="15"/>  
   </realization>  
-  <generalization id="39">    
+  <generalization id="36">    
     <end type="SOURCE" refId="17"/>    
     <end type="TARGET" refId="19"/>  
   </generalization>  
-  <association id="40">    
+  <association id="37">    
     <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="41" name="rawSocketReceiver">        
+      <attribute id="38" name="rawSocketReceiver">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="42" minimum="0" maximum="2147483647">        
+      <multiplicity id="39" minimum="0" maximum="2147483647">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="7" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="43">    
+  <realization id="40">    
     <end type="SOURCE" refId="10"/>    
     <end type="TARGET" refId="11"/>  
   </realization>  
-  <realization id="44">    
+  <realization id="41">    
     <end type="SOURCE" refId="10"/>    
     <end type="TARGET" refId="12"/>  
   </realization>  
-  <association id="45">    
+  <association id="42">    
     <end type="SOURCE" refId="16" navigable="false">      
-      <attribute id="46" name="taskQueue">        
+      <attribute id="43" name="taskQueue">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="47" minimum="0" maximum="2147483647">        
+      <multiplicity id="44" minimum="0" maximum="2147483647">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="15" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="48">    
+  <realization id="45">    
     <end type="SOURCE" refId="5"/>    
     <end type="TARGET" refId="3"/>  
   </realization>  
+  <association id="46">    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="47" name="startLock">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </attribute>      
+      <multiplicity id="48" minimum="0" maximum="1">        
+        <position height="0" width="0" x="0" y="0"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="18" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
   <association id="49">    
     <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="50" name="startLock">        
+      <attribute id="50" name="shutdownLock">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
       <multiplicity id="51" minimum="0" maximum="1">        
@@ -322,124 +323,112 @@
     <end type="TARGET" refId="18" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="52">    
-    <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="53" name="shutdownLock">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="54" minimum="0" maximum="1">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
-    </end>    
-    <end type="TARGET" refId="18" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="55">    
+  <realization id="52">    
     <end type="SOURCE" refId="9"/>    
     <end type="TARGET" refId="2"/>  
   </realization>  
-  <association id="56">    
+  <association id="53">    
     <end type="SOURCE" refId="14" navigable="false">      
-      <attribute id="57" name="deviceList">        
+      <attribute id="54" name="deviceList">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="58" minimum="0" maximum="2147483647">        
+      <multiplicity id="55" minimum="0" maximum="2147483647">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="10" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="59">    
+  <association id="56">    
     <end type="SOURCE" refId="4" navigable="false">      
-      <attribute id="60" name="instance">        
+      <attribute id="57" name="instance">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="61" minimum="0" maximum="1">        
+      <multiplicity id="58" minimum="0" maximum="1">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="5" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="62">    
+  <realization id="59">    
     <end type="SOURCE" refId="5"/>    
     <end type="TARGET" refId="1"/>  
   </realization>  
-  <association id="63">    
+  <association id="60">    
     <end type="SOURCE" refId="17" navigable="false">      
-      <attribute id="64" name="oper">        
+      <attribute id="61" name="oper">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="65" minimum="0" maximum="1">        
+      <multiplicity id="62" minimum="0" maximum="1">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="16" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="66">    
+  <association id="63">    
     <end type="SOURCE" refId="18" navigable="false">      
-      <attribute id="67" name="lockInst">        
+      <attribute id="64" name="lockInst">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="68" minimum="0" maximum="1">        
+      <multiplicity id="65" minimum="0" maximum="1">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="19" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <nesting id="69">    
+  <nesting id="66">    
     <end type="SOURCE" refId="5"/>    
     <end type="TARGET" refId="4"/>  
   </nesting>  
-  <generalization id="70">    
+  <generalization id="67">    
     <end type="SOURCE" refId="16"/>    
     <end type="TARGET" refId="19"/>  
   </generalization>  
-  <association id="71">    
+  <association id="68">    
     <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="72" name="observers">        
+      <attribute id="69" name="observers">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="73" minimum="0" maximum="2147483647">        
+      <multiplicity id="70" minimum="0" maximum="2147483647">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="74">    
+  <association id="71">    
     <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="75" name="instance">        
+      <attribute id="72" name="instance">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="76" minimum="0" maximum="1">        
+      <multiplicity id="73" minimum="0" maximum="1">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="7" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="77">    
+  <association id="74">    
     <end type="SOURCE" refId="7" navigable="false">      
-      <attribute id="78" name="receiveManager">        
+      <attribute id="75" name="receiveManager">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="79" minimum="0" maximum="1">        
+      <multiplicity id="76" minimum="0" maximum="1">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="3" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="80">    
+  <association id="77">    
     <end type="SOURCE" refId="19" navigable="false">      
-      <attribute id="81" name="lockList">        
+      <attribute id="78" name="lockList">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
-      <multiplicity id="82" minimum="0" maximum="2147483647">        
+      <multiplicity id="79" minimum="0" maximum="2147483647">        
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
