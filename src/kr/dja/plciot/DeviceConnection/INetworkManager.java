@@ -1,4 +1,4 @@
-package kr.dja.plciot.Device.Connection;
+package kr.dja.plciot.DeviceConnection;
 
 import java.util.Map;
 

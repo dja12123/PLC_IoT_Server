@@ -1,4 +1,4 @@
-package kr.dja.plciot.Device.Connection.PacketReceive;
+package kr.dja.plciot.DeviceConnection.PacketReceive;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -6,7 +6,7 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 
 import kr.dja.plciot.PLC_IoT_Core;
-import kr.dja.plciot.Device.Connection.PacketProcess;
+import kr.dja.plciot.DeviceConnection.PacketProcess;
 import kr.dja.plciot.Task.TaskLock;
 
 public class UDPRawSocketReceiver
@@ -36,7 +36,6 @@ public class UDPRawSocketReceiver
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
 			}
 		}
 	}
@@ -64,9 +63,11 @@ public class UDPRawSocketReceiver
 		@Override
 		public void run()
 		{
-			PLC_IoT_Core.CONS.push("장치 수신자 포트 " + this.instance.socket.getLocalPort() + " 번 활성화.");
+			PLC_IoT_Core.CONS.push("장치 수신자 " + this.instance.socket.getLocalPort() + " 번 활성화.");
 			this.startLock.unlock();
 			this.instance.executeTask();
+			
+			PLC_IoT_Core.CONS.push("장치 수신자 비활성화.");
 			this.shutdownLock.unlock();
 		}
 		

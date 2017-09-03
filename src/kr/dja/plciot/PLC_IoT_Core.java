@@ -7,8 +7,8 @@ import java.util.Map;
 
 import kr.dja.plciot.Database.DatabaseConnector;
 import kr.dja.plciot.Device.DeviceManager;
-import kr.dja.plciot.Device.Connection.ConnectionManager;
-import kr.dja.plciot.Device.Connection.ConnectionManager.ConnectionManagerBuilder;
+import kr.dja.plciot.DeviceConnection.ConnectionManager;
+import kr.dja.plciot.DeviceConnection.ConnectionManager.ConnectionManagerBuilder;
 import kr.dja.plciot.Log.Console;
 import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
 import kr.dja.plciot.Task.MultiThread.NextTask;
@@ -41,7 +41,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 		connectionManagerBuilder.setReceiveRegister(this.deviceManager);
 		
 		IMultiThreadTaskCallback[] startTaskArr = new IMultiThreadTaskCallback[]
-				{this.dbManager, connectionManagerBuilder, this.webServer, new TestClass(), this};
+				{this.dbManager, connectionManagerBuilder, this.webServer, this};
 		MultiThreadTaskOperator serverStartOperator = new MultiThreadTaskOperator(TaskOption.START, startTaskArr);
 		
 		IMultiThreadTaskCallback[] shutdownTaskArr = new IMultiThreadTaskCallback[]
@@ -55,6 +55,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 			@Override
 			public void windowClosing(WindowEvent e)
 			{
+				CONS.push("서버 종료 시작.");
 				serverShutdownOperator.start();
 			}
 		});
@@ -70,52 +71,12 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 	{
 		if(option == TaskOption.START)
 		{
-			CONS.push("서버 시작 완료");
+			CONS.push("서버 시작 완료.");
 		}
 		if(option == TaskOption.SHUTDOWN)
 		{
-			System.out.println("서버 종료 완료");
+			CONS.push("서버 종료 완료.");
 			System.exit(0);
 		}
 	}
-}
-
-class TestClass implements IMultiThreadTaskCallback
-{
-
-	@Override
-	public void executeTask(TaskOption option, NextTask nextTask)
-	{
-		TaskLock lock1 = nextTask.createLock();
-		TaskLock lock2 = nextTask.createLock();
-		
-		new Thread(()->{
-			try
-			{
-				Thread.sleep(3000);
-			} catch (InterruptedException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			lock1.unlock();
-			
-		}
-				).start();
-		new Thread(()->{
-			try
-			{
-				Thread.sleep(2000);
-			} catch (InterruptedException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			lock2.unlock();
-			
-		}
-				).start();
-		
-	}
-	
 }

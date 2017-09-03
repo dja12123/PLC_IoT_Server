@@ -1,4 +1,4 @@
-package kr.dja.plciot.Device.Connection.PacketSend;
+package kr.dja.plciot.DeviceConnection.PacketSend;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

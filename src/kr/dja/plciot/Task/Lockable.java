@@ -38,7 +38,6 @@ public abstract class Lockable
 		{
 			lockInst.unlock();
 			this.lockList.remove(lockInst);
-			System.out.println(this.lockList.size());
 		}
 	}
 	
@@ -69,7 +68,6 @@ public abstract class Lockable
 				{
 					this.unLock();
 				}
-				System.out.println(this.lockCount + " " + afterLock + " " + this.lockList.size());
 			}
 		}
 	}

@@ -1,14 +1,15 @@
-package kr.dja.plciot.Device.Connection;
-
-import kr.dja.plciot.Device.Connection.PacketReceive.IPacketReceiveObservable;
+package kr.dja.plciot.DeviceConnection;
 
 import java.util.Map;
 
-import kr.dja.plciot.Device.Connection.PacketReceive.IPacketReceiveObserver;
+import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObservable;
+import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObserver;
+import kr.dja.plciot.DeviceConnection.PacketSend.IPacketSender;
 
 public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 {
-	private final IPacketReceiveObservable receiveManager;
+	private final IPacketSender sender;
+	private final IPacketReceiveObservable receiver;
 	private final IDevicePacketReceiveObserver deviceCallback;
 	
 	private final String uuid;
@@ -18,19 +19,20 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 	
 	private Thread resiveTaskThread;
 	
-	public ReceiveCycle(IPacketReceiveObservable receiveManager, byte[] data, IDevicePacketReceiveObserver deviceCallback)
+	public ReceiveCycle(IPacketSender sender, IPacketReceiveObservable receiver, byte[] data, IDevicePacketReceiveObserver deviceCallback)
 	{
 		this.resendCount = 0;
 		this.taskState = false;
 		
-		this.receiveManager = receiveManager;
+		this.sender = sender;
+		this.receiver = receiver;
 		this.deviceCallback = deviceCallback;
 		
 		this.ReceivePacket = data;
 		this.uuid = PacketProcess.GetPacketFULLUID(data);
 		
 		// 수신 메니저에 해당 사이클을 바인딩 합니다.
-		this.receiveManager.addObserver(this.uuid, this);
+		this.receiver.addObserver(this.uuid, this);
 		
 		// 발신자로부터 패킷 이 반환되어 올때까지 대기힙니다.
 		this.resiveWaitTask();
@@ -115,6 +117,6 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 		this.deviceCallback.ReceiveData(receiveName, receiveData, this.taskState);
 		
 		// 수신 메니저 바인딩 해제.
-		this.receiveManager.deleteObserver(this.uuid);
+		this.receiver.deleteObserver(this.uuid);
 	}
 }

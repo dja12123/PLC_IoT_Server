@@ -1,6 +1,6 @@
-package kr.dja.plciot.Device.Connection;
+package kr.dja.plciot.DeviceConnection;
 
-import kr.dja.plciot.Device.Connection.PacketReceive.IPacketReceiveObservable;
+import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObservable;
 
 public interface IReceiveRegister
 {

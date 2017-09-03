@@ -1,4 +1,4 @@
-package kr.dja.plciot.Device.Connection.PacketReceive;
+package kr.dja.plciot.DeviceConnection.PacketReceive;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import kr.dja.plciot.PLC_IoT_Core;
-import kr.dja.plciot.Device.Connection.IReceiveRegister;
-import kr.dja.plciot.Device.Connection.PacketProcess;
-import kr.dja.plciot.Device.Connection.PacketReceive.UDPRawSocketReceiver.UDPRawSocketThreadManage;
+import kr.dja.plciot.DeviceConnection.IReceiveRegister;
+import kr.dja.plciot.DeviceConnection.PacketProcess;
+import kr.dja.plciot.DeviceConnection.PacketReceive.UDPRawSocketReceiver.UDPRawSocketThreadManage;
 import kr.dja.plciot.Task.TaskLock;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
@@ -95,11 +95,9 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 			PLC_IoT_Core.CONS.push("장치 수신자 빌드 시작.");
 			nextTask.insertTask((TaskOption option, NextTask insertNext)->
 			{
-				System.out.println(this.receiverThreadList != null);
 				for(UDPRawSocketThreadManage builder : this.receiverThreadList)
 				{
-					System.out.println(builder != null);
-					//this.instance.rawSocketReceiver.add(builder.getInstance());
+					this.instance.rawSocketReceiver.add(builder.getInstance());
 				}
 				PLC_IoT_Core.CONS.push("장치 수신자 빌드 완료.");
 				insertNext.nextTask();

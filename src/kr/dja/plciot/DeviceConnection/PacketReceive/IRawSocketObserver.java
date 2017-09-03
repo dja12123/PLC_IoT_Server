@@ -1,4 +1,4 @@
-package kr.dja.plciot.Device.Connection.PacketReceive;
+package kr.dja.plciot.DeviceConnection.PacketReceive;
 
 import java.net.InetAddress;
 

@@ -1,4 +1,4 @@
-package kr.dja.plciot.Device.Connection.PacketSend;
+package kr.dja.plciot.DeviceConnection.PacketSend;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import kr.dja.plciot.PLC_IoT_Core;
-import kr.dja.plciot.Device.Connection.PacketProcess;
+import kr.dja.plciot.DeviceConnection.PacketProcess;
 
-public class SendController implements IDataSender
+public class SendController implements IPacketSender
 {
 	private final List<UDPRawSocketSender> rawSocketSender;
 	

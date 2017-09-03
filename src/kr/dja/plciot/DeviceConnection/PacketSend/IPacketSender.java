@@ -1,8 +1,8 @@
-package kr.dja.plciot.Device.Connection.PacketSend;
+package kr.dja.plciot.DeviceConnection.PacketSend;
 
 import java.net.InetAddress;
 
-public interface IDataSender
+public interface IPacketSender
 {
 	 public void sendData(InetAddress sendAddress, byte[] data);
 }
