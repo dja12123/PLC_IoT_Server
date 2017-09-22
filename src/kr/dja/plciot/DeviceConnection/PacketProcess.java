@@ -10,7 +10,7 @@ public class PacketProcess
 	public static void main(String args[])
     {
 		String macAddr = "001F1F1F1FAA";
-		String fulluid = PacketProcess.CreateUUID(macAddr);
+		String fulluid = PacketProcess.CreateFULLUID(macAddr);
 		String packetName = "testPacket";
 		
 		HashMap<String, String> sendData = new HashMap<String, String>();
@@ -19,7 +19,7 @@ public class PacketProcess
 		
 		byte[] data = PacketProcess.CreateDataSet();
 		
-		PacketProcess.InputPacketHeader(data, fulluid, PacketProcess.PHASE_SEND);
+
 		
 		PacketProcess.InputPacketData(data, packetName, PacketProcess.DataMapToByte(sendData));
 		
@@ -28,18 +28,14 @@ public class PacketProcess
 	
 	private static final int BYTE = 8;// 8bit = byte
 	
-	private static final int FIELD_TIMEID = 4;// 0 ~ 3 Byte
-	private static final int FIELD_FULLUID = 10;// 4 ~ 9 Byte
-	private static final int FIELD_PHASE = 11; // 10 ~ 11 Byte
-	private static final int FIELD_NAME = 32; // 12 ~ 32 Byte
-	private static final int FIELD_TOTAL = 1024; // total 1024 Byte
+	private static final int FIELD_TIMEID = 3;// 0 ~ 3 Byte
+	private static final int FIELD_FULLUID = 9;// 4 ~ 9 Byte
+	private static final int FIELD_PHASE = 10; // 10 Byte
+	private static final int FIELD_NAME_SIZE = 11; // 12 ~ 32 Byte
+	private static final int FIELD_TOTAL_SIZE = 12; // total 1024 Byte
 	
 	private static final byte DATAMAP_SYNTEX_KEY = '=';
 	private static final byte DATAMAP_SYNTEX_VALUE = '\n';
-	
-	public static final byte PHASE_SEND = 0b00010110; // 0x16 SYN
-	public static final byte PHASE_CHECK = 0b00000110; // 0x06 ACK
-	public static final byte PHASE_EXECUTE = 0b00000101; // 0x05 ENQ
 	
 	private static final byte NULL_VALUE = 0b00000000;
 	
@@ -66,7 +62,7 @@ public class PacketProcess
 		return new byte[FIELD_TOTAL];
 	}
 	
-	public static String CreateUUID(String macAddr)
+	public static String CreateFULLUID(String macAddr)
 	{// uuid 생성.
 		StringBuffer returnUUID = new StringBuffer();
 		long time = System.currentTimeMillis();
@@ -86,8 +82,11 @@ public class PacketProcess
 		return returnUUID.toString();
 	}
 	
-	public static void InputPacketHeader(byte[] dataSet, String fullUID, byte phase)
+	public static byte[] CreatePacketHeader(String fullUID, byte phase)
 	{// 패킷 헤더를 패킷에 삽입합니다.
+		
+		byte[] dataSet = new byte[FIELD_PHASE + 1];
+		
 		int dataSetIndex = 0;
 		
 		for(int uuidIndex = 0; uuidIndex / 2 < FIELD_FULLUID; uuidIndex += 2)
@@ -96,12 +95,28 @@ public class PacketProcess
 			++dataSetIndex;
 		}
 		dataSet[dataSetIndex] = phase; // 신호 페이즈 넣기 (index 10)
+		
+		return dataSet;
 	}
 	
-	public static void InputPacketData(byte[] dataSet, String name, byte[] sendData)
-	{// 데이타를 패킷 버퍼에 삽입합니다.
+	public static byte[] CreatePacketData(byte[] header, String name, String data)
+	{// 헤더 정보를 합친 데이터 페킷을 생성합니다
 		
-		int dataSetIndex = FIELD_PHASE; // (index 11~)
+		if(name.length() > Byte.MAX_VALUE)
+		{
+			new Exception("name is too long");
+		}
+		if(data.length() > Byte.MAX_VALUE)
+		{
+			new Exception("data is too long");
+		}
+		
+		byte nameFieldSize = (byte)name.length();
+		byte dataFieldSize = (byte)data.length();
+		
+		byte[] packet = new byte[header.length + 2 + nameFieldSize + dataFieldSize];
+		
+		for(packet)
 		
 		for(int dataNameIndex = 0; dataNameIndex < name.length() && dataSetIndex < FIELD_NAME; ++dataNameIndex)
 		{
@@ -191,7 +206,7 @@ public class PacketProcess
 		return packetName.toString();
 	}
 	
-	public static Map<String, String> GetPacketData(byte[] dataByte)
+	/*public static Map<String, String> GetPacketData(byte[] dataByte)
 	{// 데이터 바이트를 데이터 맵으로 디코드.
 		Map<String, String> dataMap = new HashMap<String, String>();
 		
@@ -218,6 +233,6 @@ public class PacketProcess
 			
 		}
 		return dataMap;
-	}
+	}*/
 	
 }

@@ -1,25 +1,24 @@
-package kr.dja.plciot.DeviceConnection;
+package kr.dja.plciot.DeviceConnection.Cycle;
 
-import java.util.Map;
-
+import kr.dja.plciot.DeviceConnection.PacketProcess;
 import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObservable;
 import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObserver;
 import kr.dja.plciot.DeviceConnection.PacketSend.IPacketSender;
 
-public class ReceiveCycle implements Runnable, IPacketReceiveObserver
+public class SendCycle implements Runnable, IPacketReceiveObserver
 {
 	private final IPacketSender sender;
 	private final IPacketReceiveObservable receiver;
-	private final IDevicePacketReceiveObserver deviceCallback;
+	private final IPacketCycleController deviceCallback;
 	
 	private final String uuid;
-	private byte[] ReceivePacket;
+	private byte[] sendPacket;
 	private int resendCount;
 	private boolean taskState;
 	
 	private Thread resiveTaskThread;
 	
-	public ReceiveCycle(IPacketSender sender, IPacketReceiveObservable receiver, byte[] data, IDevicePacketReceiveObserver deviceCallback)
+	public SendCycle(IPacketSender sender, IPacketReceiveObservable receiver, byte[] data, IPacketCycleController deviceCallback)
 	{
 		this.resendCount = 0;
 		this.taskState = false;
@@ -28,7 +27,7 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 		this.receiver = receiver;
 		this.deviceCallback = deviceCallback;
 		
-		this.ReceivePacket = data;
+		this.sendPacket = data;
 		this.uuid = PacketProcess.GetPacketFULLUID(data);
 		
 		// 수신 메니저에 해당 사이클을 바인딩 합니다.
@@ -44,7 +43,7 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 	@Override
 	public void packetResive(byte[] resivePacket)
 	{// 패킷을 받은 상태일때.
-		this.ReceivePacket = resivePacket;
+		this.sendPacket = resivePacket;
 		this.resiveTaskThread.interrupt();
 	}
 	
@@ -61,13 +60,13 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 		{
 			byte phase = PacketProcess.GetPacketPhase(this.ReceivePacket);
 			
-			if(phase == PacketProcess.PHASE_EXECUTE)
+			if(phase == CycleProcess.PHASE_EXECUTE)
 			{// 오류가 없는 실행 상태.
 				this.taskState = true;
 				this.endProcess();// 사이클이 정상적으로 완료되었습니다.
 				return;
 			}
-			else if(phase == PacketProcess.PHASE_SEND)
+			else if(phase == CycleProcess.PHASE_START)
 			{// 오류가 있는 상태.
 				if(this.resendCount < PacketProcess.MAX_RESEND)
 				{// 장치에서 오류가 있다는 신호를 보낸 상태 - 재전송 필요.
@@ -111,7 +110,6 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 	private void endProcess()
 	{
 		String receiveName = PacketProcess.GetPacketName(this.ReceivePacket);
-		Map<String, String> receiveData = PacketProcess.GetPacketData(this.ReceivePacket);
 		
 		// 장치에게 데이터 수신을 알립니다.
 		this.deviceCallback.ReceiveData(receiveName, receiveData, this.taskState);
@@ -119,4 +117,5 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 		// 수신 메니저 바인딩 해제.
 		this.receiver.deleteObserver(this.uuid);
 	}
+
 }

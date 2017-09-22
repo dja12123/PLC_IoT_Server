@@ -12,7 +12,7 @@ import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.DeviceConnection.ConnectionManager;
 import kr.dja.plciot.DeviceConnection.IReceiveRegister;
 import kr.dja.plciot.DeviceConnection.PacketProcess;
-import kr.dja.plciot.DeviceConnection.ReceiveCycle;
+import kr.dja.plciot.DeviceConnection.Cycle.ReceiveCycle;
 import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObservable;
 import kr.dja.plciot.DeviceConnection.PacketReceive.ReceiveController;
 import kr.dja.plciot.DeviceConnection.PacketReceive.ReceiveController.ReceiveControllerBuildManager;
@@ -38,7 +38,7 @@ public class DeviceManager implements IReceiveRegister
 		String macAddr = PacketProcess.GetpacketMacAddr(data);
 		Device receiveTarget = this.deviceList.getOrDefault(macAddr, null);
 		if(receiveTarget != null)
-		{// 일반적인 통신 사이클을 시작합니다.
+		{// 일반적인 통신 수신 사이클을 시작합니다.
 			ReceiveCycle receiveCycle = new ReceiveCycle(observable, data, receiveTarget);
 		}
 		else

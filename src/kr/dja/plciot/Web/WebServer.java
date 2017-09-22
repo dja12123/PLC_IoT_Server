@@ -1,99 +1,124 @@
+/*
+ * Copyright 2012 The Netty Project
+ *
+ * The Netty Project licenses this file to you under the Apache License, version
+ * 2.0 (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package kr.dja.plciot.Web;
 
-import kr.dja.plciot.PLC_IoT_Core;
-import kr.dja.plciot.Log.Console;
-import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
-import kr.dja.plciot.Task.MultiThread.NextTask;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
+import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
- 
-
-public class WebServer implements Runnable, IMultiThreadTaskCallback
+public class WebServer
 {
-	public static final String ROOT_DOC = "/Users/kyoungil_lee/Desktop/web";
-	
-	private NextTask startNextTask;
+	private static final int PORT = 8080;
 
-	private boolean stop = false;
-
-	private Thread webServerThread;
-	
-	public WebServer()
+	public static void main(String[] args)
 	{
-	}
-
-	@Override
-	public void run()
-	{
-		PLC_IoT_Core.CONS.push("웹 서버 시작");
-		this.startNextTask.nextTask();
-		
-		ServerSocket serverSocket = null;
-		int port = 80;
- 
+		// Configure the server.
+		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+		EventLoopGroup workerGroup = new NioEventLoopGroup();
 		try
 		{
-			serverSocket = new ServerSocket(port, 1);
+			ServerBootstrap b = new ServerBootstrap();
+			b.option(ChannelOption.SO_BACKLOG, 1024);
+			b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+					.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new HTTPInitializer());
+			
+			Channel ch = b.bind(PORT).sync().channel();
+			System.out.println("OPEN");
+			
+			ch.closeFuture().sync();
+			
 		}
-		catch (IOException ie)
+		catch (InterruptedException e)
 		{
-			ie.printStackTrace();
-			System.exit(1);
+			e.printStackTrace();
 		}
- 
-		while (!this.stop)
+		finally
 		{
-			Socket socket = null;
-			InputStream input = null;
-			OutputStream output = null;
- 
+			bossGroup.shutdownGracefully();
+			workerGroup.shutdownGracefully();
+		}
+	}
+	public static class WebServerBuilderManager implements IMultiThreadTaskCallback
+	{
+		private final WebServer instance;
+		
+		private EventLoopGroup bossGroup;
+		private EventLoopGroup workerGroup;
+		private Channel channel;
+		
+		public WebServerBuilderManager(WebServer instance)
+		{
+			this.instance = instance;
+		}
+		
+		private void startTask(NextTask nextTask)
+		{
+			this.bossGroup = new NioEventLoopGroup(1);
+			this.workerGroup = new NioEventLoopGroup();
 			try
 			{
-				socket = serverSocket.accept();
-				PLC_IoT_Core.CONS.push("웹 서비스 요청");
-				input = socket.getInputStream();
-				output = socket.getOutputStream();
- 
-				Request request = new Request(input);
-				request.parse();
-
-				Response response = new Response(output);
-				response.setRequest(request);
-				response.sendStaticResource();
- 
-				socket.close();
- 
-				System.out.println(request.getUrl());
+				ServerBootstrap b = new ServerBootstrap();
+				b.option(ChannelOption.SO_BACKLOG, 1024);
+				b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+						.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new HTTPInitializer());
+				
+				this.channel = b.bind(PORT).sync().channel();
+				System.out.println("OPEN");
+				
+				nextTask.nextTask();
+				this.channel.closeFuture().sync();
+				
 			}
-			catch (Exception ex)
+			catch (InterruptedException e)
 			{
-				ex.printStackTrace();
-				continue;
+				nextTask.error(e, "WEB SERVER ERROR");
 			}
+			nextTask.nextTask();
+			
 		}
-		PLC_IoT_Core.CONS.push("서버 중단");
-	}
-
-
-	@Override
-	public void executeTask(TaskOption option, NextTask nextTask)
-	{
-		if(option == TaskOption.START)
+		
+		private void shutDownTask(NextTask nextTask)
 		{
-			this.startNextTask = nextTask;
-			this.webServerThread = new Thread(this);
-			this.webServerThread.start();
-		}
-		if(option == TaskOption.SHUTDOWN)
-		{
+			this.channel.close();
+			this.bossGroup.shutdownGracefully();
+			this.workerGroup.shutdownGracefully();
 			nextTask.nextTask();
 		}
+
+		@Override
+		public void executeTask(TaskOption option, NextTask nextTask)
+		{
+			if(option == TaskOption.START)
+			{
+				this.startTask(nextTask);
+			}
+			else if(option == TaskOption.SHUTDOWN)
+			{
+				this.shutDownTask(nextTask);
+			}
+		
+		}
+		
 	}
 }
