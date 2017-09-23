@@ -64,7 +64,7 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 		IPacketReceiveObserver observer = this.observers.getOrDefault(uuid, null);
 		if(observer != null)
 		{
-			observer.packetResive(data);
+			observer.packetReceive(data);
 		}
 		else
 		{

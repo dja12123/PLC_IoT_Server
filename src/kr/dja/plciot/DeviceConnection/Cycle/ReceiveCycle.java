@@ -25,7 +25,8 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 	
 	private Thread resiveTaskThread;
 	
-	public ReceiveCycle(IPacketSender sender, IPacketReceiveObservable receiver, InetAddress addr, byte[] data, IPacketCycleController deviceCallback)
+	public ReceiveCycle(IPacketSender sender, IPacketReceiveObservable receiver, InetAddress addr
+			, byte[] data, IPacketCycleController deviceCallback)
 	{
 		this.resendCount = 0;
 		this.taskState = false;
@@ -49,7 +50,7 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 	}
 
 	@Override
-	public void packetResive(byte[] resiveData)
+	public synchronized void packetReceive(byte[] resiveData)
 	{
 		this.receivePacket = resiveData;
 		this.resiveTaskThread.interrupt();
@@ -98,12 +99,7 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 		this.taskState = false;
 		this.endProcess();// 사이클 시간 제한 오류.
 	}
-	
-	public boolean getResiveState()
-	{
-		return this.taskState;
-	}
-	
+
 	private void resiveWaitTask()
 	{
 		this.resiveTaskThread = new Thread(this);

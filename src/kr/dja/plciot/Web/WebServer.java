@@ -23,6 +23,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
@@ -31,78 +32,66 @@ public class WebServer
 {
 	private static final int PORT = 8080;
 
-	public static void main(String[] args)
+	private EventLoopGroup bossGroup;
+	private EventLoopGroup workerGroup;
+	private Channel channel;
+	
+	public WebServer()
 	{
-		// Configure the server.
-		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-		EventLoopGroup workerGroup = new NioEventLoopGroup();
-		try
-		{
-			ServerBootstrap b = new ServerBootstrap();
-			b.option(ChannelOption.SO_BACKLOG, 1024);
-			b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-					.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new HTTPInitializer());
-			
-			Channel ch = b.bind(PORT).sync().channel();
-			System.out.println("OPEN");
-			
-			ch.closeFuture().sync();
-			
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			bossGroup.shutdownGracefully();
-			workerGroup.shutdownGracefully();
-		}
+		
 	}
-	public static class WebServerBuilderManager implements IMultiThreadTaskCallback
+	
+	public static class WebServerBuilder implements IMultiThreadTaskCallback
 	{
 		private final WebServer instance;
+		private Thread taskThread;
 		
-		private EventLoopGroup bossGroup;
-		private EventLoopGroup workerGroup;
-		private Channel channel;
-		
-		public WebServerBuilderManager(WebServer instance)
+		public WebServerBuilder(WebServer instance)
 		{
 			this.instance = instance;
 		}
 		
 		private void startTask(NextTask nextTask)
 		{
-			this.bossGroup = new NioEventLoopGroup(1);
-			this.workerGroup = new NioEventLoopGroup();
+			PLC_IoT_Core.CONS.push("웹 통신 관리자 로드 시작.");
+			this.instance.bossGroup = new NioEventLoopGroup(1);
+			this.instance.workerGroup = new NioEventLoopGroup();
 			try
 			{
 				ServerBootstrap b = new ServerBootstrap();
 				b.option(ChannelOption.SO_BACKLOG, 1024);
-				b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+				b.group(this.instance.bossGroup, this.instance.workerGroup).channel(NioServerSocketChannel.class)
 						.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new HTTPInitializer());
 				
-				this.channel = b.bind(PORT).sync().channel();
-				System.out.println("OPEN");
+				this.instance.channel = b.bind(PORT).sync().channel();
 				
+				PLC_IoT_Core.CONS.push("웹 통신 관리자 활성화.");
 				nextTask.nextTask();
-				this.channel.closeFuture().sync();
+				this.instance.channel.closeFuture().sync();
 				
 			}
 			catch (InterruptedException e)
 			{
 				nextTask.error(e, "WEB SERVER ERROR");
 			}
-			nextTask.nextTask();
-			
 		}
 		
 		private void shutDownTask(NextTask nextTask)
 		{
-			this.channel.close();
-			this.bossGroup.shutdownGracefully();
-			this.workerGroup.shutdownGracefully();
+			PLC_IoT_Core.CONS.push("웹 통신 관리자 종료 시작.");
+			this.instance.channel.close();
+			this.instance.bossGroup.shutdownGracefully();
+			this.instance.workerGroup.shutdownGracefully();
+			try
+			{
+				this.taskThread.join();
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+			
+			PLC_IoT_Core.CONS.push("웹 통신 관리자 종료 성공.");
 			nextTask.nextTask();
 		}
 
@@ -111,13 +100,13 @@ public class WebServer
 		{
 			if(option == TaskOption.START)
 			{
-				this.startTask(nextTask);
+				this.taskThread = new Thread(()->{this.startTask(nextTask);});
+				this.taskThread.start();
 			}
 			else if(option == TaskOption.SHUTDOWN)
 			{
 				this.shutDownTask(nextTask);
 			}
-		
 		}
 		
 	}

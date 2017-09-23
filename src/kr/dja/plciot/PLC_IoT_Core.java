@@ -17,6 +17,7 @@ import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 import kr.dja.plciot.UI.MainFrame;
 import kr.dja.plciot.Web.WebServer;
+import kr.dja.plciot.Web.WebServer.WebServerBuilder;
 
 public class PLC_IoT_Core implements IMultiThreadTaskCallback
 {
@@ -40,12 +41,14 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 		ConnectionManagerBuilder connectionManagerBuilder = new ConnectionManagerBuilder(this.deviceConnectionManager);
 		connectionManagerBuilder.setReceiveRegister(this.deviceManager);
 		
+		WebServerBuilder webServerBuilder = new WebServerBuilder(this.webServer);
+		
 		IMultiThreadTaskCallback[] startTaskArr = new IMultiThreadTaskCallback[]
-				{this.dbManager, connectionManagerBuilder, this.webServer, this};
+				{this.dbManager, connectionManagerBuilder, webServerBuilder, this};
 		MultiThreadTaskOperator serverStartOperator = new MultiThreadTaskOperator(TaskOption.START, startTaskArr);
 		
 		IMultiThreadTaskCallback[] shutdownTaskArr = new IMultiThreadTaskCallback[]
-				{connectionManagerBuilder, this.webServer, this.dbManager, CONS, this.mainFrame, this};
+				{connectionManagerBuilder, webServerBuilder, this.dbManager, CONS, this.mainFrame, this};
 		MultiThreadTaskOperator serverShutdownOperator = new MultiThreadTaskOperator(TaskOption.SHUTDOWN, shutdownTaskArr);
 		
 		serverStartOperator.start();

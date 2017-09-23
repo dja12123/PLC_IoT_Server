@@ -18,14 +18,14 @@ public class Device implements IPacketCycleController
 	}
 
 	@Override
-	public void packetSendCallback(boolean success, byte[] data)
+	public void packetSendCallback(boolean success, String name, String data)
 	{
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void packetReceiveCallback(byte[] data)
+	public void packetReceiveCallback(String name, String data)
 	{
 		// TODO Auto-generated method stub
 		

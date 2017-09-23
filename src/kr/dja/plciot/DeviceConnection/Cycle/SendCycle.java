@@ -1,5 +1,8 @@
 package kr.dja.plciot.DeviceConnection.Cycle;
 
+import java.net.InetAddress;
+
+import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.DeviceConnection.PacketProcess;
 import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObservable;
 import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObserver;
@@ -11,14 +14,17 @@ public class SendCycle implements Runnable, IPacketReceiveObserver
 	private final IPacketReceiveObservable receiver;
 	private final IPacketCycleController deviceCallback;
 	
+	private final InetAddress addr;
 	private final String uuid;
-	private byte[] sendPacket;
+	private byte[] fullPacket;
+	private byte[] packetHeader;
 	private int resendCount;
 	private boolean taskState;
 	
 	private Thread resiveTaskThread;
 	
-	public SendCycle(IPacketSender sender, IPacketReceiveObservable receiver, byte[] data, IPacketCycleController deviceCallback)
+	public SendCycle(IPacketSender sender, IPacketReceiveObservable receiver,InetAddress addr
+			,String macAddr, String name, String data, IPacketCycleController deviceCallback)
 	{
 		this.resendCount = 0;
 		this.taskState = false;
@@ -27,24 +33,57 @@ public class SendCycle implements Runnable, IPacketReceiveObserver
 		this.receiver = receiver;
 		this.deviceCallback = deviceCallback;
 		
-		this.sendPacket = data;
-		this.uuid = PacketProcess.GetPacketFULLUID(data);
+		this.addr = addr;
+		
+		this.uuid = PacketProcess.CreateFULLUID(macAddr);
+		this.packetHeader = PacketProcess.CreatePacketHeader(this.uuid);
+		this.fullPacket = PacketProcess.CreateFullPacket(this.packetHeader, name, data);
 		
 		// 수신 메니저에 해당 사이클을 바인딩 합니다.
 		this.receiver.addObserver(this.uuid, this);
 		
 		// 발신자로부터 패킷 이 반환되어 올때까지 대기힙니다.
-		this.resiveWaitTask();
+		this.sendWaitTask();
 		
-		// 발신자에게 패킷을 반환합니다.
-		this.reSendPhase();
+		// 패킷을 전송합니다.
+		this.reSendPhase(this.fullPacket, CycleProcess.PHASE_START);
 	}
 	
 	@Override
-	public void packetResive(byte[] resivePacket)
-	{// 패킷을 받은 상태일때.
-		this.sendPacket = resivePacket;
+	public synchronized void packetReceive(byte[] receivePacket)
+	{// 패킷을 받은 상태일때 패킷을 검사.
 		this.resiveTaskThread.interrupt();
+		
+		int receivePacketSize = PacketProcess.GetPacketSize(receivePacket);
+		if(receivePacketSize != this.fullPacket.length)
+		{
+			this.errorHandling();
+			return;
+		}
+		
+		if(PacketProcess.GetPacketPhase(receivePacket) != CycleProcess.PHASE_CHECK)
+		{
+			this.errorHandling();
+			return;
+		}
+		
+		for(int i = 0; i < receivePacketSize; ++i)
+		{
+			if(receivePacket[i] != this.fullPacket[i])
+			{
+				if(this.resendCount > CycleProcess.MAX_RESEND)
+				{
+					this.errorHandling();
+					return;
+				}
+				++this.resendCount;
+				
+				this.reSendPhase(this.fullPacket, CycleProcess.PHASE_START);
+				return;
+			}
+		}
+		
+		this.reSendPhase(this.packetHeader, CycleProcess.PHASE_EXECUTE);
 	}
 	
 	@Override
@@ -54,68 +93,44 @@ public class SendCycle implements Runnable, IPacketReceiveObserver
 		{
 			// 전송후 인터럽트가 걸릴 때까지 대기합니다.
 			// 만약 인터럽트가 걸리지 않으면 시간 초과.
-			Thread.sleep(PacketProcess.TIMEOUT);
+			Thread.sleep(CycleProcess.TIMEOUT);
 		}
 		catch (InterruptedException e)
 		{
-			byte phase = PacketProcess.GetPacketPhase(this.ReceivePacket);
-			
-			if(phase == CycleProcess.PHASE_EXECUTE)
-			{// 오류가 없는 실행 상태.
-				this.taskState = true;
-				this.endProcess();// 사이클이 정상적으로 완료되었습니다.
-				return;
-			}
-			else if(phase == CycleProcess.PHASE_START)
-			{// 오류가 있는 상태.
-				if(this.resendCount < PacketProcess.MAX_RESEND)
-				{// 장치에서 오류가 있다는 신호를 보낸 상태 - 재전송 필요.
-					++this.resendCount;
-					
-					// 발신자로부터 패킷 이 반환되어 올때까지 대기힙니다.
-					this.resiveWaitTask();
-					// 발신자에게 패킷을 반환 합니다.
-					this.reSendPhase();
-					return;
-				}
-				else
-				{// 발신자가 재대로 응답하지 않는 오류. (재전송 제한 횟수 초과)
-					new Exception("Device is not responding").printStackTrace();
-					this.endProcess();// task ERROR.
-					return;
-				}
-			}
+			return;
 		}
 		
 		this.taskState = false;
 		this.endProcess();// 사이클 시간 제한 오류.
 	}
 	
-	public boolean getResiveState()
-	{
-		return this.taskState;
-	}
-	
-	private void resiveWaitTask()
+	private void sendWaitTask()
 	{
 		this.resiveTaskThread = new Thread(this);
 		this.resiveTaskThread.start();
 	}
 	
-	private void reSendPhase()
+	private void reSendPhase(byte[] packet, byte phase)
 	{// 재전송.
-		
+		PacketProcess.SetPacketPhase(packet, phase);
+		this.sender.sendData(this.addr, packet);
 	}
 	
 	private void endProcess()
 	{
-		String receiveName = PacketProcess.GetPacketName(this.ReceivePacket);
+		String receiveName = PacketProcess.GetPacketName(this.fullPacket);
+		String receiveData = PacketProcess.GetPacketData(this.fullPacket);
 		
 		// 장치에게 데이터 수신을 알립니다.
-		this.deviceCallback.ReceiveData(receiveName, receiveData, this.taskState);
+		this.deviceCallback.packetSendCallback(this.taskState, receiveName, receiveData);
 		
 		// 수신 메니저 바인딩 해제.
 		this.receiver.deleteObserver(this.uuid);
+	}
+	
+	private void errorHandling()
+	{
+		PLC_IoT_Core.CONS.push("Packet Send ERROR");
 	}
 
 }
