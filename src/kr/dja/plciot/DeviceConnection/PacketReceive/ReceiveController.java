@@ -57,7 +57,7 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 	}
 
 	@Override
-	public void rawPacketResive(int sendPort, InetAddress sendAddress, byte[] data)
+	public void rawPacketResive(int sendPort, InetAddress receiveAddr, byte[] data)
 	{
 		String uuid = PacketProcess.GetPacketFULLUID(data);
 		PLC_IoT_Core.CONS.push(uuid);
@@ -68,7 +68,7 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 		}
 		else
 		{
-			this.register.registerReceive(this, data);
+			this.register.registerReceive(receiveAddr, data);
 		}
 	}
 	

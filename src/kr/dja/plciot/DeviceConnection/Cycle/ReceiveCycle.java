@@ -1,11 +1,15 @@
 package kr.dja.plciot.DeviceConnection.Cycle;
 
+import java.net.InetAddress;
 import java.util.Map;
 
+import kr.dja.plciot.Device.Device;
 import kr.dja.plciot.DeviceConnection.PacketProcess;
 import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObservable;
 import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObserver;
+import kr.dja.plciot.DeviceConnection.PacketReceive.ReceiveController;
 import kr.dja.plciot.DeviceConnection.PacketSend.IPacketSender;
+import kr.dja.plciot.DeviceConnection.PacketSend.SendController;
 
 public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 {
@@ -13,15 +17,15 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 	private final IPacketReceiveObservable receiver;
 	private final IPacketCycleController deviceCallback;
 	
+	private final InetAddress addr;
 	private final String uuid;
-	private byte[] receivePacketHeader;
-	private byte[] receivePacketData;
+	private byte[] receivePacket;
 	private int resendCount;
 	private boolean taskState;
 	
 	private Thread resiveTaskThread;
 	
-	public ReceiveCycle(IPacketSender sender, IPacketReceiveObservable receiver, byte[] data, IPacketCycleController deviceCallback)
+	public ReceiveCycle(IPacketSender sender, IPacketReceiveObservable receiver, InetAddress addr, byte[] data, IPacketCycleController deviceCallback)
 	{
 		this.resendCount = 0;
 		this.taskState = false;
@@ -30,7 +34,8 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 		this.receiver = receiver;
 		this.deviceCallback = deviceCallback;
 		
-		this.ReceivePacket = data;
+		this.addr = addr;
+		this.receivePacket = data;
 		this.uuid = PacketProcess.GetPacketFULLUID(data);
 		
 		// 수신 메니저에 해당 사이클을 바인딩 합니다.
@@ -42,11 +47,11 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 		// 발신자에게 패킷을 반환합니다.
 		this.reSendPhase();
 	}
-	
+
 	@Override
-	public void packetResive(byte[] resivePacket)
-	{// 패킷을 받은 상태일때.
-		this.ReceivePacket = resivePacket;
+	public void packetResive(byte[] resiveData)
+	{
+		this.receivePacket = resiveData;
 		this.resiveTaskThread.interrupt();
 	}
 	
@@ -57,11 +62,11 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 		{
 			// 전송후 인터럽트가 걸릴 때까지 대기합니다.
 			// 만약 인터럽트가 걸리지 않으면 시간 초과.
-			Thread.sleep(PacketProcess.TIMEOUT);
+			Thread.sleep(CycleProcess.TIMEOUT);
 		}
 		catch (InterruptedException e)
 		{
-			byte phase = PacketProcess.GetPacketPhase(this.ReceivePacket);
+			byte phase = PacketProcess.GetPacketPhase(this.receivePacket);
 			
 			if(phase == CycleProcess.PHASE_EXECUTE)
 			{// 오류가 없는 실행 상태.
@@ -107,15 +112,16 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 	
 	private void reSendPhase()
 	{// 재전송.
-		this.sender.sendData(sendAddress, data);
+		this.sender.sendData(this.addr, this.receivePacket);
 	}
 	
 	private void endProcess()
 	{
-		String receiveName = PacketProcess.GetPacketName(this.ReceivePacket);
+		String receiveName = PacketProcess.GetPacketName(this.receivePacket);
+		String receiveData = PacketProcess.GetPacketData(this.receivePacket);
 		
 		// 장치에게 데이터 수신을 알립니다.
-		this.deviceCallback.ReceiveData(receiveName, receiveData, this.taskState);
+		this.deviceCallback.packetReceiveCallback(receiveName, receiveData);
 		
 		// 수신 메니저 바인딩 해제.
 		this.receiver.deleteObserver(this.uuid);

@@ -31,6 +31,16 @@ public class ConnectionManager
 		
 	}
 	
+	public SendController getSendController()
+	{
+		return this.sendController;
+	}
+	
+	public ReceiveController getReceiveController()
+	{
+		return this.receiveController;
+	}
+	
 	public static class ConnectionManagerBuilder implements IMultiThreadTaskCallback
 	{
 		private final ConnectionManager instance;

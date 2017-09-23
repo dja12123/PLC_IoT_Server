@@ -1,8 +1,8 @@
 package kr.dja.plciot.DeviceConnection;
 
-import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObservable;
+import java.net.InetAddress;
 
 public interface IReceiveRegister
 {
-	public void registerReceive(IPacketReceiveObservable observable, byte[] data);
+	public void registerReceive(InetAddress addr, byte[] data);
 }

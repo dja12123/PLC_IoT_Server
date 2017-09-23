@@ -12,10 +12,12 @@ import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.DeviceConnection.ConnectionManager;
 import kr.dja.plciot.DeviceConnection.IReceiveRegister;
 import kr.dja.plciot.DeviceConnection.PacketProcess;
+import kr.dja.plciot.DeviceConnection.Cycle.IPacketCycleController;
 import kr.dja.plciot.DeviceConnection.Cycle.ReceiveCycle;
 import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObservable;
 import kr.dja.plciot.DeviceConnection.PacketReceive.ReceiveController;
 import kr.dja.plciot.DeviceConnection.PacketReceive.ReceiveController.ReceiveControllerBuildManager;
+import kr.dja.plciot.DeviceConnection.PacketSend.IPacketSender;
 import kr.dja.plciot.DeviceConnection.PacketSend.SendController;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
@@ -33,13 +35,15 @@ public class DeviceManager implements IReceiveRegister
 	}
 
 	@Override
-	public void registerReceive(IPacketReceiveObservable observable, byte[] data)
+	public void registerReceive(InetAddress addr, byte[] data)
 	{
 		String macAddr = PacketProcess.GetpacketMacAddr(data);
 		Device receiveTarget = this.deviceList.getOrDefault(macAddr, null);
 		if(receiveTarget != null)
 		{// 일반적인 통신 수신 사이클을 시작합니다.
-			ReceiveCycle receiveCycle = new ReceiveCycle(observable, data, receiveTarget);
+			ReceiveCycle receiveCycle = new ReceiveCycle(this.connectionManager.getSendController(),
+					this.connectionManager.getReceiveController(), addr, data, receiveTarget);
+			
 		}
 		else
 		{// 장치 등록 사이클을 시작합니다.

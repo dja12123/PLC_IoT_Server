@@ -14,25 +14,28 @@ public class UDPRawSocketReceiver
 	private final DatagramSocket socket;
 	private final IRawSocketObserver receiveManager;
 	private boolean threadFlag;
+	private final byte[] buffer;
 	
 	private UDPRawSocketReceiver(DatagramSocket socket, IRawSocketObserver receiveManager)
 	{
 		this.socket = socket;
 		this.receiveManager = receiveManager;
 		this.threadFlag = true;
+		this.buffer = new byte[PacketProcess.FULL_PACKET_LENGTH];
 	}
 
 	private void executeTask()
 	{
 		while(this.threadFlag)
 		{
-			byte[] buffer = PacketProcess.CreateDataSet();
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+			
+			DatagramPacket packet = new DatagramPacket(this.buffer, this.buffer.length);
 			try
 			{
 				this.socket.receive(packet);
-				this.receiveManager.rawPacketResive(packet.getPort(), packet.getAddress(), buffer);
-				packet.getAddress();
+				byte[] copyArr = new byte[PacketProcess.GetPacketSize(this.buffer)];
+				System.arraycopy(this.buffer, 0, copyArr, 0, copyArr.length);
+				this.receiveManager.rawPacketResive(packet.getPort(), packet.getAddress(), copyArr);
 			}
 			catch (IOException e)
 			{

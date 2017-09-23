@@ -1,65 +1,59 @@
 package kr.dja.plciot.DeviceConnection;
 
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
-
 public class PacketProcess
 {// 장치와 주고받는 패킷에 관련된 함수와 상수를 캡슐화.
 
 	public static void main(String args[])
     {
-		String macAddr = "001F1F1F1FAA";
+		String macAddr = "CAFEBABE0000";
 		String fulluid = PacketProcess.CreateFULLUID(macAddr);
 		String packetName = "testPacket";
+		String sendData = "abcdefghijklmnopqrstuvwxyz";
 		
-		HashMap<String, String> sendData = new HashMap<String, String>();
-		sendData.put("key", "value");
-		sendData.put("key1", "value1");
+		byte[] header = PacketProcess.CreatePacketHeader(fulluid);
+		byte[] packet = PacketProcess.CreateFullPacket(header, packetName, sendData);
 		
-		byte[] data = PacketProcess.CreateDataSet();
-		
-
-		
-		PacketProcess.InputPacketData(data, packetName, PacketProcess.DataMapToByte(sendData));
-		
-		PacketProcess.PrintDataPacket(data);
+		PacketProcess.PrintDataPacket(packet);
     }
 	
 	private static final int BYTE = 8;// 8bit = byte
 	
-	private static final int FIELD_TIMEID = 3;// 0 ~ 3 Byte
-	private static final int FIELD_FULLUID = 9;// 4 ~ 9 Byte
+	private static final int FIELD_TIMEID_START = 0;// 0 ~ 3 Byte
+	private static final int FIELD_FULLUID_START = FIELD_TIMEID_START;
+	private static final int FIELD_TIMEID_END = 3;// 0 ~ 3 Byte
+	private static final int FIELD_MACADDR_START = 4;// 4 ~ 9 Byte
+	private static final int FIELD_MACADDR_END = 9;// 4 ~ 9 Byte
+	private static final int FIELD_FULLUID_END = FIELD_MACADDR_END;
 	private static final int FIELD_PHASE = 10; // 10 Byte
-	private static final int FIELD_NAME_SIZE = 11; // 12 ~ 32 Byte
-	private static final int FIELD_TOTAL_SIZE = 12; // total 1024 Byte
+	private static final int PACKET_HEADER_SIZE = FIELD_PHASE + 1;
 	
-	private static final byte DATAMAP_SYNTEX_KEY = '=';
-	private static final byte DATAMAP_SYNTEX_VALUE = '\n';
+	private static final int PACKET_INFO_SIZE = 2;
+	private static final int FIELD_NAME_SIZE = 11; // 11 Byte
+	private static final int FIELD_DATA_SIZE = 12; // 12 Byte
+	
+	private static final int FIELD_NAMEDATA = 13; // 13 ~~
+	
+	private static final int SIZE_TIME = FIELD_TIMEID_END - FIELD_TIMEID_START + 1;
+	private static final int SIZE_MACADDR = FIELD_MACADDR_END - FIELD_MACADDR_START + 1;
 	
 	private static final byte NULL_VALUE = 0b00000000;
 	
-	public static final int TIMEOUT = 2000;
-	public static final int MAX_RESEND = 3;
+	public static final int FULL_PACKET_LENGTH = (Byte.MAX_VALUE * 2) + PACKET_HEADER_SIZE + PACKET_INFO_SIZE;
 	
-	public static void PrintDataPacket(byte[] data)
+	public static void PrintDataPacket(byte[] packet)
 	{
-		System.out.println("FullAddr   - " + PacketProcess.GetPacketFULLUID(data));
-		System.out.println("MacAddr    - " + PacketProcess.GetpacketMacAddr(data));
-		System.out.println("PacketName - " + PacketProcess.GetPacketName(data));
-		System.out.println("Phase      - " + String.format("%02X", PacketProcess.GetPacketPhase(data)));
-		Map<String, String> valueSet = PacketProcess.GetPacketData(data);
-		
-		System.out.println("-- DATA --");
-		for(String key : valueSet.keySet())
+		System.out.print("HEX: ");
+		for(byte bin : packet)
 		{
-			System.out.println("key:" + key + " value:" + valueSet.get(key));
+			System.out.print(String.format("%02X", bin) + ' ');
 		}
-	}
-	
-	public static byte[] CreateDataSet()
-	{// 데이타 샛 생성.
-		return new byte[FIELD_TOTAL];
+		System.out.println();
+		System.out.println("PacketSize - " + PacketProcess.GetPacketSize(packet) + '(' + packet.length + ')');
+		System.out.println("FullUID    - " + PacketProcess.GetPacketFULLUID(packet));
+		System.out.println("MacAddr    - " + PacketProcess.GetpacketMacAddr(packet));
+		System.out.println("Phase      - " + String.format("%02X", PacketProcess.GetPacketPhase(packet)));
+		System.out.println("PacketName - " + PacketProcess.GetPacketName(packet));
+		System.out.println("PacketData - " + PacketProcess.GetPacketData(packet));
 	}
 	
 	public static String CreateFULLUID(String macAddr)
@@ -67,40 +61,44 @@ public class PacketProcess
 		StringBuffer returnUUID = new StringBuffer();
 		long time = System.currentTimeMillis();
 		
-		for(int uuidTime = 0; uuidTime < FIELD_TIMEID; ++uuidTime)
+		for(int uuidTime = 0; uuidTime < SIZE_TIME; ++uuidTime)
 		{
 			returnUUID.append(String.format("%02X", (byte)time));
 			time = time >> BYTE;
 		}
 		
-		for(int macAddrIndex = 0; macAddrIndex / 2 < FIELD_FULLUID - FIELD_TIMEID; macAddrIndex += 2)
+		for(int uuidMac = 0; uuidMac < SIZE_MACADDR; ++uuidMac)
 		{
-			returnUUID.append(macAddr.charAt(macAddrIndex));
-			returnUUID.append(macAddr.charAt(macAddrIndex + 1));
+			returnUUID.append(macAddr.substring(uuidMac * 2, (uuidMac * 2) + 2));
 		}
 		
 		return returnUUID.toString();
 	}
 	
-	public static byte[] CreatePacketHeader(String fullUID, byte phase)
-	{// 패킷 헤더를 패킷에 삽입합니다.
+	public static byte[] CreatePacketHeader(String fullUID)
+	{// 패킷 헤더를 생성.
 		
-		byte[] dataSet = new byte[FIELD_PHASE + 1];
+		byte[] dataSet = new byte[PACKET_HEADER_SIZE];
 		
 		int dataSetIndex = 0;
-		
-		for(int uuidIndex = 0; uuidIndex / 2 < FIELD_FULLUID; uuidIndex += 2)
+		for(int uuidIndex = FIELD_FULLUID_START; uuidIndex <= FIELD_FULLUID_END; ++uuidIndex)
 		{
-			dataSet[dataSetIndex] = (byte)Integer.parseInt(fullUID.substring(uuidIndex, uuidIndex + 2), 16);
-			++dataSetIndex;
+			dataSet[dataSetIndex++] = (byte)Integer.parseInt(fullUID.substring(uuidIndex * 2, (uuidIndex * 2) + 2), 16);
 		}
-		dataSet[dataSetIndex] = phase; // 신호 페이즈 넣기 (index 10)
+		dataSet[FIELD_PHASE] = NULL_VALUE; // 신호 페이즈 넣기 (index 10)
 		
 		return dataSet;
 	}
 	
-	public static byte[] CreatePacketData(byte[] header, String name, String data)
+	public static void SetPacketPhase(byte[] packet, byte phase)
+	{
+		packet[FIELD_PHASE] = phase;
+	}
+	
+	public static byte[] CreateFullPacket(byte[] header, String name, String data)
 	{// 헤더 정보를 합친 데이터 페킷을 생성합니다
+		
+		int index = 0;
 		
 		if(name.length() > Byte.MAX_VALUE)
 		{
@@ -111,56 +109,32 @@ public class PacketProcess
 			new Exception("data is too long");
 		}
 		
-		byte nameFieldSize = (byte)name.length();
-		byte dataFieldSize = (byte)data.length();
+		byte nameFieldSize = (byte)(name.length() + 1);// null 문자를 위한 공간.
+		byte dataFieldSize = (byte)(data.length() + 1);
 		
-		byte[] packet = new byte[header.length + 2 + nameFieldSize + dataFieldSize];
+		byte[] packet = new byte[PACKET_HEADER_SIZE + nameFieldSize + dataFieldSize + PACKET_INFO_SIZE];
 		
-		for(packet)
-		
-		for(int dataNameIndex = 0; dataNameIndex < name.length() && dataSetIndex < FIELD_NAME; ++dataNameIndex)
+		for(int headerIndex = 0; headerIndex < PACKET_HEADER_SIZE; ++headerIndex)
 		{
-			dataSet[dataSetIndex] = (byte)name.charAt(dataNameIndex);
-			++dataSetIndex;
+			packet[index++] = header[headerIndex];
 		}
 		
-		while(dataSetIndex < FIELD_NAME)
-		{
-			dataSet[dataSetIndex] = NULL_VALUE;
-			++dataSetIndex;
-		}
-
-		for(int sendDataPointer = 0; sendDataPointer < sendData.length && dataSetIndex < FIELD_TOTAL; ++sendDataPointer)
-		{
-			dataSet[dataSetIndex] = sendData[sendDataPointer];
-			++dataSetIndex;
-		}
+		packet[index++] = nameFieldSize;
+		packet[index++] = dataFieldSize;
 		
-		while(dataSetIndex < FIELD_TOTAL)
-		{// 나머지 길이 모두 0으로 초기화.
-			dataSet[dataSetIndex] = NULL_VALUE;
-			++dataSetIndex;
-		}
-	}
-	
-	public static byte[] DataMapToByte(Map<String, String> dataMap)
-	{// 데이터 맵을 바이너리로 인코드.
-		
-		StringBuffer sendDataSerialStr = new StringBuffer();
-		for(String key : dataMap.keySet())
+		for(int nameIndex = 0; nameIndex < name.length(); ++nameIndex)
 		{
-			String appendStr = key+String.valueOf((char)DATAMAP_SYNTEX_KEY)+dataMap.get(key)+String.valueOf((char)DATAMAP_SYNTEX_VALUE);
-			
-			if(appendStr.length() + sendDataSerialStr.length() < FIELD_TOTAL - FIELD_NAME)
-			{
-				sendDataSerialStr.append(appendStr);
-			}
-			else
-			{
-				break;
-			}
+			packet[index++] = (byte)name.charAt(nameIndex);
 		}
-		return sendDataSerialStr.toString().getBytes();
+		packet[index++] = '\0';
+		
+		for(int dataIndex = 0; dataIndex < data.length(); ++dataIndex)
+		{
+			packet[index++] = (byte)data.charAt(dataIndex);
+		}
+		packet[index++] = '\0';
+		
+		return packet;
 	}
 	
 	public static String GetPacketFULLUID(byte[] packet)
@@ -168,7 +142,7 @@ public class PacketProcess
 		
 		StringBuffer fullUID = new StringBuffer();
 		
-		for(int uuidIndex = 0; uuidIndex  < FIELD_FULLUID; ++uuidIndex)
+		for(int uuidIndex = FIELD_FULLUID_START; uuidIndex  <= FIELD_FULLUID_END; ++uuidIndex)
 		{
 			fullUID.append(String.format("%02X", packet[uuidIndex]));
 		}
@@ -180,7 +154,7 @@ public class PacketProcess
 	{// 패킷 맥주소를 가져옵니다.
 		StringBuffer macAddr = new StringBuffer();
 		
-		for(int macAddrPacket = FIELD_TIMEID; macAddrPacket < FIELD_FULLUID; ++macAddrPacket)
+		for(int macAddrPacket = FIELD_MACADDR_START; macAddrPacket <= FIELD_MACADDR_END; ++macAddrPacket)
 		{
 			macAddr.append(String.format("%02X", packet[macAddrPacket]));
 		}
@@ -190,20 +164,49 @@ public class PacketProcess
 	
 	public static byte GetPacketPhase(byte[] packet)
 	{// 패킷 페이즈를 가져옵니다.
-		byte phase = packet[FIELD_PHASE - 1];
+		byte phase = packet[FIELD_PHASE];
 		return phase;				
 	}
 	
 	public static String GetPacketName(byte[] packet)
-	{// 패킷 맥주소를 가져옵니다.
+	{// 패킷 이름을 가져옵니다.
 		StringBuffer packetName = new StringBuffer();
+		int index = FIELD_NAMEDATA;
 		
-		for(int packetNameIndex = FIELD_PHASE; packetNameIndex < FIELD_NAME; ++packetNameIndex)
+		byte nameSize = packet[FIELD_NAME_SIZE];
+		
+		// null 문자 제거.
+		for(int nameIndex = 0; nameIndex < nameSize - 1; ++nameIndex)
 		{
-			packetName.append((char)packet[packetNameIndex]);
+			packetName.append((char)packet[index++]);
 		}
 		
 		return packetName.toString();
+	}
+	
+	public static String GetPacketData(byte[] packet)
+	{// 패킷 데이터를 가져옵니다.
+		StringBuffer packetData = new StringBuffer();
+		int index = FIELD_NAMEDATA + packet[FIELD_NAME_SIZE];
+		
+		byte dataSize = packet[FIELD_DATA_SIZE];
+		
+		// null 문자 제거.
+		for(int dataIndex = 0; dataIndex < dataSize - 1; ++dataIndex)
+		{
+			packetData.append((char)packet[index++]);
+		}
+		
+		return packetData.toString();
+	}
+
+	public static int GetPacketSize(byte[] packet)
+	{
+		int packetSize = PACKET_HEADER_SIZE + PACKET_INFO_SIZE;
+		packetSize += packet[FIELD_NAME_SIZE];
+		packetSize += packet[FIELD_DATA_SIZE];
+		
+		return packetSize;
 	}
 	
 	/*public static Map<String, String> GetPacketData(byte[] dataByte)
@@ -234,5 +237,26 @@ public class PacketProcess
 		}
 		return dataMap;
 	}*/
+	
+	/*public static byte[] DataMapToByte(Map<String, String> dataMap)
+	{// 데이터 맵을 바이너리로 인코드.
+		
+		StringBuffer sendDataSerialStr = new StringBuffer();
+		for(String key : dataMap.keySet())
+		{
+			String appendStr = key+String.valueOf((char)DATAMAP_SYNTEX_KEY)+dataMap.get(key)+String.valueOf((char)DATAMAP_SYNTEX_VALUE);
+			
+			if(appendStr.length() + sendDataSerialStr.length() < FIELD_TOTAL - FIELD_NAME)
+			{
+				sendDataSerialStr.append(appendStr);
+			}
+			else
+			{
+				break;
+			}
+		}
+		return sendDataSerialStr.toString().getBytes();
+	}*/
+	
 	
 }

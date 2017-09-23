@@ -1,20 +1,8 @@
 package kr.dja.plciot.Device;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.DatagramPacket;
-import java.net.HttpURLConnection;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
+import kr.dja.plciot.DeviceConnection.Cycle.IPacketCycleController;
 
-import kr.dja.plciot.DeviceConnection.IDevicePacketReceiveObserver;
-import kr.dja.plciot.DeviceConnection.INetworkManager;
-import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObservable;
-
-public class Device implements INetworkManager, IDevicePacketReceiveObserver
+public class Device implements IPacketCycleController
 {
 	public final String macAddr;
 	private final String ipAddr;
@@ -27,28 +15,22 @@ public class Device implements INetworkManager, IDevicePacketReceiveObserver
 		this.macAddr = macAddr;
 		this.ipAddr = ipAddr;
 		this.connectOperation = false;
-		
-	}
-	
-	@Override
-	public void sendData(String name, Map<String, String> sendData)
-	{
-		
 	}
 
 	@Override
-	public void addReceiveObserver(String name, IDevicePacketReceiveObserver observer)
+	public void packetSendCallback(boolean success, byte[] data)
 	{
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void ReceiveData(String name, Map<String, String> data, boolean success)
+	public void packetReceiveCallback(byte[] data)
 	{
 		// TODO Auto-generated method stub
 		
 	}
+
 
 
 }
