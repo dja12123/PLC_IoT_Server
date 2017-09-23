@@ -1,6 +1,7 @@
 package kr.dja.plciot.Web;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.FullHttpMessage;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -11,10 +12,15 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 
 import java.net.URISyntaxException;
 
-public class HttpServerHandler extends ChannelInboundHandlerAdapter
+public class HttpServerHandler extends ChannelInboundHandlerAdapter implements ChannelInboundHandler
 {
-
 	WebSocketServerHandshaker handshaker;
+	private final IWebSocketRawTextObserver observer;
+	
+	public HttpServerHandler(IWebSocketRawTextObserver observer)
+	{
+		this.observer = observer;
+	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception
@@ -45,7 +51,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter
 			{
 
 				// Adding new handler to the existing pipeline to handle WebSocket Messages
-				ctx.pipeline().replace(this, "websocketHandler", new WebSocketHandler());
+				ctx.pipeline().replace(this, "websocketHandler", new WebSocketHandler(this.observer));
 
 				System.out.println("WebSocketHandler added to the pipeline");
 

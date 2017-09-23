@@ -17,10 +17,12 @@ package kr.dja.plciot.Web;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import kr.dja.plciot.PLC_IoT_Core;
@@ -28,7 +30,7 @@ import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class WebServer
+public class WebServer implements IWebSocketRawTextObserver
 {
 	private static final int PORT = 8080;
 
@@ -39,6 +41,29 @@ public class WebServer
 	public WebServer()
 	{
 		
+	}
+	
+	@Override
+	public void messageReceive(Channel ch, String str)
+	{
+		PLC_IoT_Core.CONS.push(str);
+		for(int i = 0; i < 100; ++i)
+		{
+			try
+			{
+				Thread.sleep(150);
+			}
+			catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			ch.writeAndFlush(new TextWebSocketFrame(str + " " + i));
+		}
+		
+		
+		ch.close();
 	}
 	
 	public static class WebServerBuilder implements IMultiThreadTaskCallback
@@ -61,7 +86,7 @@ public class WebServer
 				ServerBootstrap b = new ServerBootstrap();
 				b.option(ChannelOption.SO_BACKLOG, 1024);
 				b.group(this.instance.bossGroup, this.instance.workerGroup).channel(NioServerSocketChannel.class)
-						.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new HTTPInitializer());
+						.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new HTTPInitializer(this.instance));
 				
 				this.instance.channel = b.bind(PORT).sync().channel();
 				

@@ -98,6 +98,14 @@ public class ConnectionManager
 		
 		private void disposInstance(NextTask nextTask)
 		{
+			PLC_IoT_Core.CONS.push("장치 통신 관리자 종료 시작.");
+			
+			nextTask.insertTask((TaskOption option, NextTask endNext)->
+			{
+				PLC_IoT_Core.CONS.push("장치 통신 관리자 종료 성공.");
+				endNext.nextTask();
+				
+			});
 			nextTask.insertTask(this.rcvBuildManager);
 			
 			for(DatagramSocket disposSocket : this.createdSocketList)
@@ -105,7 +113,6 @@ public class ConnectionManager
 				PLC_IoT_Core.CONS.push("소켓 " + disposSocket.getLocalPort() + " 번 포트 비활성화.");
 				disposSocket.close();
 			}
-			
 			nextTask.nextTask();
 		}
 		

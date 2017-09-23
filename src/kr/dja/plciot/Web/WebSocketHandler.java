@@ -11,7 +11,13 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 
 public class WebSocketHandler extends ChannelInboundHandlerAdapter
 {
-
+	private final IWebSocketRawTextObserver observer;
+	
+	public WebSocketHandler(IWebSocketRawTextObserver observer)
+	{
+		this.observer = observer;
+	}
+	
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception
 	{
@@ -28,31 +34,7 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter
 			else if (msg instanceof TextWebSocketFrame)
 			{
 				System.out.println("TextWebSocketFrame Received : ");
-
-				new Thread(() ->
-				{
-
-					for (int i = 0; i < 100; i++)
-					{
-						try
-						{
-							Thread.sleep(30);
-						}
-						catch (InterruptedException e)
-						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						System.out.println("WRITE");
-						ctx.channel().write(
-								new TextWebSocketFrame("Message recieved : " + ((TextWebSocketFrame) msg).text() + i));
-
-						ctx.channel().flush();
-					}
-
-				}).start();
-
-				System.out.println(((TextWebSocketFrame) msg).text());
+				this.observer.messageReceive(ctx.channel(), ((TextWebSocketFrame) msg).text());
 			}
 			else if (msg instanceof PingWebSocketFrame)
 			{
