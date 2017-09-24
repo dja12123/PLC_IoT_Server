@@ -19,15 +19,15 @@ public class RealTimeGraphManager implements IWebSocketObserver
 	@Override
 	public void messageReceive(Channel ch, String key, String data)
 	{
-		new RealTimeGraphSender(senderList, ch, data);
+		new RealTimeGraphSender(this.senderList, ch, data);
 		
 	}
 	
 	public void shutdown()
 	{
-		while(!senderList.isEmpty())
+		while(!this.senderList.isEmpty())
 		{
-			RealTimeGraphSender sender = senderList.get(0);
+			RealTimeGraphSender sender = this.senderList.get(0);
 			sender.endTask();
 			try
 			{

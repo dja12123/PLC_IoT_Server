@@ -60,7 +60,6 @@ public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveOb
 		
 		if(observer == null)
 		{
-			ch.close();
 			return;
 		}
 		

@@ -35,7 +35,6 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter
 			{
 				System.out.println("TextWebSocketFrame Received : ");
 				this.observer.messageReceive(ctx.channel(), ((TextWebSocketFrame) msg).text());
-				return;
 			}
 			else if (msg instanceof PingWebSocketFrame)
 			{
@@ -58,7 +57,6 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter
 				System.out.println("Unsupported WebSocketFrame");
 			}
 		}
-		ctx.close();
 	}
 	
 
