@@ -54,6 +54,34 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 	{
 		this.receivePacket = resiveData;
 		this.resiveTaskThread.interrupt();
+		
+		byte phase = PacketProcess.GetPacketPhase(this.receivePacket);
+		
+		if(phase == CycleProcess.PHASE_EXECUTE)
+		{// 오류가 없는 실행 상태.
+			this.taskState = true;
+			this.endProcess();// 사이클이 정상적으로 완료되었습니다.
+			return;
+		}
+		else if(phase == CycleProcess.PHASE_START)
+		{// 오류가 있는 상태.
+			if(this.resendCount < CycleProcess.MAX_RESEND)
+			{// 장치에서 오류가 있다는 신호를 보낸 상태 - 재전송 필요.
+				++this.resendCount;
+				
+				// 발신자로부터 패킷 이 반환되어 올때까지 대기힙니다.
+				this.resiveWaitTask();
+				// 발신자에게 패킷을 반환 합니다.
+				this.reSendPhase();
+				return;
+			}
+			else
+			{// 발신자가 재대로 응답하지 않는 오류. (재전송 제한 횟수 초과)
+				new Exception("Device is not responding").printStackTrace();
+				this.endProcess();// task ERROR.
+				return;
+			}
+		}
 	}
 	
 	@Override
@@ -67,33 +95,7 @@ public class ReceiveCycle implements Runnable, IPacketReceiveObserver
 		}
 		catch (InterruptedException e)
 		{
-			byte phase = PacketProcess.GetPacketPhase(this.receivePacket);
-			
-			if(phase == CycleProcess.PHASE_EXECUTE)
-			{// 오류가 없는 실행 상태.
-				this.taskState = true;
-				this.endProcess();// 사이클이 정상적으로 완료되었습니다.
-				return;
-			}
-			else if(phase == CycleProcess.PHASE_START)
-			{// 오류가 있는 상태.
-				if(this.resendCount < CycleProcess.MAX_RESEND)
-				{// 장치에서 오류가 있다는 신호를 보낸 상태 - 재전송 필요.
-					++this.resendCount;
-					
-					// 발신자로부터 패킷 이 반환되어 올때까지 대기힙니다.
-					this.resiveWaitTask();
-					// 발신자에게 패킷을 반환 합니다.
-					this.reSendPhase();
-					return;
-				}
-				else
-				{// 발신자가 재대로 응답하지 않는 오류. (재전송 제한 횟수 초과)
-					new Exception("Device is not responding").printStackTrace();
-					this.endProcess();// task ERROR.
-					return;
-				}
-			}
+			return;
 		}
 		
 		this.taskState = false;

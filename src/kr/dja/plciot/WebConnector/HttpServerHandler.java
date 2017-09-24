@@ -1,4 +1,4 @@
-package kr.dja.plciot.Web;
+package kr.dja.plciot.WebConnector;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
@@ -14,7 +14,7 @@ import java.net.URISyntaxException;
 
 public class HttpServerHandler extends ChannelInboundHandlerAdapter implements ChannelInboundHandler
 {
-	WebSocketServerHandshaker handshaker;
+	private WebSocketServerHandshaker handshaker;
 	private final IWebSocketRawTextObserver observer;
 	
 	public HttpServerHandler(IWebSocketRawTextObserver observer)
@@ -59,7 +59,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter implements C
 
 				System.out.println("Handshaking....");
 				// Do the Handshake to upgrade connection from HTTP to WebSocket protocol
-				handleHandshake(ctx, httpRequest);
+				this.handleHandshake(ctx, httpRequest);
 				System.out.println("Handshake is done");
 
 			}
@@ -76,14 +76,14 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter implements C
 	{
 		WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(getWebSocketURL(req), null,
 				true);
-		handshaker = wsFactory.newHandshaker(req);
-		if (handshaker == null)
+		this.handshaker = wsFactory.newHandshaker(req);
+		if (this.handshaker == null)
 		{
 			WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
 		}
 		else
 		{
-			handshaker.handshake(ctx.channel(), req);
+			this.handshaker.handshake(ctx.channel(), req);
 		}
 	}
 

@@ -1,4 +1,4 @@
-package kr.dja.plciot.Web;
+package kr.dja.plciot.WebConnector;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -35,6 +35,7 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter
 			{
 				System.out.println("TextWebSocketFrame Received : ");
 				this.observer.messageReceive(ctx.channel(), ((TextWebSocketFrame) msg).text());
+				return;
 			}
 			else if (msg instanceof PingWebSocketFrame)
 			{
@@ -57,6 +58,8 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter
 				System.out.println("Unsupported WebSocketFrame");
 			}
 		}
+		ctx.close();
 	}
+	
 
 }

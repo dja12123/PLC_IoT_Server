@@ -20,16 +20,6 @@ public class MultiThreadTaskOperator extends Lockable implements Runnable
 		this.taskQueue = Collections.synchronizedList(new ArrayList<IMultiThreadTaskCallback>());
 	}
 	
-	public MultiThreadTaskOperator(TaskOption option, IMultiThreadTaskCallback[] callbackArr)
-	{
-		this(option);
-		
-		for(IMultiThreadTaskCallback task : callbackArr)
-		{
-			this.taskQueue.add(task);
-		}
-	}
-	
 	public void addTask(IMultiThreadTaskCallback callback)
 	{
 		this.taskQueue.add(callback);

@@ -1,4 +1,4 @@
-package kr.dja.plciot.Web;
+package kr.dja.plciot.WebConnector;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;

@@ -35,7 +35,10 @@ public class UDPRawSocketReceiver
 				this.socket.receive(packet);
 				byte[] copyArr = new byte[PacketProcess.GetPacketSize(this.buffer)];
 				System.arraycopy(this.buffer, 0, copyArr, 0, copyArr.length);
-				this.receiveManager.rawPacketResive(packet.getPort(), packet.getAddress(), copyArr);
+				new Thread(()->
+				{
+					this.receiveManager.rawPacketResive(packet.getPort(), packet.getAddress(), copyArr);
+				}).start();
 			}
 			catch (IOException e)
 			{

@@ -13,16 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package kr.dja.plciot.Web;
+package kr.dja.plciot.WebConnector;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import kr.dja.plciot.PLC_IoT_Core;
@@ -30,40 +32,72 @@ import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class WebServer implements IWebSocketRawTextObserver
+public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveObservable
 {
 	private static final int PORT = 8080;
+	public static final String SEPARATOR = "=";
 
 	private EventLoopGroup bossGroup;
 	private EventLoopGroup workerGroup;
 	private Channel channel;
+
+	private final Map<String, IWebSocketObserver> observers;
 	
 	public WebServer()
 	{
-		
+		this.observers = Collections.synchronizedMap(new HashMap<String, IWebSocketObserver>());
 	}
 	
 	@Override
 	public void messageReceive(Channel ch, String str)
 	{
-		PLC_IoT_Core.CONS.push(str);
-		for(int i = 0; i < 100; ++i)
+		PLC_IoT_Core.CONS.push("웹소켓 요청: " + str);
+		
+		String[] kv = str.split(SEPARATOR, 2);
+		String key = kv[0];
+
+		IWebSocketObserver observer = this.observers.getOrDefault(key, null);
+		
+		if(observer == null)
 		{
-			try
-			{
-				Thread.sleep(150);
-			}
-			catch (InterruptedException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			ch.writeAndFlush(new TextWebSocketFrame(str + " " + i));
+			ch.close();
+			return;
 		}
 		
-		
-		ch.close();
+		if(kv.length > 1)
+		{
+			observer.messageReceive(ch, key, kv[1]);
+		}
+		else
+		{
+			observer.messageReceive(ch, key, null);
+		}
+	}
+	
+	@Override
+	public void addObserver(String key, IWebSocketObserver o)
+	{
+		if(!this.observers.containsKey(key))
+		{
+			this.observers.put(key, o);
+		}
+		else
+		{
+			new Exception("Duplicated Put Packet Observer").printStackTrace();
+		}
+	}
+
+	@Override
+	public void deleteObserver(String key)
+	{
+		if(this.observers.containsKey(key))
+		{
+			this.observers.remove(key);
+		}
+		else
+		{
+			new Exception("Remove Packet Observer").printStackTrace();
+		}
 	}
 	
 	public static class WebServerBuilder implements IMultiThreadTaskCallback
