@@ -2,14 +2,18 @@ package kr.dja.plciot;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
 import kr.dja.plciot.Database.DatabaseConnector;
 import kr.dja.plciot.Device.DeviceManager;
-import kr.dja.plciot.DeviceConnection.ConnectionManager;
-import kr.dja.plciot.DeviceConnection.ConnectionManager.ConnectionManagerBuilder;
 import kr.dja.plciot.Log.Console;
+import kr.dja.plciot.LowLevelConnection.ConnectionManager;
+import kr.dja.plciot.LowLevelConnection.ConnectionManager.ConnectionManagerBuilder;
+import kr.dja.plciot.LowLevelConnection.IReceiveHandler;
+import kr.dja.plciot.LowLevelConnection.Cycle.IPacketCycleUser;
 import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.TaskLock;
@@ -27,7 +31,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 	
 	private final MainFrame mainFrame;
 	private final DatabaseConnector dbManager;
-	private final ConnectionManager deviceConnectionManager;
+	private final ConnectionManager connectionManager;
 	private final DeviceManager deviceManager;
 	private final WebServer webServer;
 	private final WebIOManager webIOManager;
@@ -36,13 +40,13 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 	{//TEST
 		this.mainFrame = new MainFrame();
 		this.dbManager = new DatabaseConnector();
-		this.deviceConnectionManager = new ConnectionManager();
-		this.deviceManager = new DeviceManager(this.deviceConnectionManager);
+		this.connectionManager = new ConnectionManager();
+		this.deviceManager = new DeviceManager(this.connectionManager);
 		this.webServer = new WebServer();
 		this.webIOManager = new WebIOManager(this.webServer);
 		
-		ConnectionManagerBuilder connectionManagerBuilder = new ConnectionManagerBuilder(this.deviceConnectionManager);
-		connectionManagerBuilder.setReceiveRegister(this.deviceManager);
+		ConnectionManagerBuilder connectionManagerBuilder = new ConnectionManagerBuilder(this.connectionManager);
+		connectionManagerBuilder.setReceiveRegister(this.connectionManager);
 		
 		WebServerBuilder webServerBuilder = new WebServerBuilder(this.webServer);
 		
@@ -50,13 +54,16 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 		
 		serverStartOperator.addTask(this.dbManager);
 		serverStartOperator.addTask(connectionManagerBuilder);
+		serverStartOperator.addTask(this.deviceManager);
 		serverStartOperator.addTask(webServerBuilder);
 		serverStartOperator.addTask(this.webIOManager);
 		serverStartOperator.addTask(this);
+		serverStartOperator.addTask(new PacketTestClass());
 		
 		MultiThreadTaskOperator serverShutdownOperator = new MultiThreadTaskOperator(TaskOption.SHUTDOWN);
 		
 		serverShutdownOperator.addTask(this.webIOManager);
+		serverShutdownOperator.addTask(this.deviceManager);
 		serverShutdownOperator.addTask(connectionManagerBuilder);
 		serverShutdownOperator.addTask(webServerBuilder);
 		serverShutdownOperator.addTask(this.dbManager);
@@ -75,7 +82,62 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 				serverShutdownOperator.start();
 			}
 		});
+		
+		
+
 	}
+	class PacketTestClass implements IMultiThreadTaskCallback
+	{
+
+		@Override
+		public void executeTask(TaskOption option, NextTask nextTask)
+		{
+			TestReceiveHandler t = new TestReceiveHandler();
+			
+			connectionManager.addReceiveHandler(t);
+			try
+			{
+				connectionManager.startSendCycle(InetAddress.getLocalHost(), 50001, "000000000000", "testPacket", "testData", t);
+			}
+			catch (UnknownHostException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			
+		}
+		
+	}
+	
+	class TestReceiveHandler implements IReceiveHandler, IPacketCycleUser
+	{
+
+		@Override
+		public IPacketCycleUser createConnection(String uuid, String name)
+		{
+			System.out.println("createConnectionUID: " + uuid);
+			System.out.println("createConnectionNAME: " + name);
+			return this;
+		}
+
+		@Override
+		public void packetSendCallback(boolean success, String name, String data)
+		{
+			
+			
+		}
+
+		@Override
+		public void packetReceiveCallback(String name, String data)
+		{
+			
+			System.out.println("packetReceiveCallbackNAME: " + name);
+			System.out.println("packetReceiveCallbackDATA: " + data);
+		}
+		
+	}
+	
 	
 	public static void main(String[] args)
 	{
@@ -88,6 +150,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 		if(option == TaskOption.START)
 		{
 			CONS.push("서버 시작 완료.");
+			next.nextTask();
 		}
 		if(option == TaskOption.SHUTDOWN)
 		{

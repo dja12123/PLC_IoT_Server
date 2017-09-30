@@ -1,4 +1,4 @@
-package kr.dja.plciot.DeviceConnection.Cycle;
+package kr.dja.plciot.LowLevelConnection.Cycle;
 
 public class CycleProcess
 {

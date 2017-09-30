@@ -1,35 +1,24 @@
 package kr.dja.plciot.Device;
 
-import kr.dja.plciot.DeviceConnection.Cycle.IPacketCycleController;
+import kr.dja.plciot.LowLevelConnection.Cycle.IPacketCycleUser;
 
-public class Device implements IPacketCycleController
+public abstract class Device implements IPacketCycleUser
 {
 	public final String macAddr;
-	private final String ipAddr;
 	
-	private boolean connectOperation;
-	private Thread taskThread;
+	private boolean isConnected;
 	
-	public Device(String macAddr, String ipAddr)
+	public Device(String macAddr)
 	{
 		this.macAddr = macAddr;
-		this.ipAddr = ipAddr;
-		this.connectOperation = false;
+		this.isConnected = false;
 	}
 
 	@Override
-	public void packetSendCallback(boolean success, String name, String data)
-	{
-		// TODO Auto-generated method stub
-		
-	}
+	public abstract void packetSendCallback(boolean success, String name, String data);
 
 	@Override
-	public void packetReceiveCallback(String name, String data)
-	{
-		// TODO Auto-generated method stub
-		
-	}
+	public abstract void packetReceiveCallback(String name, String data);
 
 
 

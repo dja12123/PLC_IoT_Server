@@ -1,4 +1,4 @@
-package kr.dja.plciot.DeviceConnection.PacketReceive;
+package kr.dja.plciot.LowLevelConnection.PacketReceive;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -7,11 +7,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import kr.dja.plciot.PLC_IoT_Core;
-import kr.dja.plciot.DeviceConnection.IReceiveRegister;
-import kr.dja.plciot.DeviceConnection.PacketProcess;
-import kr.dja.plciot.DeviceConnection.PacketReceive.UDPRawSocketReceiver.UDPRawSocketThreadManage;
+import kr.dja.plciot.LowLevelConnection.PacketProcess;
+import kr.dja.plciot.LowLevelConnection.PacketReceive.UDPRawSocketReceiver.UDPRawSocketThreadManage;
 import kr.dja.plciot.Task.TaskLock;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
@@ -21,13 +22,15 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 {
 	private final List<UDPRawSocketReceiver> rawSocketReceiver;
 	private final Map<String, IPacketReceiveObserver> observers;
-	private final IReceiveRegister register;
+	private final IFirstReceiveObserver register;
+	private final ExecutorService threadPool;
 	
-	public ReceiveController(IReceiveRegister register)
+	public ReceiveController(IFirstReceiveObserver register)
 	{// ReceiveControllerBuilder에서 인스턴스를 생성합니다.
 		this.rawSocketReceiver = new ArrayList<UDPRawSocketReceiver>();
 		this.observers = Collections.synchronizedMap(new HashMap<String, IPacketReceiveObserver>());
 		this.register = register;
+		this.threadPool = Executors.newCachedThreadPool();
 	}
 
 	@Override
@@ -59,17 +62,25 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 	@Override
 	public void rawPacketResive(int sendPort, InetAddress receiveAddr, byte[] data)
 	{
-		String uuid = PacketProcess.GetPacketFULLUID(data);
-		PLC_IoT_Core.CONS.push(uuid);
-		IPacketReceiveObserver observer = this.observers.getOrDefault(uuid, null);
-		if(observer != null)
+		this.threadPool.submit(()->
 		{
-			observer.packetReceive(data);
-		}
-		else
-		{
-			this.register.registerReceive(receiveAddr, data);
-		}
+			if(!PacketProcess.CheckPacket(data))
+			{
+				return;
+			}
+			
+			String uuid = PacketProcess.GetPacketFULLUID(data);
+			PLC_IoT_Core.CONS.push(uuid);
+			IPacketReceiveObserver observer = this.observers.getOrDefault(uuid, null);
+			if(observer != null)
+			{
+				observer.packetReceive(data);
+			}
+			else
+			{
+				this.register.firstReceiveCallback(receiveAddr, sendPort, data);
+			}
+		});
 	}
 	
 	public static class ReceiveControllerBuildManager implements IMultiThreadTaskCallback
@@ -92,14 +103,14 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 		
 		private void initializeValues(NextTask nextTask)
 		{
-			PLC_IoT_Core.CONS.push("장치 수신자 빌드 시작.");
+			PLC_IoT_Core.CONS.push("로우 레벨 수신자 빌드 시작.");
 			nextTask.insertTask((TaskOption option, NextTask insertNext)->
 			{
 				for(UDPRawSocketThreadManage builder : this.receiverThreadList)
 				{
 					this.instance.rawSocketReceiver.add(builder.getInstance());
 				}
-				PLC_IoT_Core.CONS.push("장치 수신자 빌드 완료.");
+				PLC_IoT_Core.CONS.push("로우 레벨 수신자 빌드 완료.");
 				insertNext.nextTask();
 			});
 			

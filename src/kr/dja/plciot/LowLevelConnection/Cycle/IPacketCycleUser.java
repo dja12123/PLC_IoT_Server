@@ -1,6 +1,6 @@
-package kr.dja.plciot.DeviceConnection.Cycle;
+package kr.dja.plciot.LowLevelConnection.Cycle;
 
-public interface IPacketCycleController
+public interface IPacketCycleUser
 {
 	void packetSendCallback(boolean success, String name, String data);
 	void packetReceiveCallback(String name, String data);

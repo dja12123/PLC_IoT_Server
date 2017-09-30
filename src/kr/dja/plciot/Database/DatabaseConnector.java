@@ -54,47 +54,57 @@ public class DatabaseConnector implements IMultiThreadTaskCallback
 		}
 		return true;
 	}
+	
+	private void start(NextTask next)
+	{
+		new Thread(()->
+		{
+			while(!this.connectDB())
+			{
+				PLC_IoT_Core.CONS.push("데이터베이스 연결 재시도 대기중");
+				try
+				{
+					Thread.sleep(6000);
+				}
+				catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
+			}
+			next.nextTask();
+		}).start();
+	}
+	
+	private void shutdown(NextTask next)
+	{
+		PLC_IoT_Core.CONS.push("데이터베이스 접속 종료중");
+		if(this.connection != null)
+		{
+			try
+			{
+				this.connection.close();
+				PLC_IoT_Core.CONS.push("데이터베이스 접속 종료 성공");
+			}
+			catch (SQLException e)
+			{
+				next.error(e, "데이터베이스 오류");
+				PLC_IoT_Core.CONS.push("데이터베이스 접속 종료 실패");
+			}
+		}
+		
+		next.nextTask();
+	}
 
 	@Override
 	public void executeTask(TaskOption option, NextTask next)
 	{
 		if(option == TaskOption.START)
 		{
-			new Thread(()->
-			{
-				while(!this.connectDB())
-				{
-					PLC_IoT_Core.CONS.push("데이터베이스 연결 재시도 대기중");
-					try
-					{
-						Thread.sleep(6000);
-					}
-					catch (InterruptedException e)
-					{
-						e.printStackTrace();
-					}
-				}
-				next.nextTask();
-			}).start();
+			this.start(next);
 		}
 		else if(option == TaskOption.SHUTDOWN)
 		{
-			PLC_IoT_Core.CONS.push("데이터베이스 접속 종료중");
-			if(this.connection != null)
-			{
-				try
-				{
-					this.connection.close();
-					PLC_IoT_Core.CONS.push("데이터베이스 접속 종료 성공");
-				}
-				catch (SQLException e)
-				{
-					next.error(e, "데이터베이스 오류");
-					PLC_IoT_Core.CONS.push("데이터베이스 접속 종료 실패");
-				}
-			}
-			
-			next.nextTask();
+			this.shutdown(next);
 		}
 	}
 }

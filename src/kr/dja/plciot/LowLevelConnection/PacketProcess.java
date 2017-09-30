@@ -1,4 +1,4 @@
-package kr.dja.plciot.DeviceConnection;
+package kr.dja.plciot.LowLevelConnection;
 
 public class PacketProcess
 {// 장치와 주고받는 패킷에 관련된 함수와 상수를 캡슐화.
@@ -13,6 +13,7 @@ public class PacketProcess
 		byte[] header = PacketProcess.CreatePacketHeader(fulluid);
 		byte[] packet = PacketProcess.CreateFullPacket(header, packetName, sendData);
 		
+		System.out.println(PacketProcess.CheckPacket(packet));
 		PacketProcess.PrintDataPacket(packet);
     }
 	
@@ -31,14 +32,14 @@ public class PacketProcess
 	private static final int FIELD_NAME_SIZE = 11; // 11 Byte
 	private static final int FIELD_DATA_SIZE = 12; // 12 Byte
 	
-	private static final int FIELD_NAMEDATA = 13; // 13 ~~
+	private static final int FIELD_NAMEDATA_SIZE = 13; // 13 ~~
 	
 	private static final int SIZE_TIME = FIELD_TIMEID_END - FIELD_TIMEID_START + 1;
 	private static final int SIZE_MACADDR = FIELD_MACADDR_END - FIELD_MACADDR_START + 1;
 	
 	private static final byte NULL_VALUE = 0b00000000;
 	
-	public static final int FULL_PACKET_LENGTH = (Byte.MAX_VALUE * 2) + PACKET_HEADER_SIZE + PACKET_INFO_SIZE;
+	public static final int MAX_PACKET_LENGTH = (Byte.MAX_VALUE * 2) + PACKET_HEADER_SIZE + PACKET_INFO_SIZE;
 	
 	public static void PrintDataPacket(byte[] packet)
 	{
@@ -54,6 +55,50 @@ public class PacketProcess
 		System.out.println("Phase      - " + String.format("%02X", PacketProcess.GetPacketPhase(packet)));
 		System.out.println("PacketName - " + PacketProcess.GetPacketName(packet));
 		System.out.println("PacketData - " + PacketProcess.GetPacketData(packet));
+	}
+	
+	public static boolean CheckPacket(byte[] packet)
+	{
+		if(packet.length == PACKET_HEADER_SIZE)
+		{
+			return true;
+		}
+		
+		if(packet.length > PACKET_HEADER_SIZE)
+		{
+			return CheckFullPacket(packet);
+		}
+		
+		return false;
+	}
+	
+	public static boolean CheckFullPacket(byte[] packet)
+	{
+		if(packet.length < FIELD_NAMEDATA_SIZE)
+		{
+			return false;
+		}
+		
+		if(packet.length > MAX_PACKET_LENGTH)
+		{
+			return false;
+		}
+		
+		if(packet[FIELD_NAME_SIZE] < 0)
+		{
+			return false;
+		}
+		
+		if(packet[FIELD_DATA_SIZE] < 0)
+		{
+			return false;
+		}
+		
+		if(packet[FIELD_NAME_SIZE] + packet[FIELD_DATA_SIZE] != packet.length - FIELD_NAMEDATA_SIZE)
+		{
+			return false;
+		}
+		return true;
 	}
 	
 	public static String CreateFULLUID(String macAddr)
@@ -171,7 +216,7 @@ public class PacketProcess
 	public static String GetPacketName(byte[] packet)
 	{// 패킷 이름을 가져옵니다.
 		StringBuffer packetName = new StringBuffer();
-		int index = FIELD_NAMEDATA;
+		int index = FIELD_NAMEDATA_SIZE;
 		
 		byte nameSize = packet[FIELD_NAME_SIZE];
 		
@@ -187,7 +232,7 @@ public class PacketProcess
 	public static String GetPacketData(byte[] packet)
 	{// 패킷 데이터를 가져옵니다.
 		StringBuffer packetData = new StringBuffer();
-		int index = FIELD_NAMEDATA + packet[FIELD_NAME_SIZE];
+		int index = FIELD_NAMEDATA_SIZE + packet[FIELD_NAME_SIZE];
 		
 		byte dataSize = packet[FIELD_DATA_SIZE];
 		

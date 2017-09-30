@@ -1,15 +1,10 @@
-package kr.dja.plciot.DeviceConnection.PacketSend;
+package kr.dja.plciot.LowLevelConnection.PacketSend;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import kr.dja.plciot.PLC_IoT_Core;
-import kr.dja.plciot.DeviceConnection.PacketProcess;
 
 public class SendController implements IPacketSender
 {
@@ -20,7 +15,7 @@ public class SendController implements IPacketSender
 	
 	public SendController(List<DatagramSocket> dataSocketList)
 	{
-		PLC_IoT_Core.CONS.push("장치 송신자 빌드 시작.");
+		PLC_IoT_Core.CONS.push("로우 레벨 송신자 빌드 시작.");
 		
 		this.rawSocketSender = new ArrayList<UDPRawSocketSender>();
 		
@@ -30,11 +25,11 @@ public class SendController implements IPacketSender
 		}
 		this.sendDataSyncObj = new Object();
 		
-		PLC_IoT_Core.CONS.push("장치 송신자 빌드 완료.");
+		PLC_IoT_Core.CONS.push("로우 레벨 송신자 빌드 완료.");
 	}
 	
 	@Override
-	public void sendData(InetAddress sendAddress, byte[] data)
+	public void sendData(InetAddress sendAddress, int port, byte[] data)
 	{
 		synchronized(this.sendDataSyncObj)
 		{
@@ -44,6 +39,6 @@ public class SendController implements IPacketSender
 				this.beforeSendPort = 0;
 			}
 		}
-		this.rawSocketSender.get(this.beforeSendPort).sendData(sendAddress, data);
+		this.rawSocketSender.get(this.beforeSendPort).sendData(sendAddress, port, data);
 	}
 }

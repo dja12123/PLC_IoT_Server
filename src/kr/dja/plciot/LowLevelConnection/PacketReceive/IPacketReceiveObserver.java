@@ -1,6 +1,4 @@
-package kr.dja.plciot.DeviceConnection.PacketReceive;
-
-import java.net.InetAddress;
+package kr.dja.plciot.LowLevelConnection.PacketReceive;
 
 public interface IPacketReceiveObserver
 {

@@ -1,55 +1,86 @@
 package kr.dja.plciot.Device;
 
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import kr.dja.plciot.PLC_IoT_Core;
-import kr.dja.plciot.DeviceConnection.ConnectionManager;
-import kr.dja.plciot.DeviceConnection.IReceiveRegister;
-import kr.dja.plciot.DeviceConnection.PacketProcess;
-import kr.dja.plciot.DeviceConnection.Cycle.IPacketCycleController;
-import kr.dja.plciot.DeviceConnection.Cycle.ReceiveCycle;
-import kr.dja.plciot.DeviceConnection.PacketReceive.IPacketReceiveObservable;
-import kr.dja.plciot.DeviceConnection.PacketReceive.ReceiveController;
-import kr.dja.plciot.DeviceConnection.PacketReceive.ReceiveController.ReceiveControllerBuildManager;
-import kr.dja.plciot.DeviceConnection.PacketSend.IPacketSender;
-import kr.dja.plciot.DeviceConnection.PacketSend.SendController;
+import kr.dja.plciot.LowLevelConnection.ConnectionManager;
+import kr.dja.plciot.LowLevelConnection.IReceiveHandler;
+import kr.dja.plciot.LowLevelConnection.Cycle.IPacketCycleUser;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class DeviceManager implements IReceiveRegister
+public class DeviceManager implements IReceiveHandler, IPacketCycleUser, IMultiThreadTaskCallback
 {
-	private final ConnectionManager connectionManager;
+	private static final String DEVICE_REGISTER = "register";
+	private final ConnectionManager cycleManager;
 	private final Map<String, Device> deviceList;
 	
 	public DeviceManager(ConnectionManager connectionManager)
 	{
-		this.connectionManager = connectionManager;
+		this.cycleManager = connectionManager;
 		this.deviceList = new HashMap<String, Device>();
-	}
-
-	@Override
-	public void registerReceive(InetAddress addr, byte[] data)
-	{
-		String macAddr = PacketProcess.GetpacketMacAddr(data);
-		Device receiveTarget = this.deviceList.getOrDefault(macAddr, null);
-		if(receiveTarget != null)
-		{// 일반적인 통신 수신 사이클을 시작합니다.
-			ReceiveCycle receiveCycle = new ReceiveCycle(this.connectionManager.getSendController(),
-					this.connectionManager.getReceiveController(), addr, data, receiveTarget);
-			
-		}
-		else
-		{// 장치 등록 사이클을 시작합니다.
-			PLC_IoT_Core.CONS.push("등록되지 않은 장치 접근.");
-		}
 		
 	}
 	
+	@Override
+	public IPacketCycleUser createConnection(String uuid, String name)
+	{// 장치 ID 넘어옴
+		Device receiveTarget = this.deviceList.getOrDefault(uuid, null);
+		if(receiveTarget != null)
+		{
+			return receiveTarget;
+		}
+		if(name.equals(DEVICE_REGISTER))
+		{
+			PLC_IoT_Core.CONS.push("장치 등록 시도.");
+			return this;
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public void packetSendCallback(boolean success, String name, String data)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void packetReceiveCallback(String name, String data)
+	{
+		// 장치 등록 사이클 시작
+		
+	}
+	
+	private void start(NextTask nextTask)
+	{
+		PLC_IoT_Core.CONS.push("장치 관리자 빌드 시작.");
+		this.cycleManager.addReceiveHandler(this);
+		PLC_IoT_Core.CONS.push("장치 관리자 빌드 완료.");
+		nextTask.nextTask();
+	}
+	
+	private void shutdown(NextTask nextTask)
+	{
+		PLC_IoT_Core.CONS.push("장치 관리자 종료 시작.");
+		this.cycleManager.removeReceiveHandler(this);
+		PLC_IoT_Core.CONS.push("장치 관리자 빌드 성공.");
+		nextTask.nextTask();
+	}
+
+	@Override
+	public void executeTask(TaskOption option, NextTask nextTask)
+	{
+		if(option == TaskOption.START)
+		{
+			this.start(nextTask);
+		}
+		else if(option == TaskOption.SHUTDOWN)
+		{
+			this.shutdown(nextTask);
+		}
+	}
 }

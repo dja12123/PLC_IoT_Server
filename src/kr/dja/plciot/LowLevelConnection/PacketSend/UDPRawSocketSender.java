@@ -1,11 +1,9 @@
-package kr.dja.plciot.DeviceConnection.PacketSend;
+package kr.dja.plciot.LowLevelConnection.PacketSend;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
-
 import kr.dja.plciot.PLC_IoT_Core;
 
 public class UDPRawSocketSender
@@ -15,12 +13,12 @@ public class UDPRawSocketSender
 	public UDPRawSocketSender(DatagramSocket socket)
 	{
 		this.socket = socket;
-		PLC_IoT_Core.CONS.push("장치 송신자 포트 " + this.socket.getLocalPort() + " 번 활성화.");
+		PLC_IoT_Core.CONS.push("로우 레벨 송신자 포트 " + this.socket.getLocalPort() + " 번 활성화.");
 	}
 	
-	public void sendData(InetAddress sendAddress, byte[] data)
+	public void sendData(InetAddress sendAddress, int port, byte[] data)
 	{
-		DatagramPacket packet = new DatagramPacket(data, data.length, sendAddress, 50000);
+		DatagramPacket packet = new DatagramPacket(data, data.length, sendAddress, port);
 		try
 		{
 			this.socket.send(packet);

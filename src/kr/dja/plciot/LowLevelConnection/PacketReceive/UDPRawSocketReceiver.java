@@ -1,12 +1,10 @@
-package kr.dja.plciot.DeviceConnection.PacketReceive;
+package kr.dja.plciot.LowLevelConnection.PacketReceive;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.SocketException;
-
 import kr.dja.plciot.PLC_IoT_Core;
-import kr.dja.plciot.DeviceConnection.PacketProcess;
+import kr.dja.plciot.LowLevelConnection.PacketProcess;
 import kr.dja.plciot.Task.TaskLock;
 
 public class UDPRawSocketReceiver
@@ -21,7 +19,7 @@ public class UDPRawSocketReceiver
 		this.socket = socket;
 		this.receiveManager = receiveManager;
 		this.threadFlag = true;
-		this.buffer = new byte[PacketProcess.FULL_PACKET_LENGTH];
+		this.buffer = new byte[PacketProcess.MAX_PACKET_LENGTH];
 	}
 
 	private void executeTask()
@@ -35,10 +33,9 @@ public class UDPRawSocketReceiver
 				this.socket.receive(packet);
 				byte[] copyArr = new byte[PacketProcess.GetPacketSize(this.buffer)];
 				System.arraycopy(this.buffer, 0, copyArr, 0, copyArr.length);
-				new Thread(()->
-				{
-					this.receiveManager.rawPacketResive(packet.getPort(), packet.getAddress(), copyArr);
-				}).start();
+
+				this.receiveManager.rawPacketResive(packet.getPort(), packet.getAddress(), copyArr);
+				
 			}
 			catch (IOException e)
 			{
@@ -69,11 +66,11 @@ public class UDPRawSocketReceiver
 		@Override
 		public void run()
 		{
-			PLC_IoT_Core.CONS.push("장치 수신자 " + this.instance.socket.getLocalPort() + " 번 활성화.");
+			PLC_IoT_Core.CONS.push("로우 레벨 수신자 " + this.instance.socket.getLocalPort() + " 번 활성화.");
 			this.startLock.unlock();
 			this.instance.executeTask();
 			
-			PLC_IoT_Core.CONS.push("장치 수신자 비활성화.");
+			PLC_IoT_Core.CONS.push("로우 레벨 수신자 비활성화.");
 			this.shutdownLock.unlock();
 		}
 		

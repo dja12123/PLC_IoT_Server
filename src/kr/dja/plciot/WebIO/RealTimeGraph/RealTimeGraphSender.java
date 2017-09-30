@@ -17,6 +17,8 @@ public class RealTimeGraphSender extends Thread
 	
 	private boolean runFlag;
 	
+	int i = 0;
+	
 	public RealTimeGraphSender(List<RealTimeGraphSender> senderList, Channel ch, String data)
 	{
 		this.senderList = senderList;
@@ -34,7 +36,12 @@ public class RealTimeGraphSender extends Thread
 		PLC_IoT_Core.CONS.push("실시간 그래프 전송시작.("+this.senderList.size()+")");
 		while(this.runFlag && this.ch.isActive())
 		{
-			this.ch.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, Math.random() * 10));
+			++i;
+			if(i > 10)
+			{
+				i = 0;
+			}
+			this.ch.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, i));
 			try
 			{
 				Thread.sleep(SEND_DATA_INTERVAL);
