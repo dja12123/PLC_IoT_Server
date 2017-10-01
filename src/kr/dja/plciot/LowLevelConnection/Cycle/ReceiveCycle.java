@@ -16,14 +16,15 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	private ReceiveCycle(IPacketSender sender, IPacketReceiveObservable receiver, InetAddress addr
 			,int port, byte[] data, IPacketCycleUser userCallback, IEndCycleCallback endCycleCallback)
 	{
-		super(sender, receiver, PacketProcess.GetPacketFULLUID(data), addr, port, endCycleCallback, userCallback);
+		super(sender, receiver, addr, port, endCycleCallback, userCallback);
 		this.resendCount = 0;
 		this.receivePacket = data;
 	}
 	
 	@Override
-	protected void startTask()
+	public void start()
 	{
+		this.startTask(PacketProcess.GetPacketFULLUID(this.receivePacket));
 		// 발신자로부터 패킷 이 반환되어 올때까지 대기힙니다.
 		this.resiveWaitTask();
 		

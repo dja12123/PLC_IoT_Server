@@ -56,16 +56,15 @@ public class ConnectionManager implements IFirstReceiveObserver, IEndCycleCallba
 			,String macAddr, String name, String data, IPacketCycleUser target)
 	{
 		AbsCycle sendCycle = new SendCycleBuilder()
+				.setPacketMacAddr(macAddr)
 				.setPacketName(name)
 				.setPacketData(data)
 				.setEndCycleCallback(this)
 				.setSender(this.sendController)
 				.setReceiver(this.receiveController)
-				.setPacketFullUID(PacketProcess.CreateFULLUID(macAddr))
 				.setAddress(addr)
 				.setPort(port)
 				.getInstance();
-		
 		this.cycles.add(sendCycle);
 		sendCycle.start();
 	}
@@ -95,7 +94,6 @@ public class ConnectionManager implements IFirstReceiveObserver, IEndCycleCallba
 					.setEndCycleCallback(this)
 					.setSender(this.sendController)
 					.setReceiver(this.receiveController)
-					.setPacketFullUID(PacketProcess.GetPacketFULLUID(packet))
 					.setAddress(receiveAddr)
 					.setPort(port)
 					.getInstance();

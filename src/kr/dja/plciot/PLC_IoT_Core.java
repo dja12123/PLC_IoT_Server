@@ -97,14 +97,13 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 			connectionManager.addReceiveHandler(t);
 			try
 			{
-				connectionManager.startSendCycle(InetAddress.getLocalHost(), 50001, "000000000000", "testPacket", "testData", t);
+				connectionManager.startSendCycle(InetAddress.getLocalHost(), 50001, "CAFEBABE0000", "testPacket", "testData", t);
 			}
 			catch (UnknownHostException e1)
 			{
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			
 			
 		}
 		

@@ -13,7 +13,7 @@ import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class DatabaseConnector implements IMultiThreadTaskCallback
+public class DatabaseConnector implements IMultiThreadTaskCallback, IDatabaseHandler
 {
 	private static final String DB_ADDR = "203.250.133.158:3306";
 	private static final String DB_NAME = "team_korea_server";
@@ -21,11 +21,44 @@ public class DatabaseConnector implements IMultiThreadTaskCallback
 	private static final String DB_PW = "thqkdzhfldk";
 	
 	private Connection connection;
-	private Statement statement;
 	
 	public DatabaseConnector()
 	{
 		
+	}
+	
+	@Override
+	public int sqlUpdate(String sql)
+	{
+		Statement statement;
+		try
+		{
+			statement = this.connection.createStatement();
+			return statement.executeUpdate(sql);
+		}
+		catch (SQLException e)
+		{
+			PLC_IoT_Core.CONS.push("SQL 쿼리 오류 " + e.getMessage());
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
+	@Override
+	public ResultSet sqlQuery(String sql)
+	{
+		Statement statement;
+		try
+		{
+			statement = this.connection.createStatement();
+			return statement.executeQuery(sql);
+		}
+		catch (SQLException e)
+		{
+			PLC_IoT_Core.CONS.push("SQL 쿼리 오류 " + e.getMessage());
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	private boolean connectDB()
@@ -38,9 +71,7 @@ public class DatabaseConnector implements IMultiThreadTaskCallback
 				
 				this.connection = DriverManager.getConnection("jdbc:mysql://"+DB_ADDR+"/"+DB_NAME, DB_ID, DB_PW);
 				
-				this.statement = connection.createStatement();
-				
-				ResultSet rs = this.statement.executeQuery("select version();");
+				ResultSet rs = this.sqlQuery("select version();");
 				
 				rs.next();
 				PLC_IoT_Core.CONS.push("데이터베이스 연결 성공 - 버전: " + rs.getString("version()"));

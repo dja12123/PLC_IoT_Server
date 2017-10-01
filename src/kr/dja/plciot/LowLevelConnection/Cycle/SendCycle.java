@@ -9,6 +9,9 @@ import kr.dja.plciot.LowLevelConnection.PacketSend.IPacketSender;
 
 public class SendCycle extends AbsCycle implements Runnable
 {
+	private final String macAddr;
+	private final String name;
+	private final String data;
 	private byte[] fullPacket;
 	private byte[] packetHeader;
 	private int resendCount;
@@ -17,22 +20,26 @@ public class SendCycle extends AbsCycle implements Runnable
 	private Thread resiveTaskThread;
 	
 	private SendCycle(IPacketSender sender, IPacketReceiveObservable receiver, InetAddress addr, int port
-			,String macAddr, String name, String data, IPacketCycleUser deviceCallback, IEndCycleCallback endCycleCallback)
+			,String macAddr, String name, String data, IPacketCycleUser user, IEndCycleCallback endCycleCallback)
 	{
-		super(sender, receiver, PacketProcess.CreateFULLUID(macAddr), addr, port, endCycleCallback, deviceCallback);
+		super(sender, receiver, addr, port, endCycleCallback, user);
+		
+		this.macAddr = macAddr;
+		this.name = name;
+		this.data = data;
 		
 		this.resendCount = 0;
 		this.taskState = false;
-		
-		this.packetHeader = PacketProcess.CreatePacketHeader(this.fullUID);
-		this.fullPacket = PacketProcess.CreateFullPacket(this.packetHeader, name, data);
-		System.out.println(macAddr);
-		PacketProcess.PrintDataPacket(fullPacket);
 	}
 	
 	@Override
-	protected void startTask()
+	public void start()
 	{
+		String fullUID = PacketProcess.CreateFULLUID(this.macAddr);
+		super.startTask(fullUID);
+		
+		this.packetHeader = PacketProcess.CreatePacketHeader(fullUID);
+		this.fullPacket = PacketProcess.CreateFullPacket(this.packetHeader, this.name, this.data);
 		// 발신자로부터 패킷 이 반환되어 올때까지 대기힙니다.
 		this.sendWaitTask();
 		
@@ -45,6 +52,7 @@ public class SendCycle extends AbsCycle implements Runnable
 	{// 패킷을 받은 상태일때 패킷을 검사.
 		this.resiveTaskThread.interrupt();
 		
+		System.out.println("SendCycle에서 수신:");
 		PacketProcess.PrintDataPacket(receivePacket);
 		
 		int receivePacketSize = PacketProcess.GetPacketSize(receivePacket);
@@ -136,6 +144,7 @@ public class SendCycle extends AbsCycle implements Runnable
 	{
 		private String name;
 		private String data;
+		private String macAddr;
 		
 		public SendCycleBuilder(){}
 		
@@ -152,9 +161,15 @@ public class SendCycle extends AbsCycle implements Runnable
 			return this;
 		}
 		
+		public SendCycleBuilder setPacketMacAddr(String macAddr)
+		{
+			this.macAddr = macAddr;
+			return this;
+		}
+		
 		public SendCycle getInstance()
 		{
-			return new SendCycle(sender, receiver, addr, port, fullUID, name, data, user, endCycleCallback);
+			return new SendCycle(sender, receiver, addr, port, macAddr, name, data, user, endCycleCallback);
 		}
 	}
 }

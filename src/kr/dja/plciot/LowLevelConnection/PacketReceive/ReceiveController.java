@@ -70,7 +70,6 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 			}
 			
 			String uuid = PacketProcess.GetPacketFULLUID(data);
-			PLC_IoT_Core.CONS.push(uuid);
 			IPacketReceiveObserver observer = this.observers.getOrDefault(uuid, null);
 			if(observer != null)
 			{

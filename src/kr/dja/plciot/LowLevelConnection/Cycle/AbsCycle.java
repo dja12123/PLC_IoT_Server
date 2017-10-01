@@ -10,31 +10,30 @@ public abstract class AbsCycle implements IPacketReceiveObserver
 {
 	protected final IPacketSender sender;
 	protected final IPacketReceiveObservable receiver;
-	protected final String fullUID;
+	private String fullUID;
 	protected final InetAddress addr;
 	protected final int port;
 	private final IEndCycleCallback endCycleCallback;
 	protected final IPacketCycleUser user;
 	
-	protected AbsCycle(IPacketSender sender, IPacketReceiveObservable receiver, String fullUID,
+	protected AbsCycle(IPacketSender sender, IPacketReceiveObservable receiver,
 			 InetAddress addr, int port, IEndCycleCallback endCycleCallback, IPacketCycleUser user)
 	{
 		this.sender = sender;
 		this.receiver = receiver;
-		this.fullUID = fullUID;
 		this.addr = addr;
 		this.port = port;
 		this.endCycleCallback = endCycleCallback;
 		this.user = user;
 	}
 	
-	public void start()
+	protected void startTask(String fullUID)
 	{
+		this.fullUID = fullUID;
 		this.receiver.addObserver(this.fullUID, this);
-		this.startTask();
 	}
 	
-	protected abstract void startTask();
+	public abstract void start();
 	
 	protected void notifyEndCycle()
 	{
@@ -46,7 +45,6 @@ public abstract class AbsCycle implements IPacketReceiveObserver
 	{
 		protected IPacketSender sender;
 		protected IPacketReceiveObservable receiver;
-		protected String fullUID;
 		protected InetAddress addr;
 		protected int port;
 		protected IEndCycleCallback endCycleCallback;
@@ -61,12 +59,6 @@ public abstract class AbsCycle implements IPacketReceiveObserver
 		public AbsCycleBuilder setReceiver(IPacketReceiveObservable receiver)
 		{
 			this.receiver = receiver;
-			return this;
-		}
-		
-		public AbsCycleBuilder setPacketFullUID(String fullUID)
-		{
-			this.fullUID = fullUID;
 			return this;
 		}
 		
