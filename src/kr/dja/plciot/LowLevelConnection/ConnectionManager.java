@@ -31,23 +31,23 @@ public class ConnectionManager implements IFirstReceiveObserver, IEndCycleCallba
 	private ReceiveController receiveController;
 	private SendController sendController;
 	
-	private final List<IReceiveHandler> receiveHandlers;
+	private final List<INewConnectionHandler> receiveHandlers;
 	
 	private final List<AbsCycle> cycles;
 
 	public ConnectionManager()
 	{
-		this.receiveHandlers = Collections.synchronizedList(new ArrayList<IReceiveHandler>());
+		this.receiveHandlers = Collections.synchronizedList(new ArrayList<INewConnectionHandler>());
 		
 		this.cycles = Collections.synchronizedList(new ArrayList<AbsCycle>());
 	}
 	
-	public void addReceiveHandler(IReceiveHandler handler)
+	public void addReceiveHandler(INewConnectionHandler handler)
 	{
 		this.receiveHandlers.add(handler);
 	}
 	
-	public void removeReceiveHandler(IReceiveHandler handler)
+	public void removeReceiveHandler(INewConnectionHandler handler)
 	{
 		this.receiveHandlers.remove(handler);
 	}
@@ -80,7 +80,7 @@ public class ConnectionManager implements IFirstReceiveObserver, IEndCycleCallba
 		String macAddr = PacketProcess.GetpacketMacAddr(packet);
 		String name = PacketProcess.GetPacketName(packet);
 		
-		for(IReceiveHandler handler : this.receiveHandlers)
+		for(INewConnectionHandler handler : this.receiveHandlers)
 		{
 			IPacketCycleUser user = handler.createConnection(macAddr, name);
 			if(user == null)

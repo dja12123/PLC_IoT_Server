@@ -12,7 +12,7 @@ import kr.dja.plciot.Device.DeviceManager;
 import kr.dja.plciot.Log.Console;
 import kr.dja.plciot.LowLevelConnection.ConnectionManager;
 import kr.dja.plciot.LowLevelConnection.ConnectionManager.ConnectionManagerBuilder;
-import kr.dja.plciot.LowLevelConnection.IReceiveHandler;
+import kr.dja.plciot.LowLevelConnection.INewConnectionHandler;
 import kr.dja.plciot.LowLevelConnection.Cycle.IPacketCycleUser;
 import kr.dja.plciot.Task.MultiThread.MultiThreadTaskOperator;
 import kr.dja.plciot.Task.MultiThread.NextTask;
@@ -109,7 +109,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 		
 	}
 	
-	class TestReceiveHandler implements IReceiveHandler, IPacketCycleUser
+	class TestReceiveHandler implements INewConnectionHandler, IPacketCycleUser
 	{
 
 		@Override

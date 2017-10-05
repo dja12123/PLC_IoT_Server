@@ -5,13 +5,13 @@ import java.util.Map;
 
 import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.LowLevelConnection.ConnectionManager;
-import kr.dja.plciot.LowLevelConnection.IReceiveHandler;
+import kr.dja.plciot.LowLevelConnection.INewConnectionHandler;
 import kr.dja.plciot.LowLevelConnection.Cycle.IPacketCycleUser;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class DeviceManager implements IReceiveHandler, IPacketCycleUser, IMultiThreadTaskCallback
+public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, IMultiThreadTaskCallback
 {
 	private static final String DEVICE_REGISTER = "register";
 	private final ConnectionManager cycleManager;
