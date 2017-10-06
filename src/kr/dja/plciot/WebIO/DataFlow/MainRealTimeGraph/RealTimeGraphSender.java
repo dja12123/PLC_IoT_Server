@@ -1,4 +1,4 @@
-package kr.dja.plciot.WebIO.RealTimeGraph;
+package kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph;
 
 import java.util.List;
 

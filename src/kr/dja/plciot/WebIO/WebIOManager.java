@@ -4,7 +4,7 @@ import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 import kr.dja.plciot.WebConnector.IWebSocketReceiveObservable;
-import kr.dja.plciot.WebIO.RealTimeGraph.RealTimeGraphManager;
+import kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph.RealTimeGraphManager;
 
 public class WebIOManager implements IMultiThreadTaskCallback
 {

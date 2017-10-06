@@ -1,5 +1,7 @@
 package kr.dja.plciot.LowLevelConnection;
 
+import kr.dja.plciot.LowLevelConnection.Cycle.CycleProcess;
+
 public class PacketProcess
 {// 장치와 주고받는 패킷에 관련된 함수와 상수를 캡슐화.
 
@@ -55,6 +57,23 @@ public class PacketProcess
 		System.out.println("Phase      - " + String.format("%02X", PacketProcess.GetPacketPhase(packet)));
 		System.out.println("PacketName - " + PacketProcess.GetPacketName(packet));
 		System.out.println("PacketData - " + PacketProcess.GetPacketData(packet));
+	}
+	
+	public static boolean ComparePacket(byte[] a, byte[] b)
+	{
+		if(a.length != b.length) return false;
+		for(int i = 0; i < a.length; ++i)
+		{
+			if(a[i] != b[i])
+			{
+				if(i == FIELD_PHASE)
+				{
+					continue;
+				}
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	public static boolean CheckPacket(byte[] packet)
@@ -154,8 +173,8 @@ public class PacketProcess
 			new Exception("data is too long");
 		}
 		
-		byte nameFieldSize = (byte)(name.length() + 1);// null 문자를 위한 공간.
-		byte dataFieldSize = (byte)(data.length() + 1);
+		byte nameFieldSize = (byte)(name.length());
+		byte dataFieldSize = (byte)(data.length());
 		
 		byte[] packet = new byte[PACKET_HEADER_SIZE + nameFieldSize + dataFieldSize + PACKET_INFO_SIZE];
 		
@@ -171,13 +190,11 @@ public class PacketProcess
 		{
 			packet[index++] = (byte)name.charAt(nameIndex);
 		}
-		packet[index++] = '\0';
 		
 		for(int dataIndex = 0; dataIndex < data.length(); ++dataIndex)
 		{
 			packet[index++] = (byte)data.charAt(dataIndex);
 		}
-		packet[index++] = '\0';
 		
 		return packet;
 	}
@@ -221,7 +238,7 @@ public class PacketProcess
 		byte nameSize = packet[FIELD_NAME_SIZE];
 		
 		// null 문자 제거.
-		for(int nameIndex = 0; nameIndex < nameSize - 1; ++nameIndex)
+		for(int nameIndex = 0; nameIndex < nameSize; ++nameIndex)
 		{
 			packetName.append((char)packet[index++]);
 		}
@@ -237,7 +254,7 @@ public class PacketProcess
 		byte dataSize = packet[FIELD_DATA_SIZE];
 		
 		// null 문자 제거.
-		for(int dataIndex = 0; dataIndex < dataSize - 1; ++dataIndex)
+		for(int dataIndex = 0; dataIndex < dataSize; ++dataIndex)
 		{
 			packetData.append((char)packet[index++]);
 		}

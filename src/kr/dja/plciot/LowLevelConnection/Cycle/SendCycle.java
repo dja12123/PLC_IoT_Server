@@ -68,23 +68,21 @@ public class SendCycle extends AbsCycle implements Runnable
 			return;
 		}
 		
-		for(int i = 0; i < receivePacketSize; ++i)
+		if(!PacketProcess.ComparePacket(receivePacket, this.fullPacket))
 		{
-			if(receivePacket[i] != this.fullPacket[i])
+			if(this.resendCount > CycleProcess.MAX_RESEND)
 			{
-				if(this.resendCount > CycleProcess.MAX_RESEND)
-				{
-					this.errorHandling("Too many resend error.");
-					return;
-				}
-				++this.resendCount;
-				
-				this.reSendPhase(this.fullPacket, CycleProcess.PHASE_START);
+				this.errorHandling("Too many resend error.");
 				return;
 			}
+			++this.resendCount;
+			this.reSendPhase(this.fullPacket, CycleProcess.PHASE_START);
+			
+			return;
 		}
 		
 		this.reSendPhase(this.packetHeader, CycleProcess.PHASE_EXECUTE);
+		return;
 	}
 	
 	@Override
@@ -114,6 +112,8 @@ public class SendCycle extends AbsCycle implements Runnable
 	{// 재전송.
 		PacketProcess.SetPacketPhase(packet, phase);
 		this.sender.sendData(this.addr, this.port, packet);
+		System.out.println("SendCycle에서 송신:" + phase);
+		PacketProcess.PrintDataPacket(packet);
 	}
 	
 	private void endProcess()
