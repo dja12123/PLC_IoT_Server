@@ -105,7 +105,6 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			
 		}
 		
 	}

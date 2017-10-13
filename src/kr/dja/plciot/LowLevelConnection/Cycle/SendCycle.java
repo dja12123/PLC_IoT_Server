@@ -50,6 +50,7 @@ public class SendCycle extends AbsCycle implements Runnable
 	@Override
 	public synchronized void packetReceive(byte[] receivePacket)
 	{// 패킷을 받은 상태일때 패킷을 검사.
+		
 		this.resiveTaskThread.interrupt();
 		
 		System.out.println("SendCycle에서 수신:");
@@ -70,17 +71,20 @@ public class SendCycle extends AbsCycle implements Runnable
 		
 		if(!PacketProcess.ComparePacket(receivePacket, this.fullPacket))
 		{
-			if(this.resendCount > CycleProcess.MAX_RESEND)
+			if(this.resendCount >= CycleProcess.MAX_RESEND)
 			{
 				this.errorHandling("Too many resend error.");
 				return;
 			}
 			++this.resendCount;
+			
+			// 발신자로부터 패킷 이 반환되어 올때까지 대기힙니다.
+			this.sendWaitTask();
 			this.reSendPhase(this.fullPacket, CycleProcess.PHASE_START);
 			
 			return;
 		}
-		
+
 		this.reSendPhase(this.packetHeader, CycleProcess.PHASE_EXECUTE);
 		return;
 	}
@@ -98,8 +102,18 @@ public class SendCycle extends AbsCycle implements Runnable
 		{
 			return;
 		}
+		if(this.resendCount >= CycleProcess.MAX_RESEND)
+		{
+			this.errorHandling("Device is not responding.");
+			return;
+		}
+		++this.resendCount;
+		System.out.println("resend(" + this.resendCount +")");
 		
-		this.errorHandling("Device is not responding.");
+		// 발신자로부터 패킷 이 반환되어 올때까지 대기힙니다.
+		this.sendWaitTask();
+		this.reSendPhase(this.fullPacket, CycleProcess.PHASE_START);
+		
 	}
 	
 	private void sendWaitTask()

@@ -33,12 +33,13 @@ public class UDPRawSocketReceiver
 				this.socket.receive(packet);
 				byte[] copyArr = new byte[PacketProcess.GetPacketSize(this.buffer)];
 				System.arraycopy(this.buffer, 0, copyArr, 0, copyArr.length);
-
+				System.out.println("DATARESEIVE");
 				this.receiveManager.rawPacketResive(packet.getPort(), packet.getAddress(), copyArr);
 				
 			}
 			catch (IOException e)
 			{
+				e.printStackTrace();
 			}
 		}
 	}
