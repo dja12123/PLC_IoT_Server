@@ -26,7 +26,7 @@ public class UDPRawSocketReceiver
 	{
 		while(this.threadFlag)
 		{
-		
+	
 			DatagramPacket packet = new DatagramPacket(this.buffer, this.buffer.length);
 			try
 			{
