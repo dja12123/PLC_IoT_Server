@@ -11,7 +11,6 @@ public class RealTimeGraphSender extends Thread
 	private static final int SEND_DATA_INTERVAL = 100;
 	private static final String SEND_KEY = "SERVER_REALTIME_DATA";
 	
-	private final List<RealTimeGraphSender> senderList;
 	private final Channel ch;
 	private final String data;
 	
@@ -19,13 +18,11 @@ public class RealTimeGraphSender extends Thread
 	
 	int i = 0;
 	
-	public RealTimeGraphSender(List<RealTimeGraphSender> senderList, Channel ch, String data)
+	public RealTimeGraphSender(Channel ch, String data)
 	{
-		this.senderList = senderList;
 		this.ch = ch;
 		this.data = data;
 		
-		this.senderList.add(this);
 		this.runFlag = true;
 		this.start();
 	}
@@ -33,7 +30,6 @@ public class RealTimeGraphSender extends Thread
 	@Override
 	public void run()
 	{
-		PLC_IoT_Core.CONS.push("실시간 그래프 전송시작.("+this.senderList.size()+")");
 		while(this.runFlag && this.ch.isActive())
 		{
 			++i;
@@ -52,12 +48,11 @@ public class RealTimeGraphSender extends Thread
 			}
 		}
 		this.ch.close();
-		this.senderList.remove(this);
-		PLC_IoT_Core.CONS.push("실시간 그래프 전송종료.("+this.senderList.size()+")");
 	}
 	
 	public void endTask()
 	{
+		this.interrupt();
 		this.runFlag = false;
 	}
 }

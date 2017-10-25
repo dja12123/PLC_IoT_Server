@@ -34,7 +34,7 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter
 			else if (msg instanceof TextWebSocketFrame)
 			{
 				System.out.println("TextWebSocketFrame Received : ");
-				this.observer.messageReceive(ctx.channel(), ((TextWebSocketFrame) msg).text());
+				this.observer.rawMessageReceive(ctx.channel(), ((TextWebSocketFrame) msg).text());
 			}
 			else if (msg instanceof PingWebSocketFrame)
 			{
@@ -51,6 +51,7 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter
 				System.out.println("CloseWebSocketFrame Received : ");
 				System.out.println("ReasonText :" + ((CloseWebSocketFrame) msg).reasonText());
 				System.out.println("StatusCode : " + ((CloseWebSocketFrame) msg).statusCode());
+				this.observer.rawChannelDisconnect(ctx.channel());
 			}
 			else
 			{

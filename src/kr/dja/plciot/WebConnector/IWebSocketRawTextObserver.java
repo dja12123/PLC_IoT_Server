@@ -5,5 +5,6 @@ import io.netty.channel.ChannelHandlerContext;
 
 public interface IWebSocketRawTextObserver
 {
-	public void messageReceive(Channel ch, String str);
+	public void rawMessageReceive(Channel ch, String str);
+	public void rawChannelDisconnect(Channel ch);
 }

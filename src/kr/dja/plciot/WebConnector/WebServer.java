@@ -42,19 +42,22 @@ public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveOb
 	private Channel channel;
 
 	private final Map<String, IWebSocketObserver> observers;
+	private final Map<Channel, IWebSocketObserver> observerChannelMap;
 	
 	public WebServer()
 	{
 		this.observers = Collections.synchronizedMap(new HashMap<String, IWebSocketObserver>());
+		this.observerChannelMap = Collections.synchronizedMap(new HashMap<Channel, IWebSocketObserver>());
 	}
 	
 	@Override
-	public void messageReceive(Channel ch, String str)
+	public void rawMessageReceive(Channel ch, String str)
 	{
 		PLC_IoT_Core.CONS.push("웹소켓 요청: " + str);
 		
 		String[] kv = str.split(SEPARATOR, 2);
 		String key = kv[0];
+		String value = null;
 
 		IWebSocketObserver observer = this.observers.getOrDefault(key, null);
 		
@@ -65,38 +68,56 @@ public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveOb
 		
 		if(kv.length > 1)
 		{
-			observer.messageReceive(ch, key, kv[1]);
+			value = kv[1];
 		}
-		else
+		
+		
+		this.observerChannelMap.put(ch, observer);
+		observer.messageReceive(ch, key, value);
+		
+	}
+	
+	@Override
+	public void rawChannelDisconnect(Channel ch)
+	{
+		IWebSocketObserver observer = this.observerChannelMap.getOrDefault(ch, null);
+		if(observer == null)
 		{
-			observer.messageReceive(ch, key, null);
+			return;
 		}
+		observer.channelDisconnect(ch);
+		this.observerChannelMap.remove(ch);
 	}
 	
 	@Override
 	public void addObserver(String key, IWebSocketObserver o)
 	{
-		if(!this.observers.containsKey(key))
-		{
-			this.observers.put(key, o);
-		}
-		else
+		if(this.observers.containsKey(key))
 		{
 			new Exception("Duplicated Put Packet Observer").printStackTrace();
+			return;
+			
 		}
+		this.observers.put(key, o);
 	}
 
 	@Override
 	public void deleteObserver(String key)
 	{
-		if(this.observers.containsKey(key))
-		{
-			this.observers.remove(key);
-		}
-		else
+		if(!this.observers.containsKey(key))
 		{
 			new Exception("Remove Packet Observer").printStackTrace();
+			return;
 		}
+		IWebSocketObserver observer = this.observers.get(key);
+		for(Channel ch : this.observerChannelMap.keySet())
+		{
+			if(this.observerChannelMap.get(ch) == observer)
+			{
+				this.observerChannelMap.remove(ch);
+			}
+		}
+		this.observers.remove(key);
 	}
 	
 	public static class WebServerBuilder implements IMultiThreadTaskCallback
