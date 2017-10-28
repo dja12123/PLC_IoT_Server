@@ -43,6 +43,8 @@ public class PacketProcess
 	
 	public static final int MAX_PACKET_LENGTH = (Byte.MAX_VALUE * 2) + PACKET_HEADER_SIZE + PACKET_INFO_SIZE;
 	
+	public static final String DEFAULT_SPLIT_REGEX = "/";
+	
 	public static void PrintDataPacket(byte[] packet)
 	{
 		System.out.print("HEX: ");

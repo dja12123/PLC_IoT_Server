@@ -52,11 +52,20 @@ public class SendCycle extends AbsCycle implements Runnable
 	{// 패킷을 받은 상태일때 패킷을 검사.
 		
 		this.resiveTaskThread.interrupt();
+		int receivePacketSize = PacketProcess.GetPacketSize(receivePacket);
 		
 		System.out.println("SendCycle에서 수신:");
 		PacketProcess.PrintDataPacket(receivePacket);
 		
-		int receivePacketSize = PacketProcess.GetPacketSize(receivePacket);
+		if(PacketProcess.GetPacketPhase(receivePacket) == CycleProcess.PHASE_EXECUTE)
+		{
+			System.out.println("수신 완료.");
+			this.taskState = true;
+			this.endProcess();
+			return;
+		}
+		
+		
 		if(receivePacketSize != this.fullPacket.length)
 		{
 			this.errorHandling("Packet length error.");
@@ -126,7 +135,7 @@ public class SendCycle extends AbsCycle implements Runnable
 	{// 재전송.
 		PacketProcess.SetPacketPhase(packet, phase);
 		this.sender.sendData(this.addr, this.port, packet);
-		System.out.println("SendCycle에서 송신:" + phase);
+		System.out.println("SendCycle에서 송신:" + phase + " " + this.port);
 		PacketProcess.PrintDataPacket(packet);
 	}
 	

@@ -41,7 +41,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 		this.mainFrame = new MainFrame();
 		this.dbManager = new DatabaseConnector();
 		this.connectionManager = new ConnectionManager();
-		this.deviceManager = new DeviceManager(this.connectionManager);
+		this.deviceManager = new DeviceManager(this.connectionManager, this.dbManager);
 		this.webServer = new WebServer();
 		this.webIOManager = new WebIOManager(this.webServer);
 		
@@ -98,7 +98,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 			try
 			{
 				byte[] addr = new byte[]{(byte) 203,(byte) 250,(byte) 133,(byte) 160};
-				connectionManager.startSendCycle(InetAddress.getByAddress(addr), 50001, "1A2B3C4D5E6F", "testPacket", "testData", t);
+				connectionManager.startSendCycle(InetAddress.getByAddress(addr), 50011, "1A2B3C4D5E6F", "testPacket", "testData", t);
 			}
 			catch (UnknownHostException e1)
 			{
