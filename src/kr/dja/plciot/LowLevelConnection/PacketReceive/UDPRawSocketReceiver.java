@@ -13,6 +13,7 @@ public class UDPRawSocketReceiver
 	private final IRawSocketObserver receiveManager;
 	private boolean threadFlag;
 	private final byte[] buffer;
+	private final DatagramPacket packet;
 	
 	private UDPRawSocketReceiver(DatagramSocket socket, IRawSocketObserver receiveManager)
 	{
@@ -20,14 +21,13 @@ public class UDPRawSocketReceiver
 		this.receiveManager = receiveManager;
 		this.threadFlag = true;
 		this.buffer = new byte[PacketProcess.MAX_PACKET_LENGTH];
+		this.packet = new DatagramPacket(this.buffer, this.buffer.length);
 	}
 
 	private void executeTask()
 	{
 		while(this.threadFlag)
 		{
-			
-			DatagramPacket packet = new DatagramPacket(this.buffer, this.buffer.length);
 			try
 			{
 				this.socket.receive(packet);
@@ -39,7 +39,7 @@ public class UDPRawSocketReceiver
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 	}

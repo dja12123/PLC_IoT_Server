@@ -135,7 +135,7 @@ public class SendCycle extends AbsCycle implements Runnable
 	{// 재전송.
 		PacketProcess.SetPacketPhase(packet, phase);
 		this.sender.sendData(this.addr, this.port, packet);
-		System.out.println("SendCycle에서 송신:" + phase);
+		System.out.println("SendCycle에서 송신:" + phase + " " + this.port);
 		PacketProcess.PrintDataPacket(packet);
 	}
 	

@@ -3,6 +3,7 @@ package kr.dja.plciot.LowLevelConnection;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -193,7 +194,8 @@ public class ConnectionManager implements IFirstReceiveObserver, IEndCycleCallba
 			{
 				try
 				{
-					DatagramSocket createSocket = new DatagramSocket(i);
+					DatagramSocket createSocket = null;
+					createSocket = new DatagramSocket(i);
 					socketList.add(createSocket);
 					this.createdSocketList.add(createSocket);
 				}

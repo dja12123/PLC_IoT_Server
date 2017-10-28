@@ -1,9 +1,11 @@
 package kr.dja.plciot.Device;
 
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
 import kr.dja.plciot.PLC_IoT_Core;
+import kr.dja.plciot.Database.DatabaseConnector;
 import kr.dja.plciot.LowLevelConnection.ConnectionManager;
 import kr.dja.plciot.LowLevelConnection.INewConnectionHandler;
 import kr.dja.plciot.LowLevelConnection.Cycle.IPacketCycleUser;
@@ -15,13 +17,14 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 {
 	private static final String DEVICE_REGISTER = "register";
 	private final ConnectionManager cycleManager;
+	private final DatabaseConnector dbConnector;
 	private final Map<String, Device> deviceList;
 	
-	public DeviceManager(ConnectionManager connectionManager)
+	public DeviceManager(ConnectionManager connectionManager, DatabaseConnector dbConnector)
 	{
 		this.cycleManager = connectionManager;
 		this.deviceList = new HashMap<String, Device>();
-		
+		this.dbConnector = dbConnector;
 	}
 	
 	@Override
@@ -59,6 +62,10 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 	{
 		PLC_IoT_Core.CONS.push("장치 관리자 빌드 시작.");
 		this.cycleManager.addReceiveHandler(this);
+		
+		ResultSet deviceList = this.dbConnector.sqlQuery("select * from device");
+		deviceList.
+		
 		PLC_IoT_Core.CONS.push("장치 관리자 빌드 완료.");
 		nextTask.nextTask();
 	}
