@@ -64,7 +64,7 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 		this.cycleManager.addReceiveHandler(this);
 		
 		ResultSet deviceList = this.dbConnector.sqlQuery("select * from device");
-		deviceList.
+		//deviceList.
 		
 		PLC_IoT_Core.CONS.push("장치 관리자 빌드 완료.");
 		nextTask.nextTask();
