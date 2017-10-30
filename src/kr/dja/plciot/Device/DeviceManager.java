@@ -11,7 +11,7 @@ import kr.dja.plciot.Database.DatabaseConnector;
 import kr.dja.plciot.Device.AbsDevice.AbsDevice;
 import kr.dja.plciot.Device.AbsDevice.DataFlow.DeviceConsent;
 import kr.dja.plciot.Device.AbsDevice.DataFlow.DeviceSwitch;
-import kr.dja.plciot.Device.TaskManager.DeviceValueDBStore;
+import kr.dja.plciot.Device.TaskManager.RealTimeDataHandler;
 import kr.dja.plciot.LowLevelConnection.ConnectionManager;
 import kr.dja.plciot.LowLevelConnection.INewConnectionHandler;
 import kr.dja.plciot.LowLevelConnection.PacketProcess;
@@ -30,7 +30,7 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 	private final DatabaseConnector dbConnector;
 	private final Map<String, AbsDevice> deviceList;
 	
-	private final DeviceValueDBStore dbStoreHandler;
+	private final RealTimeDataHandler realTimeDataHandler;
 		
 	public DeviceManager(ConnectionManager connectionManager, DatabaseConnector dbConnector)
 	{
@@ -38,7 +38,7 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 		this.deviceList = new HashMap<String, AbsDevice>();
 		this.dbConnector = dbConnector;
 		
-		this.dbStoreHandler = new DeviceValueDBStore();
+		this.realTimeDataHandler = new RealTimeDataHandler();
 	}
 	
 	@Override
@@ -97,14 +97,24 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 				return;
 			}
 			
-			PLC_IoT_Core.CONS.push("장치 등록 요청이 확인됨: mac="+macAddr+" type="+deviceType);
+			if(this.deviceList.containsKey(macAddr))
+			{
+				PLC_IoT_Core.CONS.push("장비 재접속 확인.");
+				this.cycleManager.startSendCycle(addr, DEFAULT_DEVICE_PORT, macAddr, DEVICE_REGISTER_OK, "", this);
+				return;
+			}
+			else
+			{
+				PLC_IoT_Core.CONS.push("장치 등록 요청이 확인됨: mac="+macAddr+" type="+deviceType);
+			}
+			
 			switch (deviceType)
 			{
 			case DeviceConsent.TYPE_NAME:
-				device = new DeviceConsent(macAddr);
+				device = new DeviceConsent(macAddr, this.realTimeDataHandler);
 				break;
 			case DeviceSwitch.TYPE_NAME:
-				device = new DeviceSwitch(macAddr);
+				device = new DeviceSwitch(macAddr, this.realTimeDataHandler);
 				break;
 			}
 			
@@ -114,7 +124,18 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 				return;
 			}
 			
-			//this.dbConnector.sqlUpdate(sql);
+			this.deviceList.put(macAddr, device);
+			
+			ResultSet rs = this.dbConnector.sqlQuery("select * from device where mac_id = '"+macAddr+"';");
+			if(rs.next())
+			{
+				PLC_IoT_Core.CONS.push("등록된 장치 바인딩: " + rs.getString(1));
+			}
+			else
+			{
+				PLC_IoT_Core.CONS.push("미등록 장치 바인딩.");
+				this.dbConnector.sqlUpdate("insert into device VALUES('noname','"+macAddr+"','"+deviceType+"',null);");
+			}
 			
 			this.cycleManager.startSendCycle(addr, DEFAULT_DEVICE_PORT, macAddr, DEVICE_REGISTER_OK, "", this);
 			// 등록 완료 확인 메세지 전송.

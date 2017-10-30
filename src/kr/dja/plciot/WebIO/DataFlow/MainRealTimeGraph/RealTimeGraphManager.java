@@ -12,6 +12,7 @@ import kr.dja.plciot.WebConnector.IWebSocketObserver;
 
 public class RealTimeGraphManager implements IWebSocketObserver
 {
+	public static final String GRAPH_REQ = "GETGRAPH";
 	private final Map<Channel, RealTimeGraphSender> senderMap;
 	
 	public RealTimeGraphManager()
