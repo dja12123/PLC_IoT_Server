@@ -24,7 +24,6 @@ public class DeviceSwitch extends AbsDevice
 	@Override
 	public void packetReceiveCallback(InetAddress addr, String macAddr, String name, String data)
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
