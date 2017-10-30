@@ -1,13 +1,20 @@
 package kr.dja.plciot.Device;
 
+import java.net.InetAddress;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Database.DatabaseConnector;
+import kr.dja.plciot.Device.AbsDevice.AbsDevice;
+import kr.dja.plciot.Device.AbsDevice.DataFlow.DeviceConsent;
+import kr.dja.plciot.Device.AbsDevice.DataFlow.DeviceSwitch;
+import kr.dja.plciot.Device.TaskManager.DeviceValueDBStore;
 import kr.dja.plciot.LowLevelConnection.ConnectionManager;
 import kr.dja.plciot.LowLevelConnection.INewConnectionHandler;
+import kr.dja.plciot.LowLevelConnection.PacketProcess;
 import kr.dja.plciot.LowLevelConnection.Cycle.IPacketCycleUser;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
@@ -15,47 +22,124 @@ import kr.dja.plciot.Task.MultiThread.TaskOption;
 
 public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, IMultiThreadTaskCallback
 {
+	private static final int DEFAULT_DEVICE_PORT = 50011;
 	private static final String DEVICE_REGISTER = "register";
+	private static final String DEVICE_REGISTER_OK = "registerok";
+	
 	private final ConnectionManager cycleManager;
 	private final DatabaseConnector dbConnector;
-	private final Map<String, Device> deviceList;
+	private final Map<String, AbsDevice> deviceList;
 	
+	private final DeviceValueDBStore dbStoreHandler;
+		
 	public DeviceManager(ConnectionManager connectionManager, DatabaseConnector dbConnector)
 	{
 		this.cycleManager = connectionManager;
-		this.deviceList = new HashMap<String, Device>();
+		this.deviceList = new HashMap<String, AbsDevice>();
 		this.dbConnector = dbConnector;
+		
+		this.dbStoreHandler = new DeviceValueDBStore();
 	}
 	
 	@Override
 	public IPacketCycleUser createConnection(String uuid, String name)
 	{// 장치 ID 넘어옴
-		Device receiveTarget = this.deviceList.getOrDefault(uuid, null);
+		AbsDevice receiveTarget = this.deviceList.getOrDefault(uuid, null);
 		if(receiveTarget != null)
 		{
 			return receiveTarget;
 		}
 		if(name.equals(DEVICE_REGISTER))
 		{
-			PLC_IoT_Core.CONS.push("장치 등록 시도.");
+			PLC_IoT_Core.CONS.push("장치 등록 패이즈 시작.");
 			return this;
 		}
 		
-		return null;
+		return this;
 	}
 	
 	@Override
 	public void packetSendCallback(boolean success, String name, String data)
 	{
-		// TODO Auto-generated method stub
-		
+		if(name.equals(DEVICE_REGISTER_OK))
+		{
+			PLC_IoT_Core.CONS.push("장치 서버 바인딩 성공.");
+		}
 	}
 
 	@Override
-	public void packetReceiveCallback(String name, String data)
+	public void packetReceiveCallback(InetAddress addr, String macAddr, String name, String data)
 	{
-		// 장치 등록 사이클 시작
+		if(name.equals(DEVICE_REGISTER))
+		{
+			this.deviceRegisterTask(addr, macAddr, data);
+		}
+	}
+	
+	private void deviceRegisterTask(InetAddress addr, String macAddr, String data)
+	{
+		PLC_IoT_Core.CONS.push("장치 등록 작업 시작.");
+		try
+		{
+			String[] splitData = data.split(PacketProcess.DEFAULT_SPLIT_REGEX);
+			byte[] receiveInetByte = new byte[4];
+			String deviceType = splitData[4];
+			AbsDevice device = null;
+			for(int i = 0; i < 4; ++i)
+			{
+				receiveInetByte[i] = (byte) Integer.parseInt(splitData[i]);
+			}
+			InetAddress receiveInet = InetAddress.getByAddress(receiveInetByte);
+			
+			if(!addr.equals(receiveInet))
+			{
+				PLC_IoT_Core.CONS.push("주소 불일치 오류.");
+				return;
+			}
+			
+			PLC_IoT_Core.CONS.push("장치 등록 요청이 확인됨: mac="+macAddr+" type="+deviceType);
+			switch (deviceType)
+			{
+			case DeviceConsent.TYPE_NAME:
+				device = new DeviceConsent(macAddr);
+				break;
+			case DeviceSwitch.TYPE_NAME:
+				device = new DeviceSwitch(macAddr);
+				break;
+			}
+			
+			if(device == null)
+			{
+				PLC_IoT_Core.CONS.push("정의되지 않은 장치 오류.");
+				return;
+			}
+			
+			//this.dbConnector.sqlUpdate(sql);
+			
+			this.cycleManager.startSendCycle(addr, DEFAULT_DEVICE_PORT, macAddr, DEVICE_REGISTER_OK, "", this);
+			// 등록 완료 확인 메세지 전송.
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		/*this.cycleManager.startSendCycle(InetAddress.getByAddress(123), 50011, "", "testPacket", "testData", t);
+		String[] splitData = data.split(PacketProcess.DEFAULT_SPLIT_REGEX);
+		String deviceType = splitData[0];// DEVICE TYPE
+		String ipAddr = splitData[1];
 		
+		AbsDevice taskDevice = this.deviceList.getOrDefault(deviceUUID, null);
+		
+		if(taskDevice == null)
+		{// 가져오지 못했을경우 추상 장치 객체 생성.
+			switch(deviceType)
+			{
+			case DeviceConsent.TYPE_NAME:
+				taskDevice = new DeviceConsent(deviceUUID);
+				break;
+				
+			}
+		}*/
 	}
 	
 	private void start(NextTask nextTask)
@@ -63,8 +147,23 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 		PLC_IoT_Core.CONS.push("장치 관리자 빌드 시작.");
 		this.cycleManager.addReceiveHandler(this);
 		
-		ResultSet deviceList = this.dbConnector.sqlQuery("select * from device");
-		//deviceList.
+
+		ResultSet deviceListSql = this.dbConnector.sqlQuery("select * from device");
+		
+		try
+		{
+			while(deviceListSql.next())
+			{
+				System.out.print(deviceListSql.getString(1) + " ");
+				System.out.print(deviceListSql.getString(2) + " ");
+				System.out.print(deviceListSql.getString(3) + " ");
+				System.out.println(deviceListSql.getString(4) + " ");
+			}
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
 		
 		PLC_IoT_Core.CONS.push("장치 관리자 빌드 완료.");
 		nextTask.nextTask();

@@ -30,11 +30,12 @@ public class UDPRawSocketReceiver
 		{
 			try
 			{
-				this.socket.receive(packet);
+				this.socket.receive(this.packet);
 				byte[] copyArr = new byte[PacketProcess.GetPacketSize(this.buffer)];
 				System.arraycopy(this.buffer, 0, copyArr, 0, copyArr.length);
 				System.out.println("DATARESEIVE");
-				this.receiveManager.rawPacketResive(packet.getPort(), packet.getAddress(), copyArr);
+				PacketProcess.PrintDataPacket(copyArr);
+				this.receiveManager.rawPacketResive(this.packet.getPort(), this.packet.getAddress(), copyArr);
 				
 			}
 			catch (IOException e)

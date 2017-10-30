@@ -13,10 +13,10 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	
 	private Thread resiveTaskThread;
 	
-	private ReceiveCycle(IPacketSender sender, IPacketReceiveObservable receiver, InetAddress addr
-			,int port, byte[] data, IPacketCycleUser userCallback, IEndCycleCallback endCycleCallback)
+	private ReceiveCycle(IPacketSender sender, IPacketReceiveObservable receiver, InetAddress addr,
+			byte[] data, IPacketCycleUser userCallback, IEndCycleCallback endCycleCallback)
 	{
-		super(sender, receiver, addr, port, endCycleCallback, userCallback);
+		super(sender, receiver, addr, endCycleCallback, userCallback);
 		this.resendCount = 0;
 		this.receivePacket = data;
 	}
@@ -35,10 +35,9 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	@Override
 	public synchronized void packetReceive(byte[] resiveData)
 	{
-		this.receivePacket = resiveData;
 		this.resiveTaskThread.interrupt();
 		
-		byte phase = PacketProcess.GetPacketPhase(this.receivePacket);
+		byte phase = PacketProcess.GetPacketPhase(resiveData);
 		
 		if(phase == CycleProcess.PHASE_EXECUTE)
 		{// 오류가 없는 실행 상태.
@@ -47,9 +46,9 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 		}
 		else if(phase == CycleProcess.PHASE_START)
 		{// 오류가 있는 상태.
+			this.receivePacket = resiveData;
 			if(this.resendCount > CycleProcess.MAX_RESEND)
 			{// 장치에서 오류가 있다는 신호를 보낸 상태 - 재전송 필요.
-				
 				this.errorHandling("Too many resend error.");
 				return;
 			}
@@ -66,6 +65,10 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	@Override
 	public void run()
 	{
+		synchronized(this)
+		{
+			this.notify();
+		}
 		try
 		{
 			// 전송후 인터럽트가 걸릴 때까지 대기합니다.
@@ -80,28 +83,49 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 		this.errorHandling("Device is not responding.");
 	}
 
-	private void resiveWaitTask()
+	synchronized private void resiveWaitTask()
 	{
 		this.resiveTaskThread = new Thread(this);
 		this.resiveTaskThread.start();
+		try
+		{
+			this.wait();
+		}
+		catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void reSendPhase(byte phase)
 	{// 재전송.
 		PacketProcess.SetPacketPhase(this.receivePacket, phase);
-		this.sender.sendData(this.addr, this.port, this.receivePacket);
+		System.out.println(this.addr + " " + 50011 + " " + "으로 전송");
+		//TODO POARTCHECK
+		try
+		{
+			Thread.sleep(100);
+		}
+		catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.sender.sendData(this.addr, 50011, this.receivePacket);
 	}
 	
 	private void endProcess()
 	{
-		this.notifyEndCycle();
 		
+		this.notifyEndCycle();
+		String macAddr = PacketProcess.GetpacketMacAddr(this.receivePacket);
 		String receiveName = PacketProcess.GetPacketName(this.receivePacket);
 		String receiveData = PacketProcess.GetPacketData(this.receivePacket);
-		
 		// 장치에게 데이터 수신을 알립니다.
-		this.user.packetReceiveCallback(receiveName, receiveData);
-		
+
+		this.user.packetReceiveCallback(this.addr, macAddr, receiveName, receiveData);
+
 		// 수신 메니저 바인딩 해제.
 		
 	}
@@ -128,7 +152,7 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 		
 		public ReceiveCycle getInstance()
 		{
-			return new ReceiveCycle(sender, receiver, addr, port, data, user, endCycleCallback);
+			return new ReceiveCycle(sender, receiver, addr, data, user, endCycleCallback);
 		}
 	}
 }

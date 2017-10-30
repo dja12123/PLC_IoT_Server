@@ -43,20 +43,30 @@ public class PacketProcess
 	
 	public static final int MAX_PACKET_LENGTH = (Byte.MAX_VALUE * 2) + PACKET_HEADER_SIZE + PACKET_INFO_SIZE;
 	
+	public static final String DEFAULT_SPLIT_REGEX = "/";
+	
 	public static void PrintDataPacket(byte[] packet)
 	{
-		System.out.print("HEX: ");
-		for(byte bin : packet)
+		try
 		{
-			System.out.print(String.format("%02X", bin) + ' ');
+			System.out.print("HEX: ");
+			for(byte bin : packet)
+			{
+				System.out.print(String.format("%02X", bin) + ' ');
+			}
+			System.out.println();
+			System.out.println("PacketSize - " + PacketProcess.GetPacketSize(packet) + '(' + packet.length + ')');
+			System.out.println("FullUID    - " + PacketProcess.GetPacketFULLUID(packet));
+			System.out.println("MacAddr    - " + PacketProcess.GetpacketMacAddr(packet));
+			System.out.println("Phase      - " + String.format("%02X", PacketProcess.GetPacketPhase(packet)));
+			System.out.println("PacketName - " + PacketProcess.GetPacketName(packet));
+			System.out.println("PacketData - " + PacketProcess.GetPacketData(packet));
 		}
-		System.out.println();
-		System.out.println("PacketSize - " + PacketProcess.GetPacketSize(packet) + '(' + packet.length + ')');
-		System.out.println("FullUID    - " + PacketProcess.GetPacketFULLUID(packet));
-		System.out.println("MacAddr    - " + PacketProcess.GetpacketMacAddr(packet));
-		System.out.println("Phase      - " + String.format("%02X", PacketProcess.GetPacketPhase(packet)));
-		System.out.println("PacketName - " + PacketProcess.GetPacketName(packet));
-		System.out.println("PacketData - " + PacketProcess.GetPacketData(packet));
+		catch(ArrayIndexOutOfBoundsException e)
+		{
+			
+		}
+
 	}
 	
 	public static boolean ComparePacket(byte[] a, byte[] b)
@@ -264,7 +274,13 @@ public class PacketProcess
 
 	public static int GetPacketSize(byte[] packet)
 	{
-		int packetSize = PACKET_HEADER_SIZE + PACKET_INFO_SIZE;
+		int packetSize;
+		packetSize = PACKET_HEADER_SIZE;
+		if(PacketProcess.GetPacketPhase(packet) == CycleProcess.PHASE_EXECUTE)
+		{
+			return packetSize;
+		}
+		packetSize += PACKET_INFO_SIZE;
 		packetSize += packet[FIELD_NAME_SIZE];
 		packetSize += packet[FIELD_DATA_SIZE];
 		

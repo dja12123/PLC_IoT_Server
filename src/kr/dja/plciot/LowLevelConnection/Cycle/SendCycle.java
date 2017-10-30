@@ -9,6 +9,7 @@ import kr.dja.plciot.LowLevelConnection.PacketSend.IPacketSender;
 
 public class SendCycle extends AbsCycle implements Runnable
 {
+	private final int port;
 	private final String macAddr;
 	private final String name;
 	private final String data;
@@ -22,8 +23,9 @@ public class SendCycle extends AbsCycle implements Runnable
 	private SendCycle(IPacketSender sender, IPacketReceiveObservable receiver, InetAddress addr, int port
 			,String macAddr, String name, String data, IPacketCycleUser user, IEndCycleCallback endCycleCallback)
 	{
-		super(sender, receiver, addr, port, endCycleCallback, user);
+		super(sender, receiver, addr, endCycleCallback, user);
 		
+		this.port = port;
 		this.macAddr = macAddr;
 		this.name = name;
 		this.data = data;
@@ -101,6 +103,10 @@ public class SendCycle extends AbsCycle implements Runnable
 	@Override
 	public void run()
 	{
+		synchronized(this)
+		{
+			this.notify();
+		}
 		try
 		{
 			// 전송후 인터럽트가 걸릴 때까지 대기합니다.
@@ -125,10 +131,18 @@ public class SendCycle extends AbsCycle implements Runnable
 		
 	}
 	
-	private void sendWaitTask()
+	synchronized private void sendWaitTask()
 	{
 		this.resiveTaskThread = new Thread(this);
 		this.resiveTaskThread.start();
+		try
+		{
+			this.wait();
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	private void reSendPhase(byte[] packet, byte phase)
@@ -168,6 +182,7 @@ public class SendCycle extends AbsCycle implements Runnable
 		private String name;
 		private String data;
 		private String macAddr;
+		private int port;
 		
 		public SendCycleBuilder(){}
 		
@@ -187,6 +202,12 @@ public class SendCycle extends AbsCycle implements Runnable
 		public SendCycleBuilder setPacketMacAddr(String macAddr)
 		{
 			this.macAddr = macAddr;
+			return this;
+		}
+		
+		public SendCycleBuilder setPacketPort(int port)
+		{
+			this.port = port;
 			return this;
 		}
 		

@@ -64,6 +64,7 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 	{
 		this.threadPool.submit(()->
 		{
+			System.out.println("패킷 수신 알1");
 			if(!PacketProcess.CheckPacket(data))
 			{
 				return;
@@ -73,11 +74,15 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 			IPacketReceiveObserver observer = this.observers.getOrDefault(uuid, null);
 			if(observer != null)
 			{
+				System.out.println("패킷 수신 알림2" + observer);
 				observer.packetReceive(data);
+				System.out.println("패킷 수신 알림2");
 			}
 			else
 			{
+				System.out.println("옵저버 없음");
 				this.register.firstReceiveCallback(receiveAddr, sendPort, data);
+				
 			}
 		});
 	}
