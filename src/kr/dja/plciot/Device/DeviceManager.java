@@ -44,6 +44,7 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 	@Override
 	public IPacketCycleUser createConnection(String uuid, String name)
 	{// 장치 ID 넘어옴
+		System.out.println("새 연결 형성됨." + this.deviceList.size());
 		AbsDevice receiveTarget = this.deviceList.getOrDefault(uuid, null);
 		if(receiveTarget != null)
 		{
@@ -161,6 +162,11 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 				
 			}
 		}*/
+	}
+	
+	public Map<String, AbsDevice> getDeviceMap()
+	{
+		return this.deviceList;
 	}
 	
 	private void start(NextTask nextTask)

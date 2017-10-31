@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Device.AbsDevice.AbsDevice;
 import kr.dja.plciot.Device.TaskManager.RealTimeDataHandler;
 
@@ -36,6 +37,6 @@ public abstract class AbsDataFlowDevice extends AbsDevice
 	
 	protected abstract void storeValue(String data);
 	
-	protected abstract void getDeviceValues(Map<String, Integer> map);
+	public abstract void getDeviceValues(Map<String, Integer> map);
 	
 }

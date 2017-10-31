@@ -8,15 +8,19 @@ import java.util.Map;
 
 import io.netty.channel.Channel;
 import kr.dja.plciot.PLC_IoT_Core;
+import kr.dja.plciot.Device.DeviceManager;
 import kr.dja.plciot.WebConnector.IWebSocketObserver;
 
 public class RealTimeGraphManager implements IWebSocketObserver
 {
 	public static final String GRAPH_REQ = "GETGRAPH";
+	private final DeviceManager deviceManager;
+	
 	private final Map<Channel, RealTimeGraphSender> senderMap;
 	
-	public RealTimeGraphManager()
+	public RealTimeGraphManager(DeviceManager deviceManager)
 	{
+		this.deviceManager = deviceManager;
 		this.senderMap = Collections.synchronizedMap(new HashMap<Channel, RealTimeGraphSender>());
 	}
 
@@ -24,7 +28,7 @@ public class RealTimeGraphManager implements IWebSocketObserver
 	public void messageReceive(Channel ch, String key, String data)
 	{
 		PLC_IoT_Core.CONS.push("실시간 그래프 전송 시작. " + ch);
-		RealTimeGraphSender sender = new RealTimeGraphSender(ch, data);
+		RealTimeGraphSender sender = new RealTimeGraphSender(ch, data, this.deviceManager);//TODO 구조 수정 필요.
 		this.senderMap.put(ch, sender);
 	}
 	

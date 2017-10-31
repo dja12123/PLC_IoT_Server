@@ -1,9 +1,13 @@
 package kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph;
 
+import java.util.HashMap;
 import java.util.List;
 
 import io.netty.channel.Channel;
 import kr.dja.plciot.PLC_IoT_Core;
+import kr.dja.plciot.Device.DeviceManager;
+import kr.dja.plciot.Device.AbsDevice.AbsDevice;
+import kr.dja.plciot.Device.AbsDevice.DataFlow.AbsDataFlowDevice;
 import kr.dja.plciot.WebIO.WebIOProcess;
 
 public class RealTimeGraphSender extends Thread
@@ -11,15 +15,17 @@ public class RealTimeGraphSender extends Thread
 	private static final int SEND_DATA_INTERVAL = 100;
 	private static final String SEND_KEY = "SERVER_REALTIME_DATA";
 	
+	private final DeviceManager deviceManager;
+	
 	private final Channel ch;
 	private final String data;
 	
 	private boolean runFlag;
 	
-	int i = 0;
-	
-	public RealTimeGraphSender(Channel ch, String data)
+	public RealTimeGraphSender(Channel ch, String data, DeviceManager deviceManager)
 	{
+		this.deviceManager = deviceManager;
+		
 		this.ch = ch;
 		this.data = data;
 		
@@ -32,12 +38,16 @@ public class RealTimeGraphSender extends Thread
 	{
 		while(this.runFlag && this.ch.isActive())
 		{
-			++i;
-			if(i > 10)
+			AbsDevice device = deviceManager.getDeviceMap().getOrDefault("1A2B3C4D5E6E", null);
+			HashMap<String, Integer> map = new HashMap<String, Integer>();
+			if(device != null)
 			{
-				i = 0;
+				((AbsDataFlowDevice)device).getDeviceValues(map);
+				int value = map.getOrDefault("Power", 0);
+				System.out.println("°ª:" + value);
+				this.ch.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, value));
 			}
-			this.ch.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, i));
+			
 			try
 			{
 				Thread.sleep(SEND_DATA_INTERVAL);

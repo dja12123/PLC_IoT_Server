@@ -1,5 +1,6 @@
 package kr.dja.plciot.WebIO;
 
+import kr.dja.plciot.Device.DeviceManager;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
@@ -11,13 +12,16 @@ public class WebIOManager implements IMultiThreadTaskCallback
 	private final IWebSocketReceiveObservable observable;
 	
 	private final RealTimeGraphManager realTimeGraphManager;
+	private final DeviceManager deviceManager;
+	
 	private final GetDevice getDevice;
 	
-	public WebIOManager(IWebSocketReceiveObservable observable)
+	public WebIOManager(IWebSocketReceiveObservable observable, DeviceManager deviceManager)
 	{
 		this.observable = observable;
+		this.deviceManager = deviceManager;
 		
-		this.realTimeGraphManager = new RealTimeGraphManager();
+		this.realTimeGraphManager = new RealTimeGraphManager(deviceManager);
 		this.getDevice = new GetDevice();
 	}
 	
