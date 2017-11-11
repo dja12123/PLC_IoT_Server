@@ -58,7 +58,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 		serverStartOperator.addTask(webServerBuilder);
 		serverStartOperator.addTask(this.webIOManager);
 		serverStartOperator.addTask(this);
-		serverStartOperator.addTask(new PacketTestClass());
+		//serverStartOperator.addTask(new PacketTestClass());
 		
 		MultiThreadTaskOperator serverShutdownOperator = new MultiThreadTaskOperator(TaskOption.SHUTDOWN);
 		

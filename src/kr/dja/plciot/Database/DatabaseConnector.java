@@ -15,7 +15,7 @@ import kr.dja.plciot.Task.MultiThread.TaskOption;
 
 public class DatabaseConnector implements IMultiThreadTaskCallback, IDatabaseHandler
 {
-	private static final String DB_ADDR = "203.250.133.158:3306";
+	private static final String DB_ADDR = "192.168.0.1:3306";
 	private static final String DB_NAME = "team_korea_server";
 	private static final String DB_ID = "serverProgram";
 	private static final String DB_PW = "thqkdzhfldk";
