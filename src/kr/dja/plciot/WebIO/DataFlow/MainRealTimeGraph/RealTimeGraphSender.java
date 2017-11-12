@@ -1,13 +1,11 @@
 package kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph;
 
-import java.util.HashMap;
-import java.util.List;
-
+import java.util.Iterator;
 import io.netty.channel.Channel;
-import kr.dja.plciot.PLC_IoT_Core;
-import kr.dja.plciot.Device.DeviceManager;
+import kr.dja.plciot.Device.IDeviceList;
 import kr.dja.plciot.Device.AbsDevice.AbsDevice;
 import kr.dja.plciot.Device.AbsDevice.DataFlow.AbsDataFlowDevice;
+import kr.dja.plciot.WebConnector.WebServer;
 import kr.dja.plciot.WebIO.WebIOProcess;
 
 public class RealTimeGraphSender extends Thread
@@ -15,19 +13,19 @@ public class RealTimeGraphSender extends Thread
 	private static final int SEND_DATA_INTERVAL = 100;
 	private static final String SEND_KEY = "SERVER_REALTIME_DATA";
 	
-	private final DeviceManager deviceManager;
+	private final IDeviceList deviceList;
 	
 	private final Channel ch;
-	private final String data;
+	private final String dataKey;
 	
 	private boolean runFlag;
 	
-	public RealTimeGraphSender(Channel ch, String data, DeviceManager deviceManager)
+	public RealTimeGraphSender(Channel ch, String dataKey, IDeviceList deviceList)
 	{
-		this.deviceManager = deviceManager;
+		this.deviceList = deviceList;
 		
 		this.ch = ch;
-		this.data = data;
+		this.dataKey = dataKey;
 		
 		this.runFlag = true;
 		this.start();
@@ -38,15 +36,24 @@ public class RealTimeGraphSender extends Thread
 	{
 		while(this.runFlag && this.ch.isActive())
 		{
-			AbsDevice device = deviceManager.getDeviceMap().getOrDefault("1A2B3C4D5E6E", null);
-			HashMap<String, Integer> map = new HashMap<String, Integer>();
-			if(device != null)
+			Iterator<AbsDevice> itr = this.deviceList.getIterator();
+			int count = 0;
+			int sum = 0;
+			while(itr.hasNext())
 			{
-				((AbsDataFlowDevice)device).getDeviceValues(map);
-				int value = map.getOrDefault("Power", 0);
-				System.out.println("°ª:" + value);
-				this.ch.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, value));
+				AbsDevice absDevice = itr.next();
+				if(!(absDevice instanceof AbsDataFlowDevice)) continue;
+				AbsDataFlowDevice dataFlowDevice = (AbsDataFlowDevice)absDevice;
+				
+				int deviceValue = dataFlowDevice.getDeviceValue(this.dataKey);
+				if(deviceValue == -1) continue;
+				
+				++count;
+				sum += deviceValue;
 			}
+			String sendData = count + WebServer.SEPARATOR + sum;
+			
+			this.ch.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, sendData));
 			
 			try
 			{

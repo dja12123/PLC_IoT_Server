@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import kr.dja.plciot.PLC_IoT_Core;
@@ -20,11 +21,11 @@ import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, IMultiThreadTaskCallback
+public class DeviceManager implements IDeviceList, INewConnectionHandler, IPacketCycleUser, IMultiThreadTaskCallback
 {
-	private static final int DEFAULT_DEVICE_PORT = 50011;
-	private static final String DEVICE_REGISTER = "register";
-	private static final String DEVICE_REGISTER_OK = "registerok";
+	public static final int DEFAULT_DEVICE_PORT = 50011;
+	public static final String DEVICE_REGISTER = "register";
+	public static final String DEVICE_REGISTER_OK = "registerok";
 	
 	private final ConnectionManager cycleManager;
 	private final DatabaseConnector dbConnector;
@@ -39,6 +40,18 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 		this.dbConnector = dbConnector;
 		
 		this.realTimeDataHandler = new RealTimeDataHandler();
+	}
+	
+	@Override
+	public Iterator<AbsDevice> getIterator()
+	{
+		return this.deviceList.values().iterator();
+	}
+
+	@Override
+	public AbsDevice getDeviceFromMac(String mac)
+	{
+		return this.deviceList.get(mac);
 	}
 	
 	@Override
@@ -98,24 +111,14 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 				return;
 			}
 			
-			if(this.deviceList.containsKey(macAddr))
-			{
-				PLC_IoT_Core.CONS.push("장비 재접속 확인.");
-				this.cycleManager.startSendCycle(addr, DEFAULT_DEVICE_PORT, macAddr, DEVICE_REGISTER_OK, "", this);
-				return;
-			}
-			else
-			{
-				PLC_IoT_Core.CONS.push("장치 등록 요청이 확인됨: mac="+macAddr+" type="+deviceType);
-			}
-			
+			PLC_IoT_Core.CONS.push("장치 등록 요청이 확인됨: mac="+macAddr+" type="+deviceType);
 			switch (deviceType)
 			{
 			case DeviceConsent.TYPE_NAME:
-				device = new DeviceConsent(macAddr, this.realTimeDataHandler);
+				device = new DeviceConsent(macAddr, this.cycleManager, this.realTimeDataHandler, this.dbConnector);
 				break;
 			case DeviceSwitch.TYPE_NAME:
-				device = new DeviceSwitch(macAddr, this.realTimeDataHandler);
+				device = new DeviceSwitch(macAddr, this.cycleManager, this.realTimeDataHandler, this.dbConnector);
 				break;
 			}
 			
@@ -135,7 +138,7 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 			else
 			{
 				PLC_IoT_Core.CONS.push("미등록 장치 바인딩.");
-				this.dbConnector.sqlUpdate("insert into device VALUES('noname','"+macAddr+"','"+deviceType+"',null);");
+				this.dbConnector.sqlUpdate("insert into waiting_device VALUES('"+macAddr+"','"+deviceType+"');");
 			}
 			
 			this.cycleManager.startSendCycle(addr, DEFAULT_DEVICE_PORT, macAddr, DEVICE_REGISTER_OK, "", this);
@@ -145,28 +148,6 @@ public class DeviceManager implements INewConnectionHandler, IPacketCycleUser, I
 		{
 			e.printStackTrace();
 		}
-		/*this.cycleManager.startSendCycle(InetAddress.getByAddress(123), 50011, "", "testPacket", "testData", t);
-		String[] splitData = data.split(PacketProcess.DEFAULT_SPLIT_REGEX);
-		String deviceType = splitData[0];// DEVICE TYPE
-		String ipAddr = splitData[1];
-		
-		AbsDevice taskDevice = this.deviceList.getOrDefault(deviceUUID, null);
-		
-		if(taskDevice == null)
-		{// 가져오지 못했을경우 추상 장치 객체 생성.
-			switch(deviceType)
-			{
-			case DeviceConsent.TYPE_NAME:
-				taskDevice = new DeviceConsent(deviceUUID);
-				break;
-				
-			}
-		}*/
-	}
-	
-	public Map<String, AbsDevice> getDeviceMap()
-	{
-		return this.deviceList;
 	}
 	
 	private void start(NextTask nextTask)

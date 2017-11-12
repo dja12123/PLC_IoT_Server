@@ -3,9 +3,9 @@ package kr.dja.plciot.Device.AbsDevice.DataFlow;
 import java.net.InetAddress;
 import java.util.Map;
 
-import kr.dja.plciot.PLC_IoT_Core;
-import kr.dja.plciot.Device.AbsDevice.AbsDevice;
+import kr.dja.plciot.Database.IDatabaseHandler;
 import kr.dja.plciot.Device.TaskManager.RealTimeDataHandler;
+import kr.dja.plciot.LowLevelConnection.ISendCycleStarter;
 import kr.dja.plciot.LowLevelConnection.PacketProcess;
 
 public class DeviceConsent extends AbsDataFlowDevice
@@ -17,10 +17,9 @@ public class DeviceConsent extends AbsDataFlowDevice
 	int temp;
 	int bright;
 	
-	public DeviceConsent(String macAddr, RealTimeDataHandler realTimeDataHandler)
+	public DeviceConsent(String macAddr, ISendCycleStarter sendManager, RealTimeDataHandler realTimeDataHandler, IDatabaseHandler dbhandler)
 	{
-		super(macAddr, realTimeDataHandler);
-		// TODO Auto-generated constructor stub
+		super(macAddr,sendManager, realTimeDataHandler, dbhandler);
 	}
 
 	@Override
@@ -38,12 +37,20 @@ public class DeviceConsent extends AbsDataFlowDevice
 	}
 
 	@Override
-	public void getDeviceValues(Map<String, Integer> map)
+	public int getDeviceValue(String key)
 	{
-		map.put("Power", power);
-		map.put("Humi", humi);
-		map.put("Temp", temp);
-		map.put("Bright", bright);
+		switch(key)
+		{
+		case "Power":
+			return this.power;
+		case "Humi":
+			return this.humi;
+		case "Temp":
+			return this.temp;
+		case "Bright":
+			return this.bright;
+		}
+		return -1;
 	}
 
 	@Override
@@ -54,7 +61,5 @@ public class DeviceConsent extends AbsDataFlowDevice
 		this.humi = Integer.parseInt(dataSplit[1]);
 		this.temp = Integer.parseInt(dataSplit[2]);
 		this.bright = Integer.parseInt(dataSplit[3]);
-		System.out.println("스위치 데이터 적재 완료");
 	}
-
 }

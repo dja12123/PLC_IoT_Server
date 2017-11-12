@@ -5,17 +5,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import kr.dja.plciot.PLC_IoT_Core;
+import kr.dja.plciot.Database.IDatabaseHandler;
 import kr.dja.plciot.Device.AbsDevice.AbsDevice;
 import kr.dja.plciot.Device.TaskManager.RealTimeDataHandler;
+import kr.dja.plciot.LowLevelConnection.ISendCycleStarter;
 
 public abstract class AbsDataFlowDevice extends AbsDevice
 {
 	private final RealTimeDataHandler realTimeDataHandler;
+	protected final IDatabaseHandler databaseHandler;
 	
-	public AbsDataFlowDevice(String macAddr, RealTimeDataHandler realTimeDataHandler)
+	public AbsDataFlowDevice(String macAddr, ISendCycleStarter sendManager, RealTimeDataHandler realTimeDataHandler, IDatabaseHandler dbhandler)
 	{
-		super(macAddr);
+		super(macAddr, sendManager);
 		this.realTimeDataHandler = realTimeDataHandler;
+		this.databaseHandler = dbhandler;
 	}
 
 	@Override
@@ -37,6 +41,6 @@ public abstract class AbsDataFlowDevice extends AbsDevice
 	
 	protected abstract void storeValue(String data);
 	
-	public abstract void getDeviceValues(Map<String, Integer> map);
+	public abstract int getDeviceValue(String key);
 	
 }

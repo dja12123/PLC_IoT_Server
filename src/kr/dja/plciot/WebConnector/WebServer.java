@@ -35,7 +35,7 @@ import kr.dja.plciot.Task.MultiThread.TaskOption;
 public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveObservable
 {
 	private static final int PORT = 8080;
-	public static final String SEPARATOR = ",";
+	public static final String SEPARATOR = "/";
 
 	private EventLoopGroup bossGroup;
 	private EventLoopGroup workerGroup;

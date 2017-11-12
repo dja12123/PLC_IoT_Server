@@ -1,18 +1,17 @@
 package kr.dja.plciot.Device.AbsDevice.DataFlow;
 
 import java.net.InetAddress;
-import java.util.Map;
-
-import kr.dja.plciot.Device.AbsDevice.AbsDevice;
+import kr.dja.plciot.Database.IDatabaseHandler;
 import kr.dja.plciot.Device.TaskManager.RealTimeDataHandler;
+import kr.dja.plciot.LowLevelConnection.ISendCycleStarter;
 
 public class DeviceSwitch extends AbsDataFlowDevice
 {
 	public static final String TYPE_NAME = "SWITCH";
 	
-	public DeviceSwitch(String macAddr, RealTimeDataHandler realTimeDataHandler)
+	public DeviceSwitch(String macAddr, ISendCycleStarter sendManager, RealTimeDataHandler realTimeDataHandler, IDatabaseHandler dbhandler)
 	{
-		super(macAddr, realTimeDataHandler);
+		super(macAddr,sendManager, realTimeDataHandler, dbhandler);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -27,20 +26,17 @@ public class DeviceSwitch extends AbsDataFlowDevice
 	public void packetReceiveCallback(InetAddress addr, String macAddr, String name, String data)
 	{
 		super.packetReceiveCallback(addr, macAddr, name, data);
-		
 	}
 
 	@Override
-	public void getDeviceValues(Map<String, Integer> map)
+	public int getDeviceValue(String key)
 	{
-		
+		return -1;
 	}
 
 	@Override
 	protected void storeValue(String data)
 	{
-		// TODO Auto-generated method stub
 		
 	}
-
 }

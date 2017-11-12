@@ -21,7 +21,7 @@ import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class ConnectionManager implements IFirstReceiveObserver, IEndCycleCallback
+public class ConnectionManager implements IFirstReceiveObserver, IEndCycleCallback, ISendCycleStarter
 {
 	private static final int UDP_RCV_PORT_START = 50000;
 	private static final int UDP_RCV_PORT_END = 50010;
@@ -53,6 +53,7 @@ public class ConnectionManager implements IFirstReceiveObserver, IEndCycleCallba
 		this.receiveHandlers.remove(handler);
 	}
 	
+	@Override
 	public void startSendCycle(InetAddress addr, int port
 			,String macAddr, String name, String data, IPacketCycleUser target)
 	{

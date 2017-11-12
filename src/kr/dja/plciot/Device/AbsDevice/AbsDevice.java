@@ -5,19 +5,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import kr.dja.plciot.PLC_IoT_Core;
+import kr.dja.plciot.Device.DeviceManager;
 import kr.dja.plciot.Device.TaskManager.DeviceTaskHandler;
+import kr.dja.plciot.LowLevelConnection.ISendCycleStarter;
 import kr.dja.plciot.LowLevelConnection.Cycle.IPacketCycleUser;
 
 public abstract class AbsDevice implements IPacketCycleUser
 {
 	protected List<DeviceTaskHandler> taskManagerList;
 	public final String macAddr;
+	protected final ISendCycleStarter sendManager;
 	private boolean active;
 	
-	public AbsDevice(String macAddr)
+	public AbsDevice(String macAddr, ISendCycleStarter sendManager)
 	{
 		this.taskManagerList = Collections.synchronizedList(new ArrayList<DeviceTaskHandler>());
 		this.macAddr = macAddr;
+		this.sendManager = sendManager;
 		this.active = false;
 	}
 	
@@ -48,7 +53,23 @@ public abstract class AbsDevice implements IPacketCycleUser
 	public abstract void packetSendCallback(boolean success, String name, String data);
 
 	@Override
-	public abstract void packetReceiveCallback(InetAddress addr, String macAddr, String name, String data);
+	public void packetReceiveCallback(InetAddress addr, String macAddr, String name, String data)
+	{
+		switch(name)
+		{
+		case DeviceManager.DEVICE_REGISTER:
+			this.deviceReConnection(addr);
+			break;
+		}
+		
+		return;
+	}
+	
+	private void deviceReConnection(InetAddress addr)
+	{
+		PLC_IoT_Core.CONS.push("장비 재접속 확인.");
+		this.sendManager.startSendCycle(addr, DeviceManager.DEFAULT_DEVICE_PORT, macAddr, DeviceManager.DEVICE_REGISTER_OK, "", this);
+	}
 
 
 }
