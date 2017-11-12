@@ -31,6 +31,7 @@ public abstract class AbsDataFlowDevice extends AbsDevice
 	@Override
 	public void packetReceiveCallback(InetAddress addr, String macAddr, String name, String data)
 	{
+		super.packetReceiveCallback(addr, macAddr, name, data);
 		switch(name)
 		{
 		case "sensorData":
