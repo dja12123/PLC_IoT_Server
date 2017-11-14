@@ -51,7 +51,7 @@ public class RealTimeGraphSender extends Thread
 				++count;
 				sum += deviceValue;
 			}
-			String sendData = count + WebServer.SEPARATOR + sum;
+			String sendData = count + WebServer.KEY_SEPARATOR + sum;
 			
 			this.ch.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, sendData));
 			

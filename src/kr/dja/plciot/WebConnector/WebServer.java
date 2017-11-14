@@ -35,7 +35,8 @@ import kr.dja.plciot.Task.MultiThread.TaskOption;
 public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveObservable
 {
 	private static final int PORT = 8080;
-	public static final String SEPARATOR = "/";
+	public static final String KEY_SEPARATOR = "=";
+	public static final String VALUE_SEPARATOR = "/";
 
 	private EventLoopGroup bossGroup;
 	private EventLoopGroup workerGroup;
@@ -55,7 +56,7 @@ public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveOb
 	{
 		PLC_IoT_Core.CONS.push("웹소켓 요청: " + str);
 		
-		String[] kv = str.split(SEPARATOR, 2);
+		String[] kv = str.split(KEY_SEPARATOR, 2);
 		String key = kv[0];
 		String value = null;
 

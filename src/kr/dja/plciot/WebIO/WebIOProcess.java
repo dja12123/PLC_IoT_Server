@@ -8,11 +8,11 @@ public class WebIOProcess
 	
 	public static Object CreateDataPacket(String key, Object data)
 	{
-		return new TextWebSocketFrame(key + WebServer.SEPARATOR + data.toString());
+		return new TextWebSocketFrame(key + WebServer.KEY_SEPARATOR + data.toString());
 	}
 	
 	public static Object CreateDataPacket(String key)
 	{
-		return new TextWebSocketFrame(key + WebServer.SEPARATOR);
+		return new TextWebSocketFrame(key + WebServer.KEY_SEPARATOR);
 	}
 }

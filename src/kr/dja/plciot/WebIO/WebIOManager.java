@@ -11,10 +11,11 @@ public class WebIOManager implements IMultiThreadTaskCallback
 {
 	private final IWebSocketReceiveObservable observable;
 	
+	
 	private final RealTimeGraphManager realTimeGraphManager;
 	private final DeviceManager deviceManager;
 	
-	private final GetDevice getDevice;
+	private final DeviceInfoChange getDevice;
 	
 	public WebIOManager(IWebSocketReceiveObservable observable, DeviceManager deviceManager)
 	{
@@ -22,13 +23,13 @@ public class WebIOManager implements IMultiThreadTaskCallback
 		this.deviceManager = deviceManager;
 		
 		this.realTimeGraphManager = new RealTimeGraphManager(deviceManager);
-		this.getDevice = new GetDevice();
+		this.getDevice = new DeviceInfoChange();
 	}
 	
 	private void start(NextTask nextTask)
 	{
 		this.observable.addObserver(RealTimeGraphManager.GRAPH_REQ, this.realTimeGraphManager);
-		this.observable.addObserver(GetDevice.DATA_REQ, this.realTimeGraphManager);
+		this.observable.addObserver(DeviceInfoChange.DATA_REQ, this.realTimeGraphManager);
 		nextTask.nextTask();
 	}
 	
@@ -36,7 +37,7 @@ public class WebIOManager implements IMultiThreadTaskCallback
 	{
 		this.observable.deleteObserver(RealTimeGraphManager.GRAPH_REQ);
 		this.realTimeGraphManager.shutdown();
-		this.observable.deleteObserver(GetDevice.DATA_REQ);
+		this.observable.deleteObserver(DeviceInfoChange.DATA_REQ);
 		nextTask.nextTask();
 	}
 
