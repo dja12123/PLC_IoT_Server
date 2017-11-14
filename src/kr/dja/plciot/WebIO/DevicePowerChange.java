@@ -1,18 +1,34 @@
 package kr.dja.plciot.WebIO;
 
 import io.netty.channel.Channel;
+import kr.dja.plciot.Device.IDeviceList;
+import kr.dja.plciot.Device.AbsDevice.AbsDevice;
 import kr.dja.plciot.WebConnector.IWebSocketObserver;
+import kr.dja.plciot.WebConnector.WebServer;
 
 public class DevicePowerChange implements IWebSocketObserver
 {
+	public static final String DEVICE_POWER_CHANGE_REQ = "DevicePowerChange";
 	
-	public static final String DATA_REQ = "DevicePowerChange";
+	private IDeviceList deviceList;
+	
+	public DevicePowerChange(IDeviceList deviceList)
+	{
+		this.deviceList = deviceList;
+	}
 	
 	@Override
 	public void messageReceive(Channel ch, String key, String data)
 	{
-		// TODO Auto-generated method stub
+		String dataSplit[] = data.split(WebServer.VALUE_SEPARATOR);
+		AbsDevice device = deviceList.getDeviceFromMac(dataSplit[0]);
+		if(device == null) return;
 		
+		switch(dataSplit[1])
+		{
+		case "on": device.setPower(true); break;
+		case "off": device.setPower(false); break;
+		}
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package kr.dja.plciot.WebIO;
 
 import kr.dja.plciot.Device.DeviceManager;
+import kr.dja.plciot.Device.IDeviceList;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
@@ -13,23 +14,26 @@ public class WebIOManager implements IMultiThreadTaskCallback
 	
 	
 	private final RealTimeGraphManager realTimeGraphManager;
-	private final DeviceManager deviceManager;
+	private final IDeviceList deviceList;
 	
 	private final DeviceInfoChange deviceInfoChange;
+	private final DevicePowerChange devicePowerChange;
 	
-	public WebIOManager(IWebSocketReceiveObservable observable, DeviceManager deviceManager)
+	public WebIOManager(IWebSocketReceiveObservable observable, IDeviceList deviceList)
 	{
 		this.observable = observable;
-		this.deviceManager = deviceManager;
+		this.deviceList = deviceList;
 		
-		this.realTimeGraphManager = new RealTimeGraphManager(deviceManager);
+		this.realTimeGraphManager = new RealTimeGraphManager(deviceList);
 		this.deviceInfoChange = new DeviceInfoChange();
+		this.devicePowerChange = new DevicePowerChange(deviceList);
 	}
 	
 	private void start(NextTask nextTask)
 	{
 		this.observable.addObserver(RealTimeGraphManager.GRAPH_REQ, this.realTimeGraphManager);
-		this.observable.addObserver(DeviceInfoChange.DATA_REQ, this.deviceInfoChange);
+		this.observable.addObserver(DeviceInfoChange.DEVICE_INFO_CHANGE_REQ, this.deviceInfoChange);
+		this.observable.addObserver(DevicePowerChange.DEVICE_POWER_CHANGE_REQ, this.devicePowerChange);
 		nextTask.nextTask();
 	}
 	
@@ -37,7 +41,8 @@ public class WebIOManager implements IMultiThreadTaskCallback
 	{
 		this.observable.deleteObserver(RealTimeGraphManager.GRAPH_REQ);
 		this.realTimeGraphManager.shutdown();
-		this.observable.deleteObserver(DeviceInfoChange.DATA_REQ);
+		this.observable.deleteObserver(DeviceInfoChange.DEVICE_INFO_CHANGE_REQ);
+		this.observable.deleteObserver(DevicePowerChange.DEVICE_POWER_CHANGE_REQ);
 		nextTask.nextTask();
 	}
 

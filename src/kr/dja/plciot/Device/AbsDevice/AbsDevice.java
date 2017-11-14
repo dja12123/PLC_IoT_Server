@@ -13,10 +13,14 @@ import kr.dja.plciot.LowLevelConnection.Cycle.IPacketCycleUser;
 
 public abstract class AbsDevice implements IPacketCycleUser
 {
+	public static final String DEVICE_POWER_CHANGE = "powerchange";
+	public static final String ON = "on";
+	public static final String OFF = "off";
 	protected List<DeviceTaskHandler> taskManagerList;
 	public final String macAddr;
 	protected final ISendCycleStarter sendManager;
 	private boolean active;
+	protected InetAddress addr;
 	
 	public AbsDevice(String macAddr, ISendCycleStarter sendManager)
 	{
@@ -55,6 +59,7 @@ public abstract class AbsDevice implements IPacketCycleUser
 	@Override
 	public void packetReceiveCallback(InetAddress addr, String macAddr, String name, String data)
 	{
+		this.addr = addr;
 		switch(name)
 		{
 		case DeviceManager.DEVICE_REGISTER:
@@ -67,9 +72,17 @@ public abstract class AbsDevice implements IPacketCycleUser
 	
 	private void deviceReConnection(InetAddress addr)
 	{
-		PLC_IoT_Core.CONS.push("장비 재접속 확인.");
+		PLC_IoT_Core.CONS.push(this.macAddr + ": 장비 재접속 확인.");
 		this.sendManager.startSendCycle(addr, DeviceManager.DEFAULT_DEVICE_PORT, macAddr, DeviceManager.DEVICE_REGISTER_OK, "", this);
 	}
-
-
+	
+	public void setPower(boolean onoff)
+	{
+		String power;
+		
+		if(onoff) power = ON;
+		else power = OFF;
+		PLC_IoT_Core.CONS.push(this.macAddr + ": 장비 전원제어("+power+")");
+		this.sendManager.startSendCycle(this.addr, DeviceManager.DEFAULT_DEVICE_PORT, macAddr, DEVICE_POWER_CHANGE, power, this);
+	}
 }

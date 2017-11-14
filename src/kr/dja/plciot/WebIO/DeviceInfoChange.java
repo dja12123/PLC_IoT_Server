@@ -6,7 +6,7 @@ import kr.dja.plciot.WebConnector.IWebSocketObserver;
 
 public class DeviceInfoChange implements IWebSocketObserver
 {
-	public static final String DATA_REQ = "DeviceInfoChange";
+	public static final String DEVICE_INFO_CHANGE_REQ = "DeviceInfoChange";
 	
 	public static final String DATA_RESEND = "DeviceInfoCheck";
 	public static final String INFO_CHANGE_OK = "OK";
