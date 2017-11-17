@@ -47,6 +47,7 @@ public class DeviceManager implements IDeviceView, INewConnectionHandler, IPacke
 	public void addObserver(String key, IDeviceEventObserver observer)
 	{
 		this.deviceEventListenerList.put(key, observer);
+		PLC_IoT_Core.CONS.push("장치 데이터 이벤트 바인딩 key: " + key);
 	}
 
 	@Override
@@ -63,7 +64,6 @@ public class DeviceManager implements IDeviceView, INewConnectionHandler, IPacke
 		for(IDeviceEventObserver observer : observerList)
 		{
 			observer.deviceEvent(device, key, data);
-			System.out.println("옵저버에게 알림");
 		}
 	}
 
