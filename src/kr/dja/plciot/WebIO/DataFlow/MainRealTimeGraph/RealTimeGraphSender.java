@@ -26,6 +26,8 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 	private int sum;
 	private int dataCount;
 	
+	private String sendData;
+	
 	public RealTimeGraphSender(Channel ch, String dataKey, IDeviceView deviceView)
 	{
 		super(ch);
@@ -41,6 +43,8 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 		this.sum = 0;
 		this.dataCount = 0;
 		
+		this.sendData = "0";
+		
 		this.thread.start();
 	}
 	
@@ -49,14 +53,12 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 	{
 		while(this.runFlag && this.channel.isActive())
 		{
-			String sendData = "0";
-			if(this.dataCount != 0)
+			if(this.dataCount > 0)
 			{
-				sendData = Integer.toString(this.sum/this.dataCount);
+				this.sendData = Integer.toString(this.sum/this.dataCount);
+				this.sum = 0;
+				this.dataCount = 0;
 			}
-			
-			this.sum = 0;
-			this.dataCount = 0;
 			
 			this.channel.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, sendData));
 			try
@@ -89,18 +91,11 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 	@Override
 	public void deviceEvent(AbsDevice device, String key, String data)
 	{
-		System.out.println("장치 이벤트 받음.");
 		if(!(device instanceof AbsDataFlowDevice)) return;
-		System.out.println("p1");
 		AbsDataFlowDevice dataflowDevice = (AbsDataFlowDevice)device;
-		System.out.println("p2");
 		int deviceData = dataflowDevice.getDeviceValue(this.dataKey);
-		System.out.println("p3");
-		
 		if(deviceData == -1) return;
-		System.out.println("p4");
 		this.sum += deviceData;
 		++this.dataCount;
-		System.out.println("장치 이벤트 처리 완료.");
 	}
 }
