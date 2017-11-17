@@ -98,5 +98,6 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 		
 		this.sum += deviceData;
 		++this.dataCount;
+		System.out.println("장치 이벤트 처리 완료.");
 	}
 }
