@@ -38,7 +38,7 @@ public class DeviceConsent extends AbsDataFlowDevice
 
 	public int getDeviceValue(String key)
 	{
-		System.out.println("장치 값 가져오기");
+		System.out.println("장치 값 가져오기 " + key);
 		switch(key)
 		{
 		case "Power":
