@@ -61,6 +61,7 @@ public class DeviceManager implements IDeviceView, INewConnectionHandler, IPacke
 	{
 		System.out.println("장치 이벤트 발생");
 		List<IDeviceEventObserver> observerList = this.deviceEventListenerList.get(key);
+		System.out.println(observerList);
 		if(observerList == null) return;
 		for(IDeviceEventObserver observer : observerList)
 		{
