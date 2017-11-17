@@ -63,6 +63,7 @@ public class DeviceManager implements IDeviceView, INewConnectionHandler, IPacke
 		for(IDeviceEventObserver observer : observerList)
 		{
 			observer.deviceEvent(device, key, data);
+			System.out.println("옵저버에게 알림");
 		}
 	}
 

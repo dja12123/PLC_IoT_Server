@@ -90,7 +90,6 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 	public void deviceEvent(AbsDevice device, String key, String data)
 	{
 		if(!(device instanceof AbsDataFlowDevice)) return;
-		System.out.println("REALTIMERECEIVE");
 		AbsDataFlowDevice dataflowDevice = (AbsDataFlowDevice)device;
 		int deviceData = dataflowDevice.getDeviceValue(this.dataKey);
 		

@@ -56,12 +56,8 @@ public class SendCycle extends AbsCycle implements Runnable
 		this.resiveTaskThread.interrupt();
 		int receivePacketSize = PacketProcess.GetPacketSize(receivePacket);
 		
-		System.out.println("SendCycle에서 수신:");
-		PacketProcess.PrintDataPacket(receivePacket);
-		
 		if(PacketProcess.GetPacketPhase(receivePacket) == CycleProcess.PHASE_EXECUTE)
 		{
-			System.out.println("수신 완료.");
 			this.taskState = true;
 			this.endProcess();
 			return;
@@ -123,7 +119,6 @@ public class SendCycle extends AbsCycle implements Runnable
 			return;
 		}
 		++this.resendCount;
-		System.out.println("resend(" + this.resendCount +")");
 		
 		// 발신자로부터 패킷 이 반환되어 올때까지 대기힙니다.
 		this.sendWaitTask();
@@ -149,8 +144,6 @@ public class SendCycle extends AbsCycle implements Runnable
 	{// 재전송.
 		PacketProcess.SetPacketPhase(packet, phase);
 		this.sender.sendData(this.addr, this.port, packet);
-		System.out.println("SendCycle에서 송신:" + phase + " " + this.port);
-		PacketProcess.PrintDataPacket(packet);
 	}
 	
 	private void endProcess()
@@ -165,7 +158,7 @@ public class SendCycle extends AbsCycle implements Runnable
 			receiveName = PacketProcess.GetPacketName(this.fullPacket);
 			receiveData = PacketProcess.GetPacketData(this.fullPacket);
 		}
-		
+		System.out.println("송신 사이클 완료 mac:" + macAddr + " name:" + receiveName + " data:" + receiveData);
 		// 장치에게 데이터 송신이 완료되었음을 알립니다.
 		this.user.packetSendCallback(this.taskState, receiveName, receiveData);
 	}

@@ -10,6 +10,7 @@ import io.netty.channel.Channel;
 import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Device.DeviceManager;
 import kr.dja.plciot.Device.IDeviceView;
+import kr.dja.plciot.Device.AbsDevice.DataFlow.AbsDataFlowDevice;
 import kr.dja.plciot.WebConnector.IWebSocketObserver;
 import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataManager;
 import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataMember;
@@ -17,16 +18,16 @@ import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataMember;
 public class RealTimeGraphManager extends AbsWebFlowDataManager implements IWebSocketObserver
 {
 	public static final String GRAPH_REQ = "GETGRAPH";
-	private final IDeviceView deviceList;
+	private final IDeviceView deviceView;
 	
 	public RealTimeGraphManager(IDeviceView deviceList)
 	{
-		this.deviceList = deviceList;
+		this.deviceView = deviceList;
 	}
 
 	@Override
 	protected AbsWebFlowDataMember getMember(Channel ch, String data)
 	{
-		return new RealTimeGraphSender(ch, data, this.deviceList);
+		return new RealTimeGraphSender(ch, data, this.deviceView);
 	}
 }

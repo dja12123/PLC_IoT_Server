@@ -101,7 +101,6 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	private void reSendPhase(byte phase)
 	{// 재전송.
 		PacketProcess.SetPacketPhase(this.receivePacket, phase);
-		System.out.println(this.addr + " " + 50011 + " " + "으로 전송");
 		//TODO POARTCHECK
 		try
 		{
@@ -117,13 +116,12 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	
 	private void endProcess()
 	{
-		
 		this.notifyEndCycle();
 		String macAddr = PacketProcess.GetpacketMacAddr(this.receivePacket);
 		String receiveName = PacketProcess.GetPacketName(this.receivePacket);
 		String receiveData = PacketProcess.GetPacketData(this.receivePacket);
 		// 장치에게 데이터 수신을 알립니다.
-
+		System.out.println("수신 사이클 완료 mac:" + macAddr + " name:" + receiveName + " data:" + receiveData);
 		this.user.packetReceiveCallback(this.addr, macAddr, receiveName, receiveData);
 
 		// 수신 메니저 바인딩 해제.
