@@ -17,7 +17,7 @@ import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataMember;
 
 public class RealTimeGraphManager extends AbsWebFlowDataManager implements IWebSocketObserver
 {
-	public static final String GRAPH_REQ = "GETGRAPH";
+	public static final String GRAPH_REQ = "getGraph";
 	private final IDeviceView deviceView;
 	
 	public RealTimeGraphManager(IDeviceView deviceList)
