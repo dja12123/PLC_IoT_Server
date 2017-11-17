@@ -91,11 +91,14 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 	{
 		System.out.println("장치 이벤트 받음.");
 		if(!(device instanceof AbsDataFlowDevice)) return;
+		System.out.println("p1");
 		AbsDataFlowDevice dataflowDevice = (AbsDataFlowDevice)device;
+		System.out.println("p2");
 		int deviceData = dataflowDevice.getDeviceValue(this.dataKey);
+		System.out.println("p3");
 		
 		if(deviceData == -1) return;
-		
+		System.out.println("p4");
 		this.sum += deviceData;
 		++this.dataCount;
 		System.out.println("장치 이벤트 처리 완료.");
