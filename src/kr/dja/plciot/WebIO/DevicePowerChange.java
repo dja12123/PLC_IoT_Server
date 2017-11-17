@@ -1,7 +1,7 @@
 package kr.dja.plciot.WebIO;
 
 import io.netty.channel.Channel;
-import kr.dja.plciot.Device.IDeviceList;
+import kr.dja.plciot.Device.IDeviceView;
 import kr.dja.plciot.Device.AbsDevice.AbsDevice;
 import kr.dja.plciot.WebConnector.IWebSocketObserver;
 import kr.dja.plciot.WebConnector.WebServer;
@@ -10,9 +10,9 @@ public class DevicePowerChange implements IWebSocketObserver
 {
 	public static final String DEVICE_POWER_CHANGE_REQ = "DevicePowerChange";
 	
-	private IDeviceList deviceList;
+	private IDeviceView deviceList;
 	
-	public DevicePowerChange(IDeviceList deviceList)
+	public DevicePowerChange(IDeviceView deviceList)
 	{
 		this.deviceList = deviceList;
 	}

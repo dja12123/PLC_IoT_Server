@@ -4,7 +4,7 @@ import java.net.InetAddress;
 import java.util.Map;
 
 import kr.dja.plciot.Database.IDatabaseHandler;
-import kr.dja.plciot.Device.TaskManager.RealTimeDataHandler;
+import kr.dja.plciot.Device.IDeviceEventObserver;
 import kr.dja.plciot.LowLevelConnection.ISendCycleStarter;
 import kr.dja.plciot.LowLevelConnection.PacketProcess;
 
@@ -17,9 +17,10 @@ public class DeviceConsent extends AbsDataFlowDevice
 	int temp;
 	int bright;
 	
-	public DeviceConsent(String macAddr, ISendCycleStarter sendManager, RealTimeDataHandler realTimeDataHandler, IDatabaseHandler dbhandler)
+	public DeviceConsent(String macAddr, ISendCycleStarter sendManager, 
+			IDeviceEventObserver eventObserver, IDatabaseHandler dbhandler)
 	{
-		super(macAddr,sendManager, realTimeDataHandler, dbhandler);
+		super(macAddr,sendManager, eventObserver, dbhandler);
 	}
 
 	@Override
@@ -33,10 +34,8 @@ public class DeviceConsent extends AbsDataFlowDevice
 	public void packetReceiveCallback(InetAddress addr, String macAddr, String name, String data)
 	{
 		super.packetReceiveCallback(addr, macAddr, name, data);
-		
 	}
 
-	@Override
 	public int getDeviceValue(String key)
 	{
 		switch(key)

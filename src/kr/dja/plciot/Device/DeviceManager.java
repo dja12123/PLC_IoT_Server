@@ -3,8 +3,10 @@ package kr.dja.plciot.Device;
 import java.net.InetAddress;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import kr.dja.plciot.PLC_IoT_Core;
@@ -12,7 +14,6 @@ import kr.dja.plciot.Database.DatabaseConnector;
 import kr.dja.plciot.Device.AbsDevice.AbsDevice;
 import kr.dja.plciot.Device.AbsDevice.DataFlow.DeviceConsent;
 import kr.dja.plciot.Device.AbsDevice.DataFlow.DeviceSwitch;
-import kr.dja.plciot.Device.TaskManager.RealTimeDataHandler;
 import kr.dja.plciot.LowLevelConnection.ConnectionManager;
 import kr.dja.plciot.LowLevelConnection.INewConnectionHandler;
 import kr.dja.plciot.LowLevelConnection.PacketProcess;
@@ -21,7 +22,7 @@ import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class DeviceManager implements IDeviceList, INewConnectionHandler, IPacketCycleUser, IMultiThreadTaskCallback
+public class DeviceManager implements IDeviceView, INewConnectionHandler, IPacketCycleUser, IMultiThreadTaskCallback, IDeviceEventObserver
 {
 	public static final int DEFAULT_DEVICE_PORT = 50011;
 	public static final String DEVICE_REGISTER = "register";
@@ -31,7 +32,7 @@ public class DeviceManager implements IDeviceList, INewConnectionHandler, IPacke
 	private final DatabaseConnector dbConnector;
 	private final Map<String, AbsDevice> deviceList;
 	
-	private final RealTimeDataHandler realTimeDataHandler;
+	private final MultiValueMap<String, IDeviceEventObserver> deviceEventListenerList;
 		
 	public DeviceManager(ConnectionManager connectionManager, DatabaseConnector dbConnector)
 	{
@@ -39,7 +40,36 @@ public class DeviceManager implements IDeviceList, INewConnectionHandler, IPacke
 		this.deviceList = new HashMap<String, AbsDevice>();
 		this.dbConnector = dbConnector;
 		
-		this.realTimeDataHandler = new RealTimeDataHandler();
+		this.deviceEventListenerList = new MultiValueMap<String, IDeviceEventObserver>();
+	}
+
+	@Override
+	public void addObserver(String key, IDeviceEventObserver observer)
+	{
+		this.deviceEventListenerList.put(key, observer);
+	}
+
+	@Override
+	public void deleteObserver(IDeviceEventObserver observer)
+	{
+		this.deviceEventListenerList.remove(observer);
+	}
+	
+	@Override
+	public void deviceEvent(AbsDevice device, String key, String data)
+	{
+		List<IDeviceEventObserver> observerList = this.deviceEventListenerList.get(key);
+		if(observerList == null) return;
+		for(IDeviceEventObserver observer : observerList)
+		{
+			observer.deviceEvent(device, key, data);
+		}
+	}
+
+	@Override
+	public void deleteObserver(IDeviceEventObserver observer, String str)
+	{
+		this.deviceEventListenerList.remove(str, observer);
 	}
 	
 	@Override
@@ -115,10 +145,10 @@ public class DeviceManager implements IDeviceList, INewConnectionHandler, IPacke
 			switch (deviceType)
 			{
 			case DeviceConsent.TYPE_NAME:
-				device = new DeviceConsent(macAddr, this.cycleManager, this.realTimeDataHandler, this.dbConnector);
+				device = new DeviceConsent(macAddr, this.cycleManager, this, this.dbConnector);
 				break;
 			case DeviceSwitch.TYPE_NAME:
-				device = new DeviceSwitch(macAddr, this.cycleManager, this.realTimeDataHandler, this.dbConnector);
+				device = new DeviceSwitch(macAddr, this.cycleManager, this, this.dbConnector);
 				break;
 			}
 			
@@ -155,7 +185,6 @@ public class DeviceManager implements IDeviceList, INewConnectionHandler, IPacke
 		PLC_IoT_Core.CONS.push("장치 관리자 빌드 시작.");
 		this.cycleManager.addReceiveHandler(this);
 		
-
 		ResultSet deviceListSql = this.dbConnector.sqlQuery("select * from device");
 		
 		try
@@ -197,4 +226,69 @@ public class DeviceManager implements IDeviceList, INewConnectionHandler, IPacke
 			this.shutdown(nextTask);
 		}
 	}
+}
+
+class MultiValueMap<K, V>
+{
+	private final Map<K, List<V>> kvmap;
+	private final Map<V, List<K>> vkmap;
+	
+	public MultiValueMap()
+	{
+		this.kvmap = new HashMap<K, List<V>>();
+		this.vkmap = new HashMap<V, List<K>>();
+	}
+	
+	public void put(K key, V value)
+	{
+		List<V> vlist = this.kvmap.getOrDefault(key, null);
+		if(vlist == null)
+		{
+			vlist = new ArrayList<V>();
+			this.kvmap.put(key, vlist);
+		}
+		vlist.add(value);
+		
+		List<K> klist = this.vkmap.getOrDefault(value, null);
+		if(klist == null)
+		{
+			klist = new ArrayList<K>();
+			this.vkmap.put(value, klist);
+		}
+		klist.add(key);
+	}
+	
+	public List<V> get(K key)
+	{
+		return this.kvmap.get(key);
+	}
+	
+	public void remove(K key, V value)
+	{
+		List<V> vlist = this.kvmap.getOrDefault(key, null);
+		if(vlist == null) return;
+		
+		vlist.remove(value);
+		if(vlist.size() == 0) this.kvmap.remove(key);
+		
+		List<K> klist = this.vkmap.get(value);
+		klist.remove(key);
+		if(klist.size() == 0) this.vkmap.remove(value);
+	}
+	
+	public void remove(V value)
+	{
+		List<K> klist = this.vkmap.getOrDefault(value, null);
+		if(klist == null) return;
+		
+		for(K key : klist)
+		{
+			List<V> vlist = this.kvmap.get(key);
+			vlist.remove(value);
+			if(vlist.size() == 0) this.kvmap.remove(key);
+		}
+		
+		this.vkmap.remove(value);
+	}
+	
 }

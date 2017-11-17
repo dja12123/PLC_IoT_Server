@@ -27,5 +27,4 @@ public class DeviceInfoChange implements IWebSocketObserver
 		// TODO Auto-generated method stub
 		
 	}
-
 }

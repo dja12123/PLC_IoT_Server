@@ -6,19 +6,20 @@ import java.util.Map;
 
 import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Database.IDatabaseHandler;
+import kr.dja.plciot.Device.IDeviceEventObserver;
 import kr.dja.plciot.Device.AbsDevice.AbsDevice;
-import kr.dja.plciot.Device.TaskManager.RealTimeDataHandler;
 import kr.dja.plciot.LowLevelConnection.ISendCycleStarter;
 
 public abstract class AbsDataFlowDevice extends AbsDevice
 {
-	private final RealTimeDataHandler realTimeDataHandler;
+	public static final String SENSOR_DATA_EVENT = "sensorData";
+	
 	protected final IDatabaseHandler databaseHandler;
 	
-	public AbsDataFlowDevice(String macAddr, ISendCycleStarter sendManager, RealTimeDataHandler realTimeDataHandler, IDatabaseHandler dbhandler)
+	public AbsDataFlowDevice(String macAddr, ISendCycleStarter sendManager, IDeviceEventObserver eventObserver,
+			IDatabaseHandler dbhandler)
 	{
-		super(macAddr, sendManager);
-		this.realTimeDataHandler = realTimeDataHandler;
+		super(macAddr, sendManager, eventObserver);
 		this.databaseHandler = dbhandler;
 	}
 
@@ -34,8 +35,9 @@ public abstract class AbsDataFlowDevice extends AbsDevice
 		super.packetReceiveCallback(addr, macAddr, name, data);
 		switch(name)
 		{
-		case "sensorData":
+		case SENSOR_DATA_EVENT:
 			this.storeValue(data);
+			this.eventObserver.deviceEvent(this, SENSOR_DATA_EVENT, data);
 			break;
 		}
 	}
@@ -43,5 +45,4 @@ public abstract class AbsDataFlowDevice extends AbsDevice
 	protected abstract void storeValue(String data);
 	
 	public abstract int getDeviceValue(String key);
-	
 }

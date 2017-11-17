@@ -2,59 +2,63 @@ package kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph;
 
 import java.util.Iterator;
 import io.netty.channel.Channel;
-import kr.dja.plciot.Device.IDeviceList;
+import kr.dja.plciot.Device.IDeviceEventObserver;
+import kr.dja.plciot.Device.IDeviceView;
 import kr.dja.plciot.Device.AbsDevice.AbsDevice;
 import kr.dja.plciot.Device.AbsDevice.DataFlow.AbsDataFlowDevice;
 import kr.dja.plciot.WebConnector.WebServer;
 import kr.dja.plciot.WebIO.WebIOProcess;
+import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataMember;
 
-public class RealTimeGraphSender extends Thread
+public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDeviceEventObserver, Runnable
 {
-	private static final int SEND_DATA_INTERVAL = 100;
+	private static final int SEND_DATA_INTERVAL = 200;
 	private static final String SEND_KEY = "SERVER_REALTIME_DATA";
 	
-	private final IDeviceList deviceList;
+	private final IDeviceView deviceView;
 	
-	private final Channel ch;
 	private final String dataKey;
 	
 	private boolean runFlag;
 	
-	public RealTimeGraphSender(Channel ch, String dataKey, IDeviceList deviceList)
+	private final Thread thread;
+	
+	private int sum;
+	private int dataCount;
+	
+	public RealTimeGraphSender(Channel ch, String dataKey, IDeviceView deviceView)
 	{
-		this.deviceList = deviceList;
+		super(ch);
+		this.deviceView = deviceView;
+		this.deviceView.addObserver(AbsDataFlowDevice.SENSOR_DATA_EVENT, this);
 		
-		this.ch = ch;
 		this.dataKey = dataKey;
 		
 		this.runFlag = true;
-		this.start();
+		
+		this.thread = new Thread(this);
+		
+		this.sum = 0;
+		this.dataCount = 0;
+		
+		this.thread.start();
 	}
 	
 	@Override
 	public void run()
 	{
-		while(this.runFlag && this.ch.isActive())
+		while(this.runFlag && this.channel.isActive())
 		{
-			Iterator<AbsDevice> itr = this.deviceList.getIterator();
-			int count = 0;
-			int sum = 0;
-			while(itr.hasNext())
+			String sendData = "";
+			if(this.dataCount != 0)
 			{
-				AbsDevice absDevice = itr.next();
-				if(!(absDevice instanceof AbsDataFlowDevice)) continue;
-				AbsDataFlowDevice dataFlowDevice = (AbsDataFlowDevice)absDevice;
-				
-				int deviceValue = dataFlowDevice.getDeviceValue(this.dataKey);
-				if(deviceValue == -1) continue;
-				
-				++count;
-				sum += deviceValue;
+				sendData = Integer.toString(this.sum/this.dataCount);
 			}
-			String sendData = count + WebServer.KEY_SEPARATOR + sum;
 			
-			this.ch.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, sendData));
+			this.sum = 0;
+			this.dataCount = 0;
 			
+			this.channel.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, sendData));
 			try
 			{
 				Thread.sleep(SEND_DATA_INTERVAL);
@@ -64,12 +68,35 @@ public class RealTimeGraphSender extends Thread
 				break;
 			}
 		}
-		this.ch.close();
+		this.channel.close();
 	}
 	
 	public void endTask()
 	{
-		this.interrupt();
+		this.thread.interrupt();
+		try
+		{
+			this.thread.join();
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+		this.deviceView.deleteObserver(this, AbsDataFlowDevice.SENSOR_DATA_EVENT);
 		this.runFlag = false;
+	}
+
+	@Override
+	public void deviceEvent(AbsDevice device, String key, String data)
+	{
+		if(!(device instanceof AbsDataFlowDevice)) return;
+		
+		AbsDataFlowDevice dataflowDevice = (AbsDataFlowDevice)device;
+		int deviceData = dataflowDevice.getDeviceValue(this.dataKey);
+		
+		if(deviceData == -1) return;
+		
+		this.sum += deviceData;
+		++this.dataCount;
 	}
 }

@@ -7,9 +7,11 @@ import kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph.RealTimeGraphSender;
 
 public abstract class AbsWebFlowDataMember
 {
-	List<RealTimeGraphSender> senderList;
-	public AbsWebFlowDataMember(Channel ch, String data)
+	protected final Channel channel;
+	
+	public AbsWebFlowDataMember(Channel ch)
 	{
-		
+		this.channel = ch;
 	}
+	public abstract void endTask();
 }

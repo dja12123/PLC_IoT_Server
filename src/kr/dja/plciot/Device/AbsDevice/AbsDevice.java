@@ -7,7 +7,7 @@ import java.util.List;
 
 import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Device.DeviceManager;
-import kr.dja.plciot.Device.TaskManager.DeviceTaskHandler;
+import kr.dja.plciot.Device.IDeviceEventObserver;
 import kr.dja.plciot.LowLevelConnection.ISendCycleStarter;
 import kr.dja.plciot.LowLevelConnection.Cycle.IPacketCycleUser;
 
@@ -16,36 +16,18 @@ public abstract class AbsDevice implements IPacketCycleUser
 	public static final String DEVICE_POWER_CHANGE = "powerchange";
 	public static final String ON = "on";
 	public static final String OFF = "off";
-	protected List<DeviceTaskHandler> taskManagerList;
 	public final String macAddr;
 	protected final ISendCycleStarter sendManager;
 	private boolean active;
 	protected InetAddress addr;
+	protected final IDeviceEventObserver eventObserver;
 	
-	public AbsDevice(String macAddr, ISendCycleStarter sendManager)
+	public AbsDevice(String macAddr, ISendCycleStarter sendManager, IDeviceEventObserver eventObserver)
 	{
-		this.taskManagerList = Collections.synchronizedList(new ArrayList<DeviceTaskHandler>());
 		this.macAddr = macAddr;
 		this.sendManager = sendManager;
 		this.active = false;
-	}
-	
-	public void activation()
-	{
-		this.active = true;
-		for(DeviceTaskHandler taskManager : this.taskManagerList)
-		{
-			taskManager.registerDevice(this);
-		}
-	}
-	
-	public void deActivation()
-	{
-		this.active = false;
-		for(DeviceTaskHandler taskManager : this.taskManagerList)
-		{
-			taskManager.deRegisterDevice(this);
-		}
+		this.eventObserver = eventObserver;
 	}
 	
 	public boolean isActivation()
@@ -65,6 +47,10 @@ public abstract class AbsDevice implements IPacketCycleUser
 		case DeviceManager.DEVICE_REGISTER:
 			this.deviceReConnection(addr);
 			break;
+		case DEVICE_POWER_CHANGE:
+			if(data == ON) this.setPower(true);
+			else if(data == OFF) this.setPower(false);
+			break;
 		}
 		
 		return;
@@ -83,6 +69,7 @@ public abstract class AbsDevice implements IPacketCycleUser
 		if(onoff) power = ON;
 		else power = OFF;
 		PLC_IoT_Core.CONS.push(this.macAddr + ": 장비 전원제어("+power+")");
+		this.eventObserver.deviceEvent(this, DEVICE_POWER_CHANGE, power);
 		this.sendManager.startSendCycle(this.addr, DeviceManager.DEFAULT_DEVICE_PORT, macAddr, DEVICE_POWER_CHANGE, power, this);
 	}
 }

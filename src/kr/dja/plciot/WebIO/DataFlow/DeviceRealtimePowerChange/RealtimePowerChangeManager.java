@@ -1,4 +1,4 @@
-package kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph;
+package kr.dja.plciot.WebIO.DataFlow.DeviceRealtimePowerChange;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,12 +14,12 @@ import kr.dja.plciot.WebConnector.IWebSocketObserver;
 import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataManager;
 import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataMember;
 
-public class RealTimeGraphManager extends AbsWebFlowDataManager implements IWebSocketObserver
+public class RealtimePowerChangeManager extends AbsWebFlowDataManager
 {
 	public static final String GRAPH_REQ = "GETGRAPH";
 	private final IDeviceView deviceList;
 	
-	public RealTimeGraphManager(IDeviceView deviceList)
+	public RealtimePowerChangeManager(IDeviceView deviceList)
 	{
 		this.deviceList = deviceList;
 	}
@@ -27,6 +27,6 @@ public class RealTimeGraphManager extends AbsWebFlowDataManager implements IWebS
 	@Override
 	protected AbsWebFlowDataMember getMember(Channel ch, String data)
 	{
-		return new RealTimeGraphSender(ch, data, this.deviceList);
+		return new RealtimePowerChangeSender(ch, this.deviceList);
 	}
 }

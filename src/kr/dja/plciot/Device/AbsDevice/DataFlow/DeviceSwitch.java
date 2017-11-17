@@ -2,16 +2,17 @@ package kr.dja.plciot.Device.AbsDevice.DataFlow;
 
 import java.net.InetAddress;
 import kr.dja.plciot.Database.IDatabaseHandler;
-import kr.dja.plciot.Device.TaskManager.RealTimeDataHandler;
+import kr.dja.plciot.Device.IDeviceEventObserver;
 import kr.dja.plciot.LowLevelConnection.ISendCycleStarter;
 
 public class DeviceSwitch extends AbsDataFlowDevice
 {
 	public static final String TYPE_NAME = "SWITCH";
 	
-	public DeviceSwitch(String macAddr, ISendCycleStarter sendManager, RealTimeDataHandler realTimeDataHandler, IDatabaseHandler dbhandler)
+	public DeviceSwitch(String macAddr, ISendCycleStarter sendManager,
+			IDeviceEventObserver eventObserver, IDatabaseHandler dbhandler)
 	{
-		super(macAddr,sendManager, realTimeDataHandler, dbhandler);
+		super(macAddr,sendManager, eventObserver, dbhandler);
 		// TODO Auto-generated constructor stub
 	}
 
