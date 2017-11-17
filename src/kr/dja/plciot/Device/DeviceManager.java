@@ -88,7 +88,6 @@ public class DeviceManager implements IDeviceView, INewConnectionHandler, IPacke
 	@Override
 	public IPacketCycleUser createConnection(String uuid, String name)
 	{// 장치 ID 넘어옴
-		System.out.println("새 연결 형성됨." + this.deviceList.size());
 		AbsDevice receiveTarget = this.deviceList.getOrDefault(uuid, null);
 		if(receiveTarget != null)
 		{
