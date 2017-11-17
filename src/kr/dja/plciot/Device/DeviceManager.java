@@ -59,6 +59,7 @@ public class DeviceManager implements IDeviceView, INewConnectionHandler, IPacke
 	@Override
 	public void deviceEvent(AbsDevice device, String key, String data)
 	{
+		System.out.println("장치 이벤트 발생");
 		List<IDeviceEventObserver> observerList = this.deviceEventListenerList.get(key);
 		if(observerList == null) return;
 		for(IDeviceEventObserver observer : observerList)
@@ -68,9 +69,10 @@ public class DeviceManager implements IDeviceView, INewConnectionHandler, IPacke
 	}
 
 	@Override
-	public void deleteObserver(IDeviceEventObserver observer, String str)
+	public void deleteObserver(IDeviceEventObserver observer, String key)
 	{
-		this.deviceEventListenerList.remove(str, observer);
+		this.deviceEventListenerList.remove(key, observer);
+		PLC_IoT_Core.CONS.push("장치 데이터 이벤트 바인딩 해제 key: " + key);
 	}
 	
 	@Override
