@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Device.IDeviceEventObserver;
 import kr.dja.plciot.Device.IDeviceHandler;
 import kr.dja.plciot.Device.AbsDevice.AbsDevice;
@@ -15,7 +16,7 @@ import kr.dja.plciot.Task.MultiThread.TaskOption;
 
 public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable, IDeviceEventObserver
 {
-	private final int DB_STORE_INTEVAL = 10000;
+	private final int DB_STORE_INTEVAL = 2000;
 	
 	private final IDatabaseHandler dbHandler;
 	private final IDeviceHandler deviceHandler;
@@ -40,11 +41,21 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 	@Override
 	public void run()
 	{
+		PLC_IoT_Core.CONS.push("실시간 데이터 푸시 관리자 활성화.");
 		this.nextTask.nextTask();// 시작시 흐름 넘김.
 		while(this.runFlag)
 		{
-			
+			PLC_IoT_Core.CONS.push("기록 완료.");
+			try
+			{
+				Thread.sleep(DB_STORE_INTEVAL);
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
 		}
+		PLC_IoT_Core.CONS.push("실시간 데이터 푸시 관리자 비활성화.");
 		this.nextTask.nextTask();// 끝날시 흐름 넘김.
 	}
 	
@@ -56,6 +67,7 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 	
 	private void start(NextTask nextTask)
 	{
+		PLC_IoT_Core.CONS.push("실시간 데이터 푸시 관리자 시작.");
 		ResultSet rs = this.dbHandler.sqlQuery("select * from value_by_device_type;");
 		try
 		{
@@ -67,9 +79,8 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 		}
 		catch (SQLException e)
 		{
+			e.printStackTrace();
 		}
-		
-		
 		this.runFlag = true;
 		this.nextTask = nextTask;
 		this.thread.start();
@@ -77,6 +88,7 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 	
 	private void shutdown(NextTask nextTask)
 	{
+		PLC_IoT_Core.CONS.push("실시간 데이터 푸시 관리자 종료 시작.");
 		this.nextTask = nextTask;
 		this.runFlag = false;
 		this.thread.interrupt();
