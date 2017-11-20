@@ -65,7 +65,6 @@ public abstract class AbsDevice implements IPacketCycleUser
 	public void setPower(boolean onoff)
 	{
 		String power;
-		
 		if(onoff) power = ON;
 		else power = OFF;
 		PLC_IoT_Core.CONS.push(this.macAddr + ": 장비 전원제어("+power+")");

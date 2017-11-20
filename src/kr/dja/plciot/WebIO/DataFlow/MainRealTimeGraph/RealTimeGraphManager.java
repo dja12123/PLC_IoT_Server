@@ -9,7 +9,7 @@ import java.util.Map;
 import io.netty.channel.Channel;
 import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Device.DeviceManager;
-import kr.dja.plciot.Device.IDeviceView;
+import kr.dja.plciot.Device.IDeviceHandler;
 import kr.dja.plciot.Device.AbsDevice.DataFlow.AbsDataFlowDevice;
 import kr.dja.plciot.WebConnector.IWebSocketObserver;
 import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataManager;
@@ -18,9 +18,9 @@ import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataMember;
 public class RealTimeGraphManager extends AbsWebFlowDataManager implements IWebSocketObserver
 {
 	public static final String GRAPH_REQ = "getGraph";
-	private final IDeviceView deviceView;
+	private final IDeviceHandler deviceView;
 	
-	public RealTimeGraphManager(IDeviceView deviceList)
+	public RealTimeGraphManager(IDeviceHandler deviceList)
 	{
 		this.deviceView = deviceList;
 	}

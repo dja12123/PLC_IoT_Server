@@ -3,7 +3,7 @@ package kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph;
 import java.util.Iterator;
 import io.netty.channel.Channel;
 import kr.dja.plciot.Device.IDeviceEventObserver;
-import kr.dja.plciot.Device.IDeviceView;
+import kr.dja.plciot.Device.IDeviceHandler;
 import kr.dja.plciot.Device.AbsDevice.AbsDevice;
 import kr.dja.plciot.Device.AbsDevice.DataFlow.AbsDataFlowDevice;
 import kr.dja.plciot.WebConnector.WebServer;
@@ -15,7 +15,7 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 	private static final int SEND_DATA_INTERVAL = 200;
 	private static final String SEND_KEY = "SERVER_REALTIME_DATA";
 	
-	private final IDeviceView deviceView;
+	private final IDeviceHandler deviceView;
 	
 	private final String dataKey;
 	
@@ -28,7 +28,7 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 	
 	private String sendData;
 	
-	public RealTimeGraphSender(Channel ch, String dataKey, IDeviceView deviceView)
+	public RealTimeGraphSender(Channel ch, String dataKey, IDeviceHandler deviceView)
 	{
 		super(ch);
 		this.deviceView = deviceView;

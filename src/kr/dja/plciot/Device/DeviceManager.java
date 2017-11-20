@@ -22,7 +22,7 @@ import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class DeviceManager implements IDeviceView, INewConnectionHandler, IPacketCycleUser, IMultiThreadTaskCallback, IDeviceEventObserver
+public class DeviceManager implements IDeviceHandler, INewConnectionHandler, IPacketCycleUser, IMultiThreadTaskCallback, IDeviceEventObserver
 {
 	public static final int DEFAULT_DEVICE_PORT = 50011;
 	public static final String DEVICE_REGISTER = "register";
@@ -33,7 +33,7 @@ public class DeviceManager implements IDeviceView, INewConnectionHandler, IPacke
 	private final Map<String, AbsDevice> deviceList;
 	
 	private final MultiValueMap<String, IDeviceEventObserver> deviceEventListenerList;
-		
+	
 	public DeviceManager(ConnectionManager connectionManager, DatabaseConnector dbConnector)
 	{
 		this.cycleManager = connectionManager;
@@ -59,15 +59,12 @@ public class DeviceManager implements IDeviceView, INewConnectionHandler, IPacke
 	@Override
 	public void deviceEvent(AbsDevice device, String key, String data)
 	{
-		System.out.println("장치 이벤트 발생");
 		List<IDeviceEventObserver> observerList = this.deviceEventListenerList.get(key);
 		System.out.println(observerList);
 		if(observerList == null) return;
 		for(IDeviceEventObserver observer : observerList)
 		{
-			System.out.println("장치 이벤트 알림 시작");
 			observer.deviceEvent(device, key, data);
-			System.out.println("장치 이벤트 알림 완료");
 		}
 	}
 

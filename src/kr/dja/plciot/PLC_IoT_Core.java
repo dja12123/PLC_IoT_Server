@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import kr.dja.plciot.Database.DatabaseConnector;
+import kr.dja.plciot.Database.DataflowDeviceLoader;
 import kr.dja.plciot.Device.DeviceManager;
 import kr.dja.plciot.Log.Console;
 import kr.dja.plciot.LowLevelConnection.ConnectionManager;
@@ -33,6 +34,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 	private final DatabaseConnector dbManager;
 	private final ConnectionManager connectionManager;
 	private final DeviceManager deviceManager;
+	private final DataflowDeviceLoader dataLoader;
 	private final WebServer webServer;
 	private final WebIOManager webIOManager;
 	
@@ -42,6 +44,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 		this.dbManager = new DatabaseConnector();
 		this.connectionManager = new ConnectionManager();
 		this.deviceManager = new DeviceManager(this.connectionManager, this.dbManager);
+		this.dataLoader = new DataflowDeviceLoader(this.dbManager, this.deviceManager);
 		this.webServer = new WebServer();
 		this.webIOManager = new WebIOManager(this.webServer, this.deviceManager);
 		
@@ -55,6 +58,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 		serverStartOperator.addTask(this.dbManager);
 		serverStartOperator.addTask(connectionManagerBuilder);
 		serverStartOperator.addTask(this.deviceManager);
+		serverStartOperator.addTask(this.dataLoader);
 		serverStartOperator.addTask(webServerBuilder);
 		serverStartOperator.addTask(this.webIOManager);
 		serverStartOperator.addTask(this);
@@ -63,6 +67,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 		MultiThreadTaskOperator serverShutdownOperator = new MultiThreadTaskOperator(TaskOption.SHUTDOWN);
 		
 		serverShutdownOperator.addTask(this.webIOManager);
+		serverShutdownOperator.addTask(this.dataLoader);
 		serverShutdownOperator.addTask(this.deviceManager);
 		serverShutdownOperator.addTask(connectionManagerBuilder);
 		serverShutdownOperator.addTask(webServerBuilder);
