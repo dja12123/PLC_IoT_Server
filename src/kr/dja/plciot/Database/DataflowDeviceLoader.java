@@ -73,7 +73,7 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 		{
 			while(rs.next())
 			{
-				String deviceType = rs.getString(0);
+				String deviceType = rs.getString(1);
 				System.out.println(deviceType);
 			}
 		}
