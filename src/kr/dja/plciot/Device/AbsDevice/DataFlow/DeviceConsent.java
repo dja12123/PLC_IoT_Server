@@ -43,7 +43,7 @@ public class DeviceConsent extends AbsDataFlowDevice
 		{
 		case "watt":
 			return this.power;
-		case "humiditv":
+		case "humidity":
 			return this.humi;
 		case "temperature":
 			return this.temp;

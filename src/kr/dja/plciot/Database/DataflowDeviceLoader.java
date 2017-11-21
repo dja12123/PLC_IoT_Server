@@ -201,7 +201,6 @@ class DeviceValue
 		if(++this.putCount >= this.dataCount)
 		{
 			this.putCount = 0;
-			for(int i = 0; i < this.dataCount; ++i) this.values[i] = 0;
 			++this.count;
 		}
 	}
