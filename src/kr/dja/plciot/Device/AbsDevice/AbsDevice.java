@@ -41,7 +41,6 @@ public abstract class AbsDevice implements IPacketCycleUser
 	@Override
 	public void packetReceiveCallback(InetAddress addr, String macAddr, String name, String data)
 	{
-		PLC_IoT_Core.CONS.push(this.macAddr + " 장비 전원 제어 " + data);
 		this.addr = addr;
 		switch(name)
 		{
@@ -49,6 +48,7 @@ public abstract class AbsDevice implements IPacketCycleUser
 			this.deviceReConnection(addr);
 			break;
 		case DEVICE_POWER_CHANGE:
+			PLC_IoT_Core.CONS.push(this.macAddr + " 장비 전원 제어 " + data);
 			if(data == ON) this.setPower(true);
 			else if(data == OFF) this.setPower(false);
 			break;
