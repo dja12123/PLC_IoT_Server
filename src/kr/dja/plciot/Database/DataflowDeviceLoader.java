@@ -77,7 +77,7 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 						int dbStoreValue = valueArr[i] / valueCount;
 						String dbStoreType = this.deviceValueTypeMap.get(recode.deviceType).get(i);
 						this.dbHandler.sqlUpdate("insert into recode_data values("+recodeInfoID+
-								", "+dbStoreType+", "+dbStoreValue+");");
+								", '"+dbStoreType+"', "+dbStoreValue+");");
 					}
 				}
 				this.recodeMap.clear();
