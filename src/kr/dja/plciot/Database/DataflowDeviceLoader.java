@@ -60,7 +60,9 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 					int recodeInfoID = -1;
 					try
 					{
-						recodeInfoID = this.dbHandler.sqlQuery("select max(idpk) from recode_info;").getInt(1);
+						ResultSet rs = this.dbHandler.sqlQuery("select max(idpk) from recode_info;");
+						rs.next();
+						recodeInfoID = rs.getInt(1);
 						++recodeInfoID;
 						this.dbHandler.sqlUpdate("insert into recode_info values('"+macAddr+"', sysdate(), "+recodeInfoID+");");
 					}
