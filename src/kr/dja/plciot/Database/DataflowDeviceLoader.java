@@ -112,13 +112,14 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 		if(resultSet == null)
 		{
 			resultSet = new DeviceValue(deviceDataTypeList.size(), dataflowDevice.getDeviceType());
-			this.recodeMap.put(device.macAddr, resultSet);
+			this.recodeMap.put(dataflowDevice.macAddr, resultSet);
 		}
 		
 		for(int i = 0; i < deviceDataTypeList.size(); ++i)
 		{
 			int deviceValue = dataflowDevice.getDeviceValue(deviceDataTypeList.get(i));
 			resultSet.storeValue(deviceValue);
+			System.out.println(deviceDataTypeList.get(i)+"에 대한 값 가져옴 " + deviceValue);
 		}
 	}
 	
