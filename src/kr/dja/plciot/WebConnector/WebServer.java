@@ -17,6 +17,7 @@ package kr.dja.plciot.WebConnector;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -27,6 +28,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import kr.dja.plciot.MultiValueMap;
 import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
@@ -42,17 +44,17 @@ public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveOb
 	private EventLoopGroup workerGroup;
 	private Channel channel;
 
-	private final Map<String, IWebSocketObserver> observers;
-	private final Map<Channel, IWebSocketObserver> observerChannelMap;
+	private final MultiValueMap<String, IWebSocketObserver> observerMap;
+	private final MultiValueMap<Channel, IWebSocketObserver> channelObserverMap;
 	
 	public WebServer()
 	{
-		this.observers = Collections.synchronizedMap(new HashMap<String, IWebSocketObserver>());
-		this.observerChannelMap = Collections.synchronizedMap(new HashMap<Channel, IWebSocketObserver>());
+		this.observerMap = new MultiValueMap<String, IWebSocketObserver>();
+		this.channelObserverMap = new MultiValueMap<Channel, IWebSocketObserver>();
 	}
 	
 	@Override
-	public void rawMessageReceive(Channel ch, String str)
+	public synchronized void rawMessageReceive(Channel ch, String str)
 	{
 		PLC_IoT_Core.CONS.push("웹소켓 요청: " + str);
 		
@@ -60,9 +62,9 @@ public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveOb
 		String key = kv[0];
 		String value = null;
 
-		IWebSocketObserver observer = this.observers.getOrDefault(key, null);
+		List<IWebSocketObserver> observerList = this.observerMap.get(str);
 		
-		if(observer == null)
+		if(observerList == null)
 		{
 			return;
 		}
@@ -72,53 +74,49 @@ public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveOb
 			value = kv[1];
 		}
 		
-		
-		this.observerChannelMap.put(ch, observer);
-		observer.messageReceive(ch, key, value);
-		
+		for(IWebSocketObserver observer : observerList)
+		{
+			observer.messageReceive(ch, key, value);
+			List<IWebSocketObserver> channelObserverList = this.channelObserverMap.get(ch);
+			if(channelObserverList != null)
+			{
+				if(channelObserverList.contains(observer)) continue;
+			}
+			this.channelObserverMap.put(ch, observer);
+		}
 	}
 	
 	@Override
-	public void rawChannelDisconnect(Channel ch)
+	public synchronized void rawChannelDisconnect(Channel ch)
 	{
-		IWebSocketObserver observer = this.observerChannelMap.getOrDefault(ch, null);
-		if(observer == null)
+		List<IWebSocketObserver> observerList = this.channelObserverMap.get(ch);
+		if(observerList == null) return;
+		
+		for(IWebSocketObserver observer : observerList)
 		{
-			return;
+			observer.channelDisconnect(ch);
 		}
-		observer.channelDisconnect(ch);
-		this.observerChannelMap.remove(ch);
+		this.channelObserverMap.removeKey(ch);
 	}
 	
 	@Override
-	public void addObserver(String key, IWebSocketObserver o)
+	public synchronized void addObserver(String key, IWebSocketObserver observer)
 	{
-		if(this.observers.containsKey(key))
-		{
-			new Exception("Duplicated Put Packet Observer").printStackTrace();
-			return;
-			
-		}
-		this.observers.put(key, o);
+		this.observerMap.put(key, observer);
 	}
 
 	@Override
-	public void deleteObserver(String key)
+	public synchronized void deleteObserver(String key, IWebSocketObserver observer)
 	{
-		if(!this.observers.containsKey(key))
-		{
-			new Exception("Remove Packet Observer").printStackTrace();
-			return;
-		}
-		IWebSocketObserver observer = this.observers.get(key);
-		for(Channel ch : this.observerChannelMap.keySet())
-		{
-			if(this.observerChannelMap.get(ch) == observer)
-			{
-				this.observerChannelMap.remove(ch);
-			}
-		}
-		this.observers.remove(key);
+		this.observerMap.remove(key, observer);
+		this.channelObserverMap.removeValue(observer);
+	}
+	
+	@Override
+	public synchronized void deleteObserver(IWebSocketObserver observer)
+	{
+		this.observerMap.removeValue(observer);
+		this.channelObserverMap.removeValue(observer);
 	}
 	
 	public static class WebServerBuilder implements IMultiThreadTaskCallback

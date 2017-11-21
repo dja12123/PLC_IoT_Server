@@ -3,7 +3,6 @@ package kr.dja.plciot.Device;
 import java.net.InetAddress;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +20,7 @@ import kr.dja.plciot.LowLevelConnection.Cycle.IPacketCycleUser;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
+import kr.dja.plciot.MultiValueMap;
 
 public class DeviceManager implements IDeviceHandler, INewConnectionHandler, IPacketCycleUser, IMultiThreadTaskCallback, IDeviceEventObserver
 {
@@ -53,7 +53,7 @@ public class DeviceManager implements IDeviceHandler, INewConnectionHandler, IPa
 	@Override
 	public void deleteObserver(IDeviceEventObserver observer)
 	{
-		this.deviceEventListenerList.remove(observer);
+		this.deviceEventListenerList.removeValue(observer);
 	}
 	
 	@Override
@@ -193,10 +193,13 @@ public class DeviceManager implements IDeviceHandler, INewConnectionHandler, IPa
 		{
 			while(deviceListSql.next())
 			{
-				System.out.print(deviceListSql.getString(1) + " ");
-				System.out.print(deviceListSql.getString(2) + " ");
-				System.out.print(deviceListSql.getString(3) + " ");
-				System.out.println(deviceListSql.getString(4) + " ");
+				String deviceDB = "장치 ";
+				deviceDB += deviceListSql.getString(1) + " ";
+				deviceDB += deviceListSql.getString(2) + " ";
+				deviceDB += deviceListSql.getString(3) + " ";
+				deviceDB += deviceListSql.getString(4) + " ";
+				deviceDB += "로드.";
+				PLC_IoT_Core.CONS.push(deviceDB);
 			}
 		}
 		catch (SQLException e)
@@ -228,69 +231,4 @@ public class DeviceManager implements IDeviceHandler, INewConnectionHandler, IPa
 			this.shutdown(nextTask);
 		}
 	}
-}
-
-class MultiValueMap<K, V>
-{
-	private final Map<K, List<V>> kvmap;
-	private final Map<V, List<K>> vkmap;
-	
-	public MultiValueMap()
-	{
-		this.kvmap = new HashMap<K, List<V>>();
-		this.vkmap = new HashMap<V, List<K>>();
-	}
-	
-	public void put(K key, V value)
-	{
-		List<V> vlist = this.kvmap.getOrDefault(key, null);
-		if(vlist == null)
-		{
-			vlist = new ArrayList<V>();
-			this.kvmap.put(key, vlist);
-		}
-		vlist.add(value);
-		
-		List<K> klist = this.vkmap.getOrDefault(value, null);
-		if(klist == null)
-		{
-			klist = new ArrayList<K>();
-			this.vkmap.put(value, klist);
-		}
-		klist.add(key);
-	}
-	
-	public List<V> get(K key)
-	{
-		return this.kvmap.get(key);
-	}
-	
-	public void remove(K key, V value)
-	{
-		List<V> vlist = this.kvmap.getOrDefault(key, null);
-		if(vlist == null) return;
-		
-		vlist.remove(value);
-		if(vlist.size() == 0) this.kvmap.remove(key);
-		
-		List<K> klist = this.vkmap.get(value);
-		klist.remove(key);
-		if(klist.size() == 0) this.vkmap.remove(value);
-	}
-	
-	public void remove(V value)
-	{
-		List<K> klist = this.vkmap.getOrDefault(value, null);
-		if(klist == null) return;
-		
-		for(K key : klist)
-		{
-			List<V> vlist = this.kvmap.get(key);
-			vlist.remove(value);
-			if(vlist.size() == 0) this.kvmap.remove(key);
-		}
-		
-		this.vkmap.remove(value);
-	}
-	
 }

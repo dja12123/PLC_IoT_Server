@@ -1,4 +1,4 @@
-package kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph;
+package kr.dja.plciot.WebIO.DataFlow.DeviceRealtimeGraph;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,23 +15,24 @@ import kr.dja.plciot.WebConnector.IWebSocketObserver;
 import kr.dja.plciot.WebConnector.IWebSocketReceiveObservable;
 import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataManager;
 import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataMember;
+import kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph.RealTimeGraphManager;
 
-public class RealTimeGraphManager extends AbsWebFlowDataManager
+public class DeviceRealTimeGraphManager extends AbsWebFlowDataManager
 {
-	public static final String GRAPH_REQ = "GetGraph";
+	private static final String DEVICE_GRAPH_REQ = "GetDeviceGraph";
 	private final IDeviceHandler deviceView;
 	
-	public RealTimeGraphManager(IWebSocketReceiveObservable webSocketHandler, IDeviceHandler deviceList)
+	public DeviceRealTimeGraphManager(IWebSocketReceiveObservable webSocketHandler, IDeviceHandler deviceList)
 	{
 		super(webSocketHandler);
 		this.deviceView = deviceList;
 		
-		this.webSocketHandler.addObserver(GRAPH_REQ, this);
+		this.webSocketHandler.addObserver(RealTimeGraphManager.GRAPH_REQ, this);
 	}
 
 	@Override
 	protected AbsWebFlowDataMember getMember(Channel ch, String data)
 	{
-		return new RealTimeGraphSender(ch, data, this.deviceView);
+		return new DeviceRealTimeGraphSender(ch, data, this.deviceView);
 	}
 }

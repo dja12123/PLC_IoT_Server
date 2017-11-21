@@ -1,48 +1,59 @@
 package kr.dja.plciot.WebIO;
 
+import kr.dja.plciot.Database.IDatabaseHandler;
 import kr.dja.plciot.Device.DeviceManager;
 import kr.dja.plciot.Device.IDeviceHandler;
 import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 import kr.dja.plciot.WebConnector.IWebSocketReceiveObservable;
+import kr.dja.plciot.WebIO.Data.DeviceInfoChange;
+import kr.dja.plciot.WebIO.Data.DevicePowerChange;
+import kr.dja.plciot.WebIO.DataFlow.DeviceRealtimeGraph.DeviceRealTimeGraphManager;
+import kr.dja.plciot.WebIO.DataFlow.DeviceRealtimePowerChange.RealtimePowerChangeManager;
 import kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph.RealTimeGraphManager;
 
 public class WebIOManager implements IMultiThreadTaskCallback
 {
-	private final IWebSocketReceiveObservable observable;
+	private final IWebSocketReceiveObservable webSocketHandler;
+	private IDatabaseHandler dbHandler;
+	private final IDeviceHandler deviceHandler;
 	
-	
-	private final RealTimeGraphManager realTimeGraphManager;
-	private final IDeviceHandler deviceList;
+	private final RealTimeGraphManager realtimeGraphManager;
+	private final DeviceRealTimeGraphManager deviceRealTimeGraphManager;
+	private final RealtimePowerChangeManager realTimePowerManager;
 	
 	private final DeviceInfoChange deviceInfoChange;
 	private final DevicePowerChange devicePowerChange;
 	
-	public WebIOManager(IWebSocketReceiveObservable observable, IDeviceHandler deviceList)
+	public WebIOManager(IWebSocketReceiveObservable webSocketHandler, IDatabaseHandler dbHandler, IDeviceHandler deviceHandler)
 	{
-		this.observable = observable;
-		this.deviceList = deviceList;
+		this.webSocketHandler = webSocketHandler;
+		this.dbHandler = dbHandler;
+		this.deviceHandler = deviceHandler;
 		
-		this.realTimeGraphManager = new RealTimeGraphManager(deviceList);
-		this.deviceInfoChange = new DeviceInfoChange();
-		this.devicePowerChange = new DevicePowerChange(deviceList);
+		this.realtimeGraphManager = new RealTimeGraphManager(this.webSocketHandler, this.deviceHandler);
+		this.deviceRealTimeGraphManager = new DeviceRealTimeGraphManager(this.webSocketHandler, this.deviceHandler);
+		this.realTimePowerManager = new RealtimePowerChangeManager(this.webSocketHandler, this.deviceHandler);
+		
+		this.deviceInfoChange = new DeviceInfoChange(this.webSocketHandler, this.dbHandler);
+		this.devicePowerChange = new DevicePowerChange(this.webSocketHandler, this.deviceHandler);
 	}
 	
 	private void start(NextTask nextTask)
 	{
-		this.observable.addObserver(RealTimeGraphManager.GRAPH_REQ, this.realTimeGraphManager);
-		this.observable.addObserver(DeviceInfoChange.DEVICE_INFO_CHANGE_REQ, this.deviceInfoChange);
-		this.observable.addObserver(DevicePowerChange.DEVICE_POWER_CHANGE_REQ, this.devicePowerChange);
 		nextTask.nextTask();
 	}
 	
 	private void shutdown(NextTask nextTask)
 	{
-		this.observable.deleteObserver(RealTimeGraphManager.GRAPH_REQ);
-		this.realTimeGraphManager.shutdown();
-		this.observable.deleteObserver(DeviceInfoChange.DEVICE_INFO_CHANGE_REQ);
-		this.observable.deleteObserver(DevicePowerChange.DEVICE_POWER_CHANGE_REQ);
+		this.realtimeGraphManager.shutdown();
+		this.deviceRealTimeGraphManager.shutdown();
+		this.realTimePowerManager.shutdown();
+		
+		this.deviceInfoChange.shutdown();
+		this.devicePowerChange.shutdown();
+		
 		nextTask.nextTask();
 	}
 

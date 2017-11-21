@@ -11,17 +11,21 @@ import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Device.DeviceManager;
 import kr.dja.plciot.Device.IDeviceHandler;
 import kr.dja.plciot.WebConnector.IWebSocketObserver;
+import kr.dja.plciot.WebConnector.IWebSocketReceiveObservable;
 import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataManager;
 import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataMember;
 
 public class RealtimePowerChangeManager extends AbsWebFlowDataManager
 {
-	public static final String GRAPH_REQ = "GETGRAPH";
+	private static final String POWER_REQ = "GetPowerChange";
 	private final IDeviceHandler deviceList;
 	
-	public RealtimePowerChangeManager(IDeviceHandler deviceList)
+	public RealtimePowerChangeManager(IWebSocketReceiveObservable webSocketHandler, IDeviceHandler deviceList)
 	{
+		super(webSocketHandler);
 		this.deviceList = deviceList;
+		
+		this.webSocketHandler.addObserver(RealtimePowerChangeManager.POWER_REQ, this);
 	}
 
 	@Override

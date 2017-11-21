@@ -1,20 +1,25 @@
-package kr.dja.plciot.WebIO;
+package kr.dja.plciot.WebIO.Data;
 
 import io.netty.channel.Channel;
 import kr.dja.plciot.Device.IDeviceHandler;
 import kr.dja.plciot.Device.AbsDevice.AbsDevice;
 import kr.dja.plciot.WebConnector.IWebSocketObserver;
+import kr.dja.plciot.WebConnector.IWebSocketReceiveObservable;
 import kr.dja.plciot.WebConnector.WebServer;
+import kr.dja.plciot.WebIO.AbsWebSender;
 
-public class DevicePowerChange implements IWebSocketObserver
+public class DevicePowerChange extends AbsWebSender
 {
-	public static final String DEVICE_POWER_CHANGE_REQ = "DevicePowerChange";
+	private static final String DEVICE_POWER_CHANGE_REQ = "DevicePowerChange";
 	
 	private IDeviceHandler deviceList;
 	
-	public DevicePowerChange(IDeviceHandler deviceList)
+	public DevicePowerChange(IWebSocketReceiveObservable webSocketHandler, IDeviceHandler deviceList)
 	{
+		super(webSocketHandler);
 		this.deviceList = deviceList;
+		
+		this.webSocketHandler.addObserver(DevicePowerChange.DEVICE_POWER_CHANGE_REQ, this);
 	}
 	
 	@Override
@@ -26,8 +31,8 @@ public class DevicePowerChange implements IWebSocketObserver
 		
 		switch(dataSplit[1])
 		{
-		case "on": device.setPower(true); break;
-		case "off": device.setPower(false); break;
+		case "On": device.setPower(true); break;
+		case "Off": device.setPower(false); break;
 		}
 	}
 

@@ -9,14 +9,17 @@ import java.util.Map;
 import io.netty.channel.Channel;
 import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.WebConnector.IWebSocketObserver;
+import kr.dja.plciot.WebConnector.IWebSocketReceiveObservable;
+import kr.dja.plciot.WebIO.AbsWebSender;
 import kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph.RealTimeGraphSender;
 
-public abstract class AbsWebFlowDataManager implements IWebSocketObserver
+public abstract class AbsWebFlowDataManager extends AbsWebSender
 {
 	private final Map<Channel, AbsWebFlowDataMember> senderMap;
 	
-	public AbsWebFlowDataManager()
+	public AbsWebFlowDataManager(IWebSocketReceiveObservable webSocketHandler)
 	{
+		super(webSocketHandler);
 		this.senderMap = Collections.synchronizedMap(new HashMap<Channel, AbsWebFlowDataMember>());
 	}
 	
@@ -38,6 +41,7 @@ public abstract class AbsWebFlowDataManager implements IWebSocketObserver
 	
 	public void shutdown()
 	{
+		super.shutdown();
 		for(Channel key : this.senderMap.keySet())
 		{
 			AbsWebFlowDataMember sender = this.senderMap.get(key);

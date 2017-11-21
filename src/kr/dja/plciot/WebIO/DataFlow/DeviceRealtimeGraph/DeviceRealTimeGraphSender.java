@@ -1,4 +1,4 @@
-package kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph;
+package kr.dja.plciot.WebIO.DataFlow.DeviceRealtimeGraph;
 
 import java.util.Iterator;
 import io.netty.channel.Channel;
@@ -10,7 +10,7 @@ import kr.dja.plciot.WebConnector.WebServer;
 import kr.dja.plciot.WebIO.WebIOProcess;
 import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataMember;
 
-public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDeviceEventObserver, Runnable
+public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements IDeviceEventObserver, Runnable
 {
 	private static final int SEND_DATA_INTERVAL = 200;
 	private static final String SEND_KEY = "serverRealtimeData";
@@ -28,7 +28,7 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 	
 	private String sendData;
 	
-	public RealTimeGraphSender(Channel ch, String dataKey, IDeviceHandler deviceView)
+	public DeviceRealTimeGraphSender(Channel ch, String dataKey, IDeviceHandler deviceView)
 	{
 		super(ch);
 		this.deviceView = deviceView;

@@ -46,7 +46,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 		this.deviceManager = new DeviceManager(this.connectionManager, this.dbManager);
 		this.dataLoader = new DataflowDeviceLoader(this.dbManager, this.deviceManager);
 		this.webServer = new WebServer();
-		this.webIOManager = new WebIOManager(this.webServer, this.deviceManager);
+		this.webIOManager = new WebIOManager(this.webServer,this.dbManager, this.deviceManager);
 		
 		ConnectionManagerBuilder connectionManagerBuilder = new ConnectionManagerBuilder(this.connectionManager);
 		connectionManagerBuilder.setReceiveRegister(this.connectionManager);
