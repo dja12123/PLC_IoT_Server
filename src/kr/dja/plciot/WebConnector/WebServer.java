@@ -63,11 +63,12 @@ public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveOb
 		String value = null;
 
 		List<IWebSocketObserver> observerList = this.observerMap.get(str);
-		
+		PLC_IoT_Core.CONS.push(observerList.toString());
 		if(observerList == null)
 		{
 			return;
 		}
+		
 		
 		if(kv.length > 1)
 		{

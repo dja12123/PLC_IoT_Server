@@ -28,7 +28,6 @@ public class DevicePowerChange extends AbsWebSender
 	{
 		String dataSplit[] = data.split(WebServer.VALUE_SEPARATOR);
 		AbsDevice device = deviceList.getDeviceFromMac(dataSplit[0]);
-		PLC_IoT_Core.CONS.push(device.toString());
 		if(device == null) return;
 		
 		switch(dataSplit[1])
