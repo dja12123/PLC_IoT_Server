@@ -63,9 +63,10 @@ public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveOb
 		String value = null;
 
 		List<IWebSocketObserver> observerList = this.observerMap.get(key);
-		
+		System.out.println(key);
 		if(observerList == null)
 		{
+			System.out.println("NULL");
 			return;
 		}
 		
