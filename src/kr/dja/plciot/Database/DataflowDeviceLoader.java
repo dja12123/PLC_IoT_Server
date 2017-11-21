@@ -81,7 +81,7 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 				this.recodeMap.clear();
 			}
 			
-			PLC_IoT_Core.CONS.push("기록 완료.");
+			//PLC_IoT_Core.CONS.push("기록 완료.");
 			try
 			{
 				Thread.sleep(DB_STORE_INTEVAL);
@@ -98,6 +98,7 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 	@Override
 	public void deviceEvent(AbsDevice device, String key, String data)
 	{
+		System.out.println(key + " " + data);
 		if(key != AbsDataFlowDevice.SENSOR_DATA_EVENT) return;
 		if(!(device instanceof AbsDataFlowDevice)) return;
 		
@@ -143,7 +144,7 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 		{
 			e.printStackTrace();
 		}
-		this.deviceHandler.addObserver(AbsDevice.DEVICE_POWER_CHANGE, this);
+		this.deviceHandler.addObserver(AbsDataFlowDevice.SENSOR_DATA_EVENT, this);
 		
 		this.runFlag = true;
 		this.nextTask = nextTask;
