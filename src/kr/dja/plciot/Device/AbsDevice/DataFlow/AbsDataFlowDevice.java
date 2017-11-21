@@ -42,6 +42,8 @@ public abstract class AbsDataFlowDevice extends AbsDevice
 		}
 	}
 	
+	public abstract String getDeviceType();
+	
 	protected abstract void storeValue(String data);
 	
 	public abstract int getDeviceValue(String key);

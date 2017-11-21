@@ -7,7 +7,7 @@ import kr.dja.plciot.LowLevelConnection.ISendCycleStarter;
 
 public class DeviceSwitch extends AbsDataFlowDevice
 {
-	public static final String TYPE_NAME = "SWITCH";
+	public static final String TYPE_NAME = "switch";
 	
 	public DeviceSwitch(String macAddr, ISendCycleStarter sendManager,
 			IDeviceEventObserver eventObserver, IDatabaseHandler dbhandler)
@@ -39,5 +39,11 @@ public class DeviceSwitch extends AbsDataFlowDevice
 	protected void storeValue(String data)
 	{
 		
+	}
+
+	@Override
+	public String getDeviceType()
+	{
+		return TYPE_NAME;
 	}
 }

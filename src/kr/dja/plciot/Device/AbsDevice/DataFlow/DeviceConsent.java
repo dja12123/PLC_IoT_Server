@@ -10,7 +10,7 @@ import kr.dja.plciot.LowLevelConnection.PacketProcess;
 
 public class DeviceConsent extends AbsDataFlowDevice
 {
-	public static final String TYPE_NAME = "CONSENT";
+	public static final String TYPE_NAME = "consent";
 	
 	int power;
 	int humi;
@@ -61,5 +61,11 @@ public class DeviceConsent extends AbsDataFlowDevice
 		this.humi = Integer.parseInt(dataSplit[1]);
 		this.temp = Integer.parseInt(dataSplit[2]);
 		this.bright = Integer.parseInt(dataSplit[3]);
+	}
+
+	@Override
+	public String getDeviceType()
+	{
+		return TYPE_NAME;
 	}
 }
