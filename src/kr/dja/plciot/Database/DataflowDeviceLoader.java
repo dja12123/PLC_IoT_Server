@@ -100,7 +100,6 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 	@Override
 	public void deviceEvent(AbsDevice device, String key, String data)
 	{
-		System.out.println(key + " " + data);
 		if(key != AbsDataFlowDevice.SENSOR_DATA_EVENT) return;
 		if(!(device instanceof AbsDataFlowDevice)) return;
 		
@@ -119,7 +118,6 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 		{
 			int deviceValue = dataflowDevice.getDeviceValue(deviceDataTypeList.get(i));
 			resultSet.storeValue(deviceValue);
-			System.out.println(deviceDataTypeList.get(i)+"에 대한 값 가져옴 " + deviceValue);
 		}
 	}
 	

@@ -31,8 +31,8 @@ public class DevicePowerChange extends AbsWebSender
 		
 		switch(dataSplit[1])
 		{
-		case "On": device.setPower(true); break;
-		case "Off": device.setPower(false); break;
+		case "on": device.setPower(true); break;
+		case "off": device.setPower(false); break;
 		}
 	}
 
