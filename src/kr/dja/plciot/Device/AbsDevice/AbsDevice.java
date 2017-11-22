@@ -48,19 +48,18 @@ public abstract class AbsDevice implements IPacketCycleUser
 			this.deviceReConnection(addr);
 			break;
 		case DEVICE_POWER_CHANGE:
-			PLC_IoT_Core.CONS.push(this.macAddr + " 장비 전원 제어 " + data);
-			if(data == ON) this.setPower(true);
-			else if(data == OFF) this.setPower(false);
+			PLC_IoT_Core.CONS.push(this.macAddr + " 장치로부터 장치 전원 제어 " + data);
+			this.eventObserver.deviceEvent(this, DEVICE_POWER_CHANGE, data);
 			break;
 		}
-		
 		return;
 	}
 	
 	private void deviceReConnection(InetAddress addr)
 	{
 		PLC_IoT_Core.CONS.push(this.macAddr + ": 장비 재접속 확인.");
-		this.sendManager.startSendCycle(addr, DeviceManager.DEFAULT_DEVICE_PORT, macAddr, DeviceManager.DEVICE_REGISTER_OK, "", this);
+		this.sendManager.startSendCycle(addr, DeviceManager.DEFAULT_DEVICE_PORT
+				, this.macAddr, DeviceManager.DEVICE_REGISTER_OK, "", this);
 	}
 	
 	public void setPower(boolean onoff)
@@ -68,8 +67,9 @@ public abstract class AbsDevice implements IPacketCycleUser
 		String power;
 		if(onoff) power = ON;
 		else power = OFF;
-		PLC_IoT_Core.CONS.push(this.macAddr + ": 장비 전원제어("+power+")");
+		PLC_IoT_Core.CONS.push(this.macAddr + ": 외부 접속으로부터 장비 전원제어 " + power);
 		this.eventObserver.deviceEvent(this, DEVICE_POWER_CHANGE, power);
-		this.sendManager.startSendCycle(this.addr, DeviceManager.DEFAULT_DEVICE_PORT, macAddr, DEVICE_POWER_CHANGE, power, this);
+		this.sendManager.startSendCycle(this.addr, DeviceManager.DEFAULT_DEVICE_PORT
+				, this.macAddr, DEVICE_POWER_CHANGE, power, this);
 	}
 }
