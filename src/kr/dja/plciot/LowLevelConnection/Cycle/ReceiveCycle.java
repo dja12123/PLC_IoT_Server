@@ -85,15 +85,6 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	{
 		this.resiveTaskThread = new Thread(this);
 		this.resiveTaskThread.start();
-		try
-		{
-			this.wait();
-		}
-		catch (InterruptedException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	private void reSendPhase(byte phase)

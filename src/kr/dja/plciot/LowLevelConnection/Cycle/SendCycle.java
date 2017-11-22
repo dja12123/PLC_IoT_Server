@@ -126,14 +126,6 @@ public class SendCycle extends AbsCycle implements Runnable
 	{
 		this.resiveTaskThread = new Thread(this);
 		this.resiveTaskThread.start();
-		try
-		{
-			this.wait();
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
 	}
 	
 	private void reSendPhase(byte[] packet, byte phase)
