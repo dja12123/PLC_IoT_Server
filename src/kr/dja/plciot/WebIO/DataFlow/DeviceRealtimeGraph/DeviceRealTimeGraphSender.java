@@ -110,11 +110,8 @@ public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements I
 	@Override
 	public void websocketEvent(Channel ch, String key, String data)
 	{
-		PLC_IoT_Core.CONS.push(ch.toString());
-		PLC_IoT_Core.CONS.push(this.channel.toString());
 		if(key.equals(REQ_TYPE_CHANGE))
 		{
-			PLC_IoT_Core.CONS.push("그래프 바인딩 정보 변경: " + data);
 			this.dataKey = data;
 		}
 	}
