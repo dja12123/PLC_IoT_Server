@@ -20,21 +20,25 @@ public class DevicePowerChange extends AbsWebSender
 		super(webSocketHandler);
 		this.deviceList = deviceList;
 		
-		this.webSocketHandler.addObserver(DevicePowerChange.DEVICE_POWER_CHANGE_REQ, this);
+		this.webSocketHandler.addObserver(DEVICE_POWER_CHANGE_REQ, this);
 	}
 	
 	@Override
 	public void messageReceive(Channel ch, String key, String data)
 	{
-		String dataSplit[] = data.split(WebServer.VALUE_SEPARATOR);
-		AbsDevice device = deviceList.getDeviceFromMac(dataSplit[0]);
-		if(device == null) return;
-		
-		switch(dataSplit[1])
+		if(key.equals(DEVICE_POWER_CHANGE_REQ))
 		{
-		case "on": device.setPower(true); break;
-		case "off": device.setPower(false); break;
+			String dataSplit[] = data.split(WebServer.VALUE_SEPARATOR);
+			AbsDevice device = deviceList.getDeviceFromMac(dataSplit[0]);
+			if(device == null) return;
+			
+			switch(dataSplit[1])
+			{
+			case "on": device.setPower(true); break;
+			case "off": device.setPower(false); break;
+			}
 		}
+
 	}
 
 	@Override

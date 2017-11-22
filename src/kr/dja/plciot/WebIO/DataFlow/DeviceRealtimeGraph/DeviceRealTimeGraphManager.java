@@ -27,7 +27,7 @@ public class DeviceRealTimeGraphManager extends AbsWebFlowDataManager
 		super(webSocketHandler);
 		this.deviceView = deviceList;
 		
-		this.webSocketHandler.addObserver(RealTimeGraphManager.GRAPH_REQ, this);
+		this.webSocketHandler.addObserver(DEVICE_GRAPH_REQ, this);
 	}
 
 	@Override

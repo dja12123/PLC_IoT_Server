@@ -31,7 +31,7 @@ public class DeviceInfoChange extends AbsWebSender
 	@Override
 	public void messageReceive(Channel ch, String key, String data)
 	{
-		if(key == DeviceInfoChange.DEVICE_INFO_CHANGE_REQ)
+		if(key.equals(DeviceInfoChange.DEVICE_INFO_CHANGE_REQ))
 		{
 			String callbackMessage = INFO_CHANGE_OK;
 			PLC_IoT_Core.CONS.push("장치 속성 변경 " + data);
