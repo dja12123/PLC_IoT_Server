@@ -38,7 +38,6 @@ public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements I
 		this.webSocketHandler = webSocketHandler;
 		this.deviceView = deviceView;
 		
-		PLC_IoT_Core.CONS.push("로드됨");
 		this.webSocketHandler.addObserver(REQ_TYPE_CHANGE, this);
 		this.deviceView.addObserver(AbsDataFlowDevice.SENSOR_DATA_EVENT, this);
 		
@@ -111,6 +110,8 @@ public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements I
 	@Override
 	public void messageReceive(Channel ch, String key, String data)
 	{
+		PLC_IoT_Core.CONS.push(ch.toString());
+		PLC_IoT_Core.CONS.push(this.channel.toString());
 		if(key.equals(REQ_TYPE_CHANGE))
 		{
 			PLC_IoT_Core.CONS.push("그래프 바인딩 정보 변경: " + data);
