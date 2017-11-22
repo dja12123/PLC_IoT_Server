@@ -18,11 +18,11 @@ public class UDPRawSocketSender
 	
 	public void sendData(InetAddress sendAddress, int port, byte[] data)
 	{
-		//System.out.println("패킷 전송 호출");
+		System.out.println("패킷 전송 호출");
 		DatagramPacket packet = new DatagramPacket(data, data.length, sendAddress, port);
 		try
 		{
-			//System.out.println(sendAddress.getHostAddress().toString() + " " + port + " " + data.toString());
+			System.out.println(sendAddress.getHostAddress().toString() + " " + port + " " + data.toString());
 			this.socket.send(packet);
 		}
 		catch (IOException e)
