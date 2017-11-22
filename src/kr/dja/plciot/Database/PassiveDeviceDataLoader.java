@@ -16,7 +16,7 @@ import kr.dja.plciot.Task.MultiThread.IMultiThreadTaskCallback;
 import kr.dja.plciot.Task.MultiThread.NextTask;
 import kr.dja.plciot.Task.MultiThread.TaskOption;
 
-public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable, IDeviceEventObserver
+public class PassiveDeviceDataLoader implements IMultiThreadTaskCallback, Runnable, IDeviceEventObserver
 {
 	private final int DB_STORE_INTEVAL = 5000;
 	
@@ -32,7 +32,7 @@ public class DataflowDeviceLoader implements IMultiThreadTaskCallback, Runnable,
 	
 	private Map<String, DeviceValue> recodeMap;
 	
-	public DataflowDeviceLoader(IDatabaseHandler dbHandler, IDeviceHandler deviceHandler)
+	public PassiveDeviceDataLoader(IDatabaseHandler dbHandler, IDeviceHandler deviceHandler)
 	{
 		this.dbHandler = dbHandler;
 		this.deviceHandler = deviceHandler;

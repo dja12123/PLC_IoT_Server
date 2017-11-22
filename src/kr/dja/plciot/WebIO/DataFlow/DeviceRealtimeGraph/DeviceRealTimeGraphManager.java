@@ -33,6 +33,6 @@ public class DeviceRealTimeGraphManager extends AbsWebFlowDataManager
 	@Override
 	protected AbsWebFlowDataMember getMember(Channel ch, String data)
 	{
-		return new DeviceRealTimeGraphSender(ch, data, this.deviceView);
+		return new DeviceRealTimeGraphSender(ch, data,this.webSocketHandler, this.deviceView);
 	}
 }

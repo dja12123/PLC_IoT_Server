@@ -1,23 +1,26 @@
 package kr.dja.plciot.WebIO.DataFlow.DeviceRealtimeGraph;
 
-import java.util.Iterator;
 import io.netty.channel.Channel;
+import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Device.IDeviceEventObserver;
 import kr.dja.plciot.Device.IDeviceHandler;
 import kr.dja.plciot.Device.AbsDevice.AbsDevice;
 import kr.dja.plciot.Device.AbsDevice.DataFlow.AbsDataFlowDevice;
-import kr.dja.plciot.WebConnector.WebServer;
+import kr.dja.plciot.WebConnector.IWebSocketObserver;
+import kr.dja.plciot.WebConnector.IWebSocketReceiveObservable;
 import kr.dja.plciot.WebIO.WebIOProcess;
 import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataMember;
 
-public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements IDeviceEventObserver, Runnable
+public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements IDeviceEventObserver, Runnable, IWebSocketObserver
 {
 	private static final int SEND_DATA_INTERVAL = 200;
 	private static final String SEND_KEY = "serverRealtimeData";
+	private static final String REQ_TYPE_CHANGE = "DeviceGraphTypeChange";
 	
+	private final IWebSocketReceiveObservable webSocketHandler;
 	private final IDeviceHandler deviceView;
 	
-	private final String dataKey;
+	private String dataKey;
 	
 	private boolean runFlag;
 	
@@ -28,10 +31,14 @@ public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements I
 	
 	private String sendData;
 	
-	public DeviceRealTimeGraphSender(Channel ch, String dataKey, IDeviceHandler deviceView)
+	public DeviceRealTimeGraphSender(Channel ch, String dataKey
+			, IWebSocketReceiveObservable webSocketHandler, IDeviceHandler deviceView)
 	{
 		super(ch);
+		this.webSocketHandler = webSocketHandler;
 		this.deviceView = deviceView;
+		
+		this.webSocketHandler.addObserver(REQ_TYPE_CHANGE, this);
 		this.deviceView.addObserver(AbsDataFlowDevice.SENSOR_DATA_EVENT, this);
 		
 		this.dataKey = dataKey;
@@ -60,7 +67,7 @@ public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements I
 				this.dataCount = 0;
 			}
 			
-			this.channel.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, sendData));
+			this.channel.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, this.sendData));
 			try
 			{
 				Thread.sleep(SEND_DATA_INTERVAL);
@@ -84,6 +91,7 @@ public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements I
 		{
 			e.printStackTrace();
 		}
+		this.webSocketHandler.deleteObserver(this);
 		this.deviceView.deleteObserver(this, AbsDataFlowDevice.SENSOR_DATA_EVENT);
 		this.runFlag = false;
 	}
@@ -98,4 +106,17 @@ public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements I
 		this.sum += deviceData;
 		++this.dataCount;
 	}
+
+	@Override
+	public void messageReceive(Channel ch, String key, String data)
+	{
+		if(key.equals(REQ_TYPE_CHANGE))
+		{
+			PLC_IoT_Core.CONS.push("그래프 바인딩 정보 변경: " + data);
+			this.dataKey = data;
+		}
+	}
+
+	@Override
+	public void channelDisconnect(Channel ch){}
 }

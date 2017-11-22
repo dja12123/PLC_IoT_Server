@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import kr.dja.plciot.Database.DatabaseConnector;
-import kr.dja.plciot.Database.DataflowDeviceLoader;
+import kr.dja.plciot.Database.PassiveDeviceDataLoader;
 import kr.dja.plciot.Device.DeviceManager;
 import kr.dja.plciot.Log.Console;
 import kr.dja.plciot.LowLevelConnection.ConnectionManager;
@@ -34,7 +34,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 	private final DatabaseConnector dbManager;
 	private final ConnectionManager connectionManager;
 	private final DeviceManager deviceManager;
-	private final DataflowDeviceLoader dataLoader;
+	private final PassiveDeviceDataLoader dataLoader;
 	private final WebServer webServer;
 	private final WebIOManager webIOManager;
 	
@@ -44,7 +44,7 @@ public class PLC_IoT_Core implements IMultiThreadTaskCallback
 		this.dbManager = new DatabaseConnector();
 		this.connectionManager = new ConnectionManager();
 		this.deviceManager = new DeviceManager(this.connectionManager, this.dbManager);
-		this.dataLoader = new DataflowDeviceLoader(this.dbManager, this.deviceManager);
+		this.dataLoader = new PassiveDeviceDataLoader(this.dbManager, this.deviceManager);
 		this.webServer = new WebServer();
 		this.webIOManager = new WebIOManager(this.webServer,this.dbManager, this.deviceManager);
 		
