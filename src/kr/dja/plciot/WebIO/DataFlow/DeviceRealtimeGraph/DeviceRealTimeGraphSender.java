@@ -38,6 +38,7 @@ public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements I
 		this.webSocketHandler = webSocketHandler;
 		this.deviceView = deviceView;
 		
+		PLC_IoT_Core.CONS.push("·ÎµåµÊ");
 		this.webSocketHandler.addObserver(REQ_TYPE_CHANGE, this);
 		this.deviceView.addObserver(AbsDataFlowDevice.SENSOR_DATA_EVENT, this);
 		
