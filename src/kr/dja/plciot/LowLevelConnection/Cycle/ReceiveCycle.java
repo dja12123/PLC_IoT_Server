@@ -69,7 +69,7 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 		{
 			// 전송후 인터럽트가 걸릴 때까지 대기합니다.
 			// 만약 인터럽트가 걸리지 않으면 시간 초과.
-			this.resiveTaskThread.wait(CycleProcess.TIMEOUT);
+			Thread.sleep(CycleProcess.TIMEOUT);
 		}
 		catch (InterruptedException e)
 		{
