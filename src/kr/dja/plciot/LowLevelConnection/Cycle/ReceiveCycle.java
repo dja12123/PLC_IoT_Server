@@ -98,6 +98,7 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	private void reSendPhase(byte phase)
 	{// 재전송.
 		PacketProcess.SetPacketPhase(this.receivePacket, phase);
+		System.out.println("전송 라우팅");
 		this.sender.sendData(this.addr, DeviceManager.DEFAULT_DEVICE_PORT, this.receivePacket);
 	}
 	
