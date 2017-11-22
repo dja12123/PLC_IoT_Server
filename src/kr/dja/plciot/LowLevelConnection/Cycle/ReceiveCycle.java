@@ -27,8 +27,9 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	{
 		this.startTask(PacketProcess.GetPacketFULLUID(this.receivePacket));
 		// 발신자로부터 패킷 이 반환되어 올때까지 대기힙니다.
+		System.out.println("전송 라우팅1");
 		this.resiveWaitTask();
-		
+		System.out.println("전송 라우팅2");
 		// 발신자에게 패킷을 반환합니다.
 		this.reSendPhase(CycleProcess.PHASE_CHECK);
 	}
@@ -98,7 +99,6 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	private void reSendPhase(byte phase)
 	{// 재전송.
 		PacketProcess.SetPacketPhase(this.receivePacket, phase);
-		System.out.println("전송 라우팅");
 		this.sender.sendData(this.addr, DeviceManager.DEFAULT_DEVICE_PORT, this.receivePacket);
 	}
 	
