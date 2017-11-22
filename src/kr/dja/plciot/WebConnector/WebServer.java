@@ -56,12 +56,10 @@ public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveOb
 	@Override
 	public synchronized void rawMessageReceive(Channel ch, String str)
 	{
-		PLC_IoT_Core.CONS.push("昆家南 夸没: " + str);
-		
 		String[] kv = str.split(KEY_SEPARATOR, 2);
 		String key = kv[0];
 		String value = null;
-
+		PLC_IoT_Core.CONS.push("昆家南 夸没 key:" + key + " value: " + value);
 		List<IWebSocketObserver> observerList = this.observerMap.get(key);
 		if(observerList == null)
 		{
