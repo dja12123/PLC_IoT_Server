@@ -24,7 +24,6 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	@Override
 	public void start()
 	{
-		System.out.println("수신 사이클 시작");
 		this.startTask(PacketProcess.GetPacketFULLUID(this.receivePacket));
 		// 발신자로부터 패킷 이 반환되어 올때까지 대기힙니다.
 		this.resiveWaitTask();
@@ -99,15 +98,6 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	{// 재전송.
 		PacketProcess.SetPacketPhase(this.receivePacket, phase);
 		//TODO POARTCHECK
-		try
-		{
-			Thread.sleep(100);
-		}
-		catch (InterruptedException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		this.sender.sendData(this.addr, 50011, this.receivePacket);
 	}
 	
