@@ -40,7 +40,7 @@ public class DeviceInfoChange extends AbsWebSender
 			{
 				String dataArr[] = data.split(WebServer.VALUE_SEPARATOR);
 				
-				if(dataArr.length == 4) throw new Exception(INFO_CHANGE_ERROR);
+				if(dataArr.length != 4) throw new Exception(INFO_CHANGE_ERROR);
 				
 				String macAddr = dataArr[0];
 				String deviceName = "null";
