@@ -39,6 +39,7 @@ public class SendController implements IPacketSender
 				this.beforeSendPort = 0;
 			}
 		}
+		System.out.println("전송 라우팅");
 		this.rawSocketSender.get(port).sendData(sendAddress, port, data);
 	}
 }
