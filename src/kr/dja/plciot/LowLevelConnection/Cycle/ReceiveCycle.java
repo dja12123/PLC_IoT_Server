@@ -35,6 +35,7 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	@Override
 	public synchronized void packetReceive(byte[] resiveData)
 	{
+		PLC_IoT_Core.CONS.push(resiveData.toString());
 		this.resiveTaskThread.interrupt();
 		
 		byte phase = PacketProcess.GetPacketPhase(resiveData);
@@ -127,8 +128,8 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	private void errorHandling(String str)
 	{
 		new Exception(str).printStackTrace();
-		PLC_IoT_Core.CONS.push("Packet Send ERROR " + str);
-		this.endProcess();
+		PLC_IoT_Core.CONS.push("Packet Receive ERROR " + str);
+		this.notifyEndCycle();
 	}
 	
 	public static class ReceiveCycleBuilder extends AbsCycleBuilder
