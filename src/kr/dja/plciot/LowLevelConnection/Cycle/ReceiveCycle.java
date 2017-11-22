@@ -35,7 +35,6 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	@Override
 	public synchronized void packetReceive(byte[] resiveData)
 	{
-		PLC_IoT_Core.CONS.push(resiveData.toString());
 		this.resiveTaskThread.interrupt();
 		
 		byte phase = PacketProcess.GetPacketPhase(resiveData);
