@@ -74,14 +74,10 @@ public class ConnectionManager implements IFirstReceiveObserver, IEndCycleCallba
 	@Override
 	public void firstReceiveCallback(InetAddress receiveAddr, int port, byte[] packet)
 	{
-		if(!PacketProcess.CheckFullPacket(packet))
-		{
-			return;
-		}
-		
 		String macAddr = PacketProcess.GetpacketMacAddr(packet);
 		String name = PacketProcess.GetPacketName(packet);
 		
+		System.out.println("RECEIVE MACADDR: "+macAddr);
 		for(INewConnectionHandler handler : this.receiveHandlers)
 		{
 			IPacketCycleUser user = handler.createConnection(macAddr, name);
@@ -89,7 +85,7 @@ public class ConnectionManager implements IFirstReceiveObserver, IEndCycleCallba
 			{
 				continue;
 			}
-			
+			System.out.println("라우팅 성공");
 			AbsCycle receiveCycle = new ReceiveCycleBuilder()
 					.setPacketData(packet)
 					.setUserCallback(user)

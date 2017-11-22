@@ -70,7 +70,6 @@ public class ReceiveController implements IPacketReceiveObservable, IRawSocketOb
 			}
 			
 			String uuid = PacketProcess.GetPacketFULLUID(data);
-			System.out.println("RECEIVE UUID:" + uuid);
 			IPacketReceiveObserver observer = this.observers.getOrDefault(uuid, null);
 			if(observer != null)
 			{
