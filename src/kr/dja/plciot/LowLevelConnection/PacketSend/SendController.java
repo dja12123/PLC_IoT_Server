@@ -31,6 +31,7 @@ public class SendController implements IPacketSender
 	@Override
 	public void sendData(InetAddress sendAddress, int port, byte[] data)
 	{
+		System.out.println("전송 라우팅");
 		synchronized(this.sendDataSyncObj)
 		{
 			++this.beforeSendPort;
