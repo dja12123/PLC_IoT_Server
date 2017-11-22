@@ -31,6 +31,7 @@ public class SendController implements IPacketSender
 	@Override
 	public void sendData(InetAddress sendAddress, int port, byte[] data)
 	{
+		System.out.println("sendData");
 		synchronized(this.sendDataSyncObj)
 		{
 			++this.beforeSendPort;
