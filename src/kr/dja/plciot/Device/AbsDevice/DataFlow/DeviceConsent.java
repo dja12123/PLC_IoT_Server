@@ -27,7 +27,6 @@ public class DeviceConsent extends AbsDataFlowDevice
 	public void packetSendCallback(boolean success, String name, String data)
 	{
 		super.packetSendCallback(success, name, data);
-		
 	}
 
 	@Override
