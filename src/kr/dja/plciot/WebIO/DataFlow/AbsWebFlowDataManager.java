@@ -24,7 +24,7 @@ public abstract class AbsWebFlowDataManager extends AbsWebSender
 	}
 	
 	@Override
-	public void messageReceive(Channel ch, String key, String data)
+	public void websocketEvent(Channel ch, String key, String data)
 	{
 		PLC_IoT_Core.CONS.push("실시간 데이터 전송 시작. " + key + " " + ch);
 		AbsWebFlowDataMember sender = this.getMember(ch, data);

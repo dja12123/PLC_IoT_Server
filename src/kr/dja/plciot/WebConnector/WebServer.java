@@ -75,7 +75,8 @@ public class WebServer implements IWebSocketRawTextObserver, IWebSocketReceiveOb
 		
 		for(IWebSocketObserver observer : observerList)
 		{
-			observer.messageReceive(ch, key, value);
+			PLC_IoT_Core.CONS.push("¶ó¿ìÆÃ" + observer.toString());
+			observer.websocketEvent(ch, key, value);
 			List<IWebSocketObserver> channelObserverList = this.channelObserverMap.get(ch);
 			if(channelObserverList != null)
 			{

@@ -108,7 +108,7 @@ public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements I
 	}
 
 	@Override
-	public void messageReceive(Channel ch, String key, String data)
+	public void websocketEvent(Channel ch, String key, String data)
 	{
 		PLC_IoT_Core.CONS.push(ch.toString());
 		PLC_IoT_Core.CONS.push(this.channel.toString());

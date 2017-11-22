@@ -4,6 +4,6 @@ import io.netty.channel.Channel;
 
 public interface IWebSocketObserver
 {
-	public void messageReceive(Channel ch,String key, String data);
+	public void websocketEvent(Channel ch,String key, String data);
 	public void channelDisconnect(Channel ch);
 }

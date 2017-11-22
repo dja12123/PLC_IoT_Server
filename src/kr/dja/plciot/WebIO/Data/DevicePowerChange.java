@@ -24,7 +24,7 @@ public class DevicePowerChange extends AbsWebSender
 	}
 	
 	@Override
-	public void messageReceive(Channel ch, String key, String data)
+	public void websocketEvent(Channel ch, String key, String data)
 	{
 		if(key.equals(DEVICE_POWER_CHANGE_REQ))
 		{

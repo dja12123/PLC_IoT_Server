@@ -29,7 +29,7 @@ public class DeviceInfoChange extends AbsWebSender
 	}
 	
 	@Override
-	public void messageReceive(Channel ch, String key, String data)
+	public void websocketEvent(Channel ch, String key, String data)
 	{
 		if(key.equals(DeviceInfoChange.DEVICE_INFO_CHANGE_REQ))
 		{
