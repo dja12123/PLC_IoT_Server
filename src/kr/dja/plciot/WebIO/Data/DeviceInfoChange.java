@@ -47,11 +47,13 @@ public class DeviceInfoChange extends AbsWebSender
 				String deviceGroup = "null";
 				
 				if(!dataArr[2].equals("")) deviceName = "'" + dataArr[2] + "'";
-				if(!dataArr[3].equals("")) deviceName = "'" + dataArr[3] + "'";
+				if(!dataArr[3].equals("null")) deviceGroup = "'" + dataArr[3] + "'";
 				
 				int dbResult = this.dbHandler.sqlUpdate("update device set device_name = "
-				+deviceName+", group_value = "+deviceGroup+" where mac_id = '"+macAddr+"'");
+				+deviceName+", group_value = "+deviceGroup+" where mac_id = '"+macAddr+"';");
 				
+				PLC_IoT_Core.CONS.push("update device set device_name = "
+				+deviceName+", group_value = "+deviceGroup+" where mac_id = '"+macAddr+"'");
 				if(dbResult == -1) throw new Exception(INFO_CHANGE_ERRORDB);
 			}
 			
