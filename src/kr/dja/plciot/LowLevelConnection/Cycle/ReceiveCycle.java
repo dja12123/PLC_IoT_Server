@@ -2,6 +2,7 @@ package kr.dja.plciot.LowLevelConnection.Cycle;
 
 import java.net.InetAddress;
 import kr.dja.plciot.PLC_IoT_Core;
+import kr.dja.plciot.Device.DeviceManager;
 import kr.dja.plciot.LowLevelConnection.PacketProcess;
 import kr.dja.plciot.LowLevelConnection.PacketReceive.IPacketReceiveObservable;
 import kr.dja.plciot.LowLevelConnection.PacketSend.IPacketSender;
@@ -97,8 +98,7 @@ public class ReceiveCycle extends AbsCycle implements Runnable
 	private void reSendPhase(byte phase)
 	{// ÀçÀü¼Û.
 		PacketProcess.SetPacketPhase(this.receivePacket, phase);
-		//TODO POARTCHECK
-		this.sender.sendData(this.addr, 50011, this.receivePacket);
+		this.sender.sendData(this.addr, DeviceManager.DEFAULT_DEVICE_PORT, this.receivePacket);
 	}
 	
 	private void endProcess()
