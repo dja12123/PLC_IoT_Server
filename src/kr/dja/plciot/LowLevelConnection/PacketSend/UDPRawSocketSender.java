@@ -21,6 +21,7 @@ public class UDPRawSocketSender
 		DatagramPacket packet = new DatagramPacket(data, data.length, sendAddress, port);
 		try
 		{
+			System.out.println(sendAddress.getHostAddress().toString() + " " + port + " " + data.toString());
 			this.socket.send(packet);
 		}
 		catch (IOException e)
