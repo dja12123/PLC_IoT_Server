@@ -40,7 +40,8 @@ public class SendController implements IPacketSender
 				this.beforeSendPort = 0;
 			}
 		}
-		this.rawSocketSender.get(port).sendData(sendAddress, port, data);
 		System.out.println("sendData2");
+		this.rawSocketSender.get(port).sendData(sendAddress, port, data);
+		System.out.println("sendData3");
 	}
 }
