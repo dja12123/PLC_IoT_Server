@@ -35,7 +35,6 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 		this.deviceView.addObserver(AbsDataFlowDevice.SENSOR_DATA_EVENT, this);
 		
 		this.dataKey = dataKey;
-		System.out.println("바인딩 데이터 키 " + dataKey);
 		
 		this.runFlag = true;
 		
@@ -95,6 +94,7 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 		if(!(device instanceof AbsDataFlowDevice)) return;
 		AbsDataFlowDevice dataflowDevice = (AbsDataFlowDevice)device;
 		int deviceData = dataflowDevice.getDeviceValue(this.dataKey);
+		System.out.println("이벤트 데이터 수신 " + deviceData);
 		if(deviceData == -1) return;
 		this.sum += deviceData;
 		++this.dataCount;
