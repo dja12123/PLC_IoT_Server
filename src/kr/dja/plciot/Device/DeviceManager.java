@@ -167,6 +167,7 @@ public class DeviceManager implements IDeviceHandler, INewConnectionHandler, IPa
 			{
 				PLC_IoT_Core.CONS.push("등록된 장치 바인딩: " + rs.getString(1));
 				this.cycleManager.startSendCycle(addr, DEFAULT_DEVICE_PORT, macAddr, DEVICE_REGISTER_OK, "", this);
+				return;
 			}
 			
 			PLC_IoT_Core.CONS.push("등록 대기 장치 접속.");
