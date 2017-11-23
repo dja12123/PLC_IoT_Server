@@ -2,6 +2,7 @@ package kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph;
 
 import java.util.Iterator;
 import io.netty.channel.Channel;
+import kr.dja.plciot.PLC_IoT_Core;
 import kr.dja.plciot.Device.IDeviceEventObserver;
 import kr.dja.plciot.Device.IDeviceHandler;
 import kr.dja.plciot.Device.AbsDevice.AbsDevice;
@@ -59,8 +60,8 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 				this.sum = 0;
 				this.dataCount = 0;
 			}
-			
-			this.channel.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, sendData));
+			PLC_IoT_Core.CONS.push("데이터 발신 " + this.sendData);
+			this.channel.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, this.sendData));
 			try
 			{
 				Thread.sleep(SEND_DATA_INTERVAL);
@@ -94,7 +95,6 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 		if(!(device instanceof AbsDataFlowDevice)) return;
 		AbsDataFlowDevice dataflowDevice = (AbsDataFlowDevice)device;
 		int deviceData = dataflowDevice.getDeviceValue(this.dataKey);
-		System.out.println("이벤트 데이터 수신 " + deviceData);
 		if(deviceData == -1) return;
 		this.sum += deviceData;
 		++this.dataCount;
