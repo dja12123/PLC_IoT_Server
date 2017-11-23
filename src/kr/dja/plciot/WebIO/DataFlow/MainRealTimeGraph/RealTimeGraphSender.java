@@ -60,7 +60,7 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 				this.sum = 0;
 				this.dataCount = 0;
 			}
-			PLC_IoT_Core.CONS.push("데이터 발신 " + this.sendData);
+
 			this.channel.writeAndFlush(WebIOProcess.CreateDataPacket(SEND_KEY, this.sendData));
 			try
 			{
