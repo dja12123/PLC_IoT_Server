@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import io.netty.channel.Channel;
 import kr.dja.plciot.Database.IDatabaseHandler;
+import kr.dja.plciot.Device.IDeviceHandler;
 import kr.dja.plciot.WebConnector.IWebSocketReceiveObservable;
 import kr.dja.plciot.WebIO.AbsWebSender;
 
@@ -13,11 +14,13 @@ public class DeviceRegister extends AbsWebSender
 	private static final String REQ_DEVICE_REGISTER = "DeviceRegister";
 	
 	private final IDatabaseHandler dbHandler;
+	private final IDeviceHandler deviceHandler;
 	
-	public DeviceRegister(IWebSocketReceiveObservable webSocketHandler, IDatabaseHandler dbHandler)
+	public DeviceRegister(IWebSocketReceiveObservable webSocketHandler, IDatabaseHandler dbHandler, IDeviceHandler deviceHandler)
 	{
 		super(webSocketHandler);
 		this.dbHandler = dbHandler;
+		this.deviceHandler = deviceHandler;
 		
 		this.webSocketHandler.addObserver(REQ_DEVICE_REGISTER, this);
 	}
@@ -40,8 +43,8 @@ public class DeviceRegister extends AbsWebSender
 				return;
 			}
 			
-			dbHandler.sqlUpdate("delete from waiting_device where macAddr = '"+data+"';");
-			dbHandler.sqlUpdate("insert into device values(null, '"+data+"', '"+deviceType+"', null, 0);");
+			this.dbHandler.sqlUpdate("delete from waiting_device where macAddr = '"+data+"';");
+			this.dbHandler.sqlUpdate("insert into device values(null, '"+data+"', '"+deviceType+"', null, 0);");
 		}
 		
 	}
