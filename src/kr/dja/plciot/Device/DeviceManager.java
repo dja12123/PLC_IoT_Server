@@ -166,14 +166,16 @@ public class DeviceManager implements IDeviceHandler, INewConnectionHandler, IPa
 			if(rs.next())
 			{
 				PLC_IoT_Core.CONS.push("등록된 장치 바인딩: " + rs.getString(1));
+				this.cycleManager.startSendCycle(addr, DEFAULT_DEVICE_PORT, macAddr, DEVICE_REGISTER_OK, "", this);
 			}
-			else
+			
+			PLC_IoT_Core.CONS.push("등록 대기 장치 접속.");
+			rs = this.dbConnector.sqlQuery("select macAddr from waiting_device where macAddr = '"+macAddr+"';");
+			if(!rs.next())
 			{
-				PLC_IoT_Core.CONS.push("미등록 장치 바인딩.");
 				this.dbConnector.sqlUpdate("insert into waiting_device VALUES('"+macAddr+"','"+deviceType+"');");
 			}
 			
-			this.cycleManager.startSendCycle(addr, DEFAULT_DEVICE_PORT, macAddr, DEVICE_REGISTER_OK, "", this);
 			// 등록 완료 확인 메세지 전송.
 		}
 		catch(Exception e)

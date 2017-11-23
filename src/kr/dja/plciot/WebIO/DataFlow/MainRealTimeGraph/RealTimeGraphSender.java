@@ -84,7 +84,7 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 		{
 			e.printStackTrace();
 		}
-		this.deviceView.deleteObserver(this, AbsDataFlowDevice.SENSOR_DATA_EVENT);
+		this.deviceView.deleteObserver(this);
 		this.runFlag = false;
 	}
 

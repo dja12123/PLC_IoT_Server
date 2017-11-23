@@ -40,6 +40,7 @@ public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements I
 		this.deviceView = deviceView;
 		
 		this.webSocketHandler.addObserver(REQ_TYPE_CHANGE, this);
+		this.webSocketHandler.addObserver(REQ_DEVICE_CHANGE, this);
 		this.deviceView.addObserver(AbsDataFlowDevice.SENSOR_DATA_EVENT, this);
 		
 		this.dataKey = dataKey;
@@ -93,7 +94,7 @@ public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements I
 			e.printStackTrace();
 		}
 		this.webSocketHandler.deleteObserver(this);
-		this.deviceView.deleteObserver(this, AbsDataFlowDevice.SENSOR_DATA_EVENT);
+		this.deviceView.deleteObserver(this);
 		this.runFlag = false;
 	}
 
