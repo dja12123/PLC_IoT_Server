@@ -35,6 +35,7 @@ public class RealTimeGraphSender extends AbsWebFlowDataMember implements IDevice
 		this.deviceView.addObserver(AbsDataFlowDevice.SENSOR_DATA_EVENT, this);
 		
 		this.dataKey = dataKey;
+		System.out.println("바인딩 데이터 키 " + dataKey);
 		
 		this.runFlag = true;
 		
