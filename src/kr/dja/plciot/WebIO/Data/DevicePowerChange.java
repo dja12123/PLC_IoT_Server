@@ -44,7 +44,7 @@ public class DevicePowerChange extends AbsWebSender
 	@Override
 	public void channelDisconnect(Channel ch)
 	{
-		// TODO Auto-generated method stub
+		
 		
 	}
 

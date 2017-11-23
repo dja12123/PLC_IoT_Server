@@ -9,6 +9,7 @@ import kr.dja.plciot.Task.MultiThread.TaskOption;
 import kr.dja.plciot.WebConnector.IWebSocketReceiveObservable;
 import kr.dja.plciot.WebIO.Data.DeviceInfoChange;
 import kr.dja.plciot.WebIO.Data.DevicePowerChange;
+import kr.dja.plciot.WebIO.Data.RemoteSQL;
 import kr.dja.plciot.WebIO.DataFlow.DeviceRealtimeGraph.DeviceRealTimeGraphManager;
 import kr.dja.plciot.WebIO.DataFlow.DeviceRealtimePowerChange.RealtimePowerChangeManager;
 import kr.dja.plciot.WebIO.DataFlow.MainRealTimeGraph.RealTimeGraphManager;
@@ -25,6 +26,7 @@ public class WebIOManager implements IMultiThreadTaskCallback
 	
 	private final DeviceInfoChange deviceInfoChange;
 	private final DevicePowerChange devicePowerChange;
+	private final RemoteSQL remoteSQL;
 	
 	public WebIOManager(IWebSocketReceiveObservable webSocketHandler, IDatabaseHandler dbHandler, IDeviceHandler deviceHandler)
 	{
@@ -38,6 +40,7 @@ public class WebIOManager implements IMultiThreadTaskCallback
 		
 		this.deviceInfoChange = new DeviceInfoChange(this.webSocketHandler, this.dbHandler);
 		this.devicePowerChange = new DevicePowerChange(this.webSocketHandler, this.deviceHandler);
+		this.remoteSQL = new RemoteSQL(this.webSocketHandler, this.dbHandler);
 	}
 	
 	private void start(NextTask nextTask)
@@ -53,6 +56,7 @@ public class WebIOManager implements IMultiThreadTaskCallback
 		
 		this.deviceInfoChange.shutdown();
 		this.devicePowerChange.shutdown();
+		this.remoteSQL.shutdown();
 		
 		nextTask.nextTask();
 	}

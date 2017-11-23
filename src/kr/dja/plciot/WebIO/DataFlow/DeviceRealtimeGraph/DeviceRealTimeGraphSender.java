@@ -16,6 +16,7 @@ public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements I
 	private static final int SEND_DATA_INTERVAL = 200;
 	private static final String SEND_KEY = "serverRealtimeData";
 	private static final String REQ_TYPE_CHANGE = "DeviceGraphTypeChange";
+	private static final String REQ_DEVICE_CHANGE = "DeviceGraphDeviceChange";
 	
 	private final IWebSocketReceiveObservable webSocketHandler;
 	private final IDeviceHandler deviceView;
