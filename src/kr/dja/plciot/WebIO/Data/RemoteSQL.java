@@ -19,7 +19,7 @@ public class RemoteSQL extends AbsWebSender
 	private IDatabaseHandler dbHandler;
 	
 	private static final String REQ_REMOTE_SQL = "RemoteSql";
-	private static final String SQL_RESEND = "RemoteSqlSuccess";
+	private static final String SQL_RESEND = "RemoteSqlResult";
 	private static final String SUCCESS = "success";
 	private static final String ERROR = "error";
 	
@@ -35,7 +35,10 @@ public class RemoteSQL extends AbsWebSender
 	{
 		if(key.equals(REQ_REMOTE_SQL))
 		{
-			ResultSet rs = this.dbHandler.sqlQuery(key);
+			String[] dataSet = data.split(WebServer.VALUE_SEPARATOR);
+			String dataKey = dataSet[0];
+			String sqlQuery = dataSet[1];
+			ResultSet rs = this.dbHandler.sqlQuery(sqlQuery);
 			if(rs == null)
 			{
 				ch.writeAndFlush(WebIOProcess.CreateDataPacket(SQL_RESEND, ERROR));
@@ -43,8 +46,8 @@ public class RemoteSQL extends AbsWebSender
 			}
 			
 			JSONArray jsonArray = new JSONArray();
+			String resultStr = SUCCESS + WebServer.VALUE_SEPARATOR + dataKey + WebServer.VALUE_SEPARATOR;
 			
-			String resultStr = SUCCESS + WebServer.VALUE_SEPARATOR;
 			try
 			{
 				while(rs.next())

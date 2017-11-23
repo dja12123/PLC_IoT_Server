@@ -13,7 +13,7 @@ import kr.dja.plciot.WebIO.DataFlow.AbsWebFlowDataMember;
 
 public class DeviceRealTimeGraphSender extends AbsWebFlowDataMember implements IDeviceEventObserver, Runnable, IWebSocketObserver
 {
-	private static final int SEND_DATA_INTERVAL = 200;
+	private static final int SEND_DATA_INTERVAL = 1000;
 	private static final String SEND_KEY = "serverRealtimeData";
 	private static final String REQ_TYPE_CHANGE = "DeviceGraphTypeChange";
 	private static final String REQ_DEVICE_CHANGE = "DeviceGraphDeviceChange";
