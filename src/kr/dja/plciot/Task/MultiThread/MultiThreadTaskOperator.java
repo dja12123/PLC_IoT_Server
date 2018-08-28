@@ -25,6 +25,7 @@ public class MultiThreadTaskOperator extends Lockable implements Runnable
 		this.taskQueue.add(callback);
 	}
 	
+	
 	public synchronized void insertTask(IMultiThreadTaskCallback callback)
 	{// 현재 작업중인 위치 바로 뒤에 작업을 삽입합니다.
 		this.taskQueue.add(0, callback);

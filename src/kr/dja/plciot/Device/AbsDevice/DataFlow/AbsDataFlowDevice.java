@@ -13,14 +13,11 @@ import kr.dja.plciot.LowLevelConnection.ISendCycleStarter;
 public abstract class AbsDataFlowDevice extends AbsDevice
 {
 	public static final String SENSOR_DATA_EVENT = "sensorData";
-	
-	protected final IDatabaseHandler databaseHandler;
-	
+		
 	public AbsDataFlowDevice(String macAddr, ISendCycleStarter sendManager, IDeviceEventObserver eventObserver,
 			IDatabaseHandler dbhandler)
 	{
 		super(macAddr, sendManager, eventObserver);
-		this.databaseHandler = dbhandler;
 	}
 
 	@Override
