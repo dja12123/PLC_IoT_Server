@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="API/mysql-connector-java-5.1.43-bin.jar"/>
 	<classpathentry kind="lib" path="API/netty-all-4.1.15.Final.jar"/>
 	<classpathentry kind="lib" path="API/java-json.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/dhcp4java"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
